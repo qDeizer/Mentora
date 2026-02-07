@@ -1,0 +1,130 @@
+﻿@model PsikologProje_Void.ViewModels.RequestsViewModel
+@{
+    ViewData["Title"] = "Randevu Talepleri";
+}
+
+<div class="container py-5 mt-4">
+    <div class="text-center mb-5">
+        <i class="fas fa-inbox fa-2x mb-2 text-white"></i>
+        <h2 class="text-white">@ViewData["Title"]</h2>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="glass-effect p-4 position-sticky" style="top: 100px;">
+                <h5 class="mb-3">Filtrele</h5>
+                <form asp-action="Index" method="get">
+                    @if (Model.Filter.AppointmentId.HasValue)
+                    {
+                        <input type="hidden" asp-for="Filter.AppointmentId" />
+                        <div class="alert alert-info p-2 small">
+                            Sadece Randevu ID: @Model.Filter.AppointmentId için olan talepler. <a asp-action="Index" class="alert-link d-block mt-1">Tümünü Göster</a>
+                        </div>
+                    }
+                    <div class="mb-3">
+                        <label asp-for="Filter.Status" class="form-label">Durum</label>
+                        <select asp-for="Filter.Status" asp-items="Html.GetEnumSelectList<RequestStatus>()" class="form-select">
+                            <option value="">Tümü</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Filtrele</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            @if (Model.Requests.Any())
+            {
+                <div class="row g-4">
+                    @foreach (var request in Model.Requests)
+                    {
+                        <div class="col-md-6">
+                            <div class="content-card d-flex flex-column">
+                                <div class="card-header-pills">
+                                    <div>
+                                        <h5 class="mb-1">Talep #@request.RequestId</h5>
+                                        <small class="text-white-50">@request.AppointmentStartTime.ToString("dd MMMM, HH:mm")</small>
+                                    </div>
+                                    @if (request.Status == RequestStatus.Pending)
+                                    {
+                                        <span class="badge bg-warning text-dark align-self-start">Beklemede</span>
+                                    }
+                                    else if (request.Status == RequestStatus.Approved)
+                                    {
+                                        <span class="badge bg-success align-self-start">Onaylandı</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger align-self-start">Reddedildi</span>
+                                    }
+                                </div>
+
+                                <div class="d-flex align-items-center my-3">
+                                    <img src="@(string.IsNullOrEmpty(request.PatientProfilePhoto) ? "/images/default-avatar.png" : request.PatientProfilePhoto)" class="navbar-profile-img" alt="Hasta" />
+                                    <div class="ms-3">
+                                        <small class="text-white-50">Hasta</small>
+                                        <h6 class="m-0">@request.PatientName</h6>
+                                    </div>
+                                </div>
+
+                                @if (!string.IsNullOrEmpty(request.RequestMessage))
+                                {
+                                    <div class="card-note">
+                                        <strong>HASTA NOTU</strong>
+                                        @request.RequestMessage
+                                    </div>
+                                }
+
+                                <div class="mt-auto pt-3">
+                                    @if (request.Status == RequestStatus.Pending)
+                                    {
+                                        <form asp-action="Reject" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="requestId" value="@request.RequestId" />
+                                            <textarea name="responseMessage" class="form-control mb-3" rows="2" placeholder="Reddetme sebebini yazın..."></textarea>
+                                            <div class="d-flex gap-2">
+                                                <button type="button" class="btn btn-success w-100" onclick="document.getElementById('approveForm-@request.RequestId').submit();">
+                                                    <i class="fas fa-check"></i> Onayla
+                                                </button>
+                                                <button type="submit" class="btn btn-danger w-100">
+                                                    <i class="fas fa-times"></i> Reddet
+                                                </button>
+                                            </div>
+                                        </form>
+                                        <form asp-action="Approve" method="post" id="approveForm-@request.RequestId" class="d-none">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="requestId" value="@request.RequestId" />
+                                        </form>
+                                    }
+                                    else if (!string.IsNullOrEmpty(request.ResponseMessage))
+                                    {
+                                        <div class="card-note">
+                                            <strong>SİZİN CEVABINIZ</strong>
+                                            @request.ResponseMessage
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5 glass-effect">
+                    <i class="far fa-envelope-open fa-3x mb-3"></i>
+                    <h4>Gösterilecek talep bulunamadı.</h4>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,37 @@
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.sln.ide/
+.TFMSelection
+UpgradeLog/
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+bin/
+obj/
+*.pdb
+*.ilk
+*.meta
+*.log
+
+# Packages
+packages/
+*.nupkg
+project.lock.json
+
+# Rider
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# STS
+.sts/
+
+# Custom additions for this project
+PsikologProje_Void.csproj.user
+Properties/launchSettings.json

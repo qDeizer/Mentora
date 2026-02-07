@@ -1,0 +1,485 @@
+/* GLOBAL STYLES & VARIABLES */
+:root {
+    --primary-color: #A06C63; /* Daha doygun kirli gül kurusu */
+    --secondary-color: #7FB3D5; /* Daha doygun pastel mavi */
+    --text-color: #5A3A36; /* Koyu kahverengimsi, kontrast için */
+    --dark-text-color: #DB8473; /* Somon / pastel turuncu (değişmedi) */
+    --bg-color-start: #F6E7DE; /* Daha doygun, kırık beyazdan pastel beje */
+    --bg-color-mid: #B2D6EB; /* Doygun pastel mavi */
+    --bg-color-end: #F1B59D; /* Şeftali / pastel ten rengi (değişmedi) */
+    --card-bg: rgba(255, 255, 255, 0.65); /* Kartlar için daha belirgin ve doygun arka plan */
+    --border-color: #B2D6EB; /* Doygun pastel mavi */
+    --input-bg: #F6E7DE; /* Input arka planı için daha doygun bej */
+    --input-focus-border: #DB8473; /* Input focus için somon (değişmedi) */
+    --font-family: 'Inter', sans-serif;
+    --border-radius: 16px;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-family);
+    background: linear-gradient(135deg, var(--bg-color-start), var(--bg-color-mid), var(--bg-color-end));
+    color: var(--text-color);
+    padding-top: 80px; /* For fixed-top navbar */
+    background-attachment: fixed;
+}
+
+/* AUTHENTICATION CONTAINER & CARD (RESTORED) */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 80px); /* 100vh minus navbar height */
+    padding: 2rem 1rem;
+}
+
+.glass-effect {
+    background: var(--card-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 500px;
+    padding: 2.5rem;
+    animation: slideUp 0.7s ease-out forwards;
+}
+
+    .auth-card.register-card {
+        max-width: 800px;
+    }
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.auth-header h2 {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.auth-header p {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+
+/* FORM STYLES (RESTORED) */
+.auth-form .form-floating-group,
+.auth-form .form-group-checkbox {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.form-control, .form-select {
+    background-color: #E3EEF5; /* Soğuk, pastel mavi taban */
+    border: 1.5px solid #7FB3D5; /* Doygun pastel mavi kenarlık */
+    color: #5A3A36; /* Koyu, okunabilir metin */
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+    .form-control::placeholder, .form-select option {
+        color: #7A7A7A !important; /* Koyu gri, daha belirgin placeholder */
+        opacity: 1;
+        font-weight: 400;
+    }
+
+.form-control:-webkit-autofill,
+.form-control:-webkit-autofill:hover,
+.form-control:-webkit-autofill:focus,
+.form-control:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--input-bg) inset !important;
+    -webkit-text-fill-color: var(--text-color) !important;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: #D0E3F0;
+    border-color: #7FB3D5;
+    box-shadow: 0 0 0 3px #C4D9E4;
+    color: #5A3A36;
+}
+
+.form-floating-group > label {
+    color: rgba(255, 255, 255, 0.7);
+    padding: 1rem;
+    transition: all 0.2s ease;
+}
+
+.form-floating-group .form-control:not(:placeholder-shown) ~ label,
+.form-floating-group .form-control:focus ~ label {
+    transform: scale(.85) translateY(-.9rem) translateX(.15rem);
+    background-color: #4a2d7c;
+    padding: 0.1rem 0.5rem;
+    border-radius: 5px;
+    opacity: 1;
+}
+
+.form-select {
+    padding-top: 0.8rem;
+    padding-bottom: 0.8rem;
+}
+
+    .form-select option {
+        background-color: #333;
+        color: var(--text-color);
+    }
+
+.text-danger {
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+/* BUTTONS (RESTORED) */
+.btn-auth {
+    width: 100%;
+    padding: 0.9rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: #fff;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+}
+
+    .btn-auth:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        filter: brightness(1.1);
+    }
+
+/* USER TYPE SELECTOR (RESTORED) */
+.user-type-selector {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+.user-type-selector .btn-group {
+    width: 100%;
+}
+.user-type-selector .btn {
+    flex: 1;
+}
+
+
+/* FILE INPUTS & PREVIEWS (RESTORED) */
+.file-upload-group {
+    background: var(--input-bg);
+    padding: 1.2rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+#profilePhotoPreview, #certificatesPreview img {
+    max-width: 100px;
+    max-height: 100px;
+    border-radius: 8px;
+    margin-top: 1rem;
+    border: 2px solid var(--border-color);
+}
+
+#certificatesPreview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+/* FOOTER & OTHER LINKS (RESTORED) */
+.auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+    .auth-footer a {
+        color: #a3b1ff;
+        font-weight: 500;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+        .auth-footer a:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+/* --- ADD-ON STYLES --- */
+
+/* NAVBAR STYLES */
+.custom-navbar {
+    background: rgba(29, 3, 52, 0.3);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.navbar-brand .brand-logo {
+    height: 40px;
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover .brand-logo {
+    transform: rotate(-10deg) scale(1.1);
+}
+
+.navbar-brand .brand-text {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.navbar-profile-img {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    margin-right: 8px;
+}
+
+.custom-dropdown {
+    background-color: #3a1c71;
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(10px);
+}
+
+    .custom-dropdown .dropdown-header {
+        color: rgba(255,255,255,0.7);
+    }
+
+    .custom-dropdown .dropdown-item:hover {
+        background-color: var(--primary-color);
+        color: #fff;
+    }
+
+    .custom-dropdown .dropdown-divider {
+        border-top: 1px solid var(--border-color);
+    }
+
+
+/* HOME PAGE HERO SECTION */
+.hero-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: calc(90vh - 80px);
+    color: #fff;
+    flex-direction: column;
+    padding: 2rem;
+}
+
+.hero-logo {
+    max-width: 150px;
+    margin-bottom: 1.5rem;
+    animation: fadeInDown 1s ease-out;
+}
+
+.hero-title {
+    font-size: 4rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    animation: fadeInUp 1s ease-out 0.3s;
+    animation-fill-mode: forwards;
+    opacity: 0;
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    font-weight: 300;
+    max-width: 600px;
+    margin-bottom: 2.5rem;
+    animation: fadeInUp 1s ease-out 0.6s;
+    animation-fill-mode: forwards;
+    opacity: 0;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: fadeInUp 1s ease-out 0.9s;
+    animation-fill-mode: forwards;
+    opacity: 0;
+}
+
+.hero-btn {
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.btn-hero-primary {
+    background: #fff;
+    color: var(--primary-color);
+}
+
+    .btn-hero-primary:hover {
+        background: transparent;
+        color: #fff;
+        border-color: #fff;
+        transform: translateY(-3px);
+    }
+
+.btn-hero-secondary {
+    background: transparent;
+    color: #fff;
+    border-color: #fff;
+}
+
+    .btn-hero-secondary:hover {
+        background: #fff;
+        color: var(--primary-color);
+        transform: translateY(-3px);
+    }
+
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* CONTENT & REQUEST CARDS */
+.content-card {
+    background: #F8F1ED !important; /* Tam opak, çok açık bej arka plan (saydamlık tamamen kaldırıldı) */
+    color: #5A3A36 !important; /* Koyu, okunabilir yazı rengi */
+    border: 2px solid #C4D9E4 !important; /* Pastel açık mavi kenarlık */
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+    .content-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        border-color: #9F8584 !important; /* Hover'da kirli gül kurusu kenarlık */
+    }
+
+.card-header-pills {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-note {
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+    .card-note strong {
+        display: block;
+        font-style: normal;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        opacity: 0.7;
+        margin-bottom: 0.25rem;
+        letter-spacing: 0.5px;
+    }
+
+.hero-title, .hero-section .brand-text, .home-hero h1, .display-5, .display-4 {
+    color: #DB8473 !important; /* Somon / pastel turuncu, sıcak ve dikkat çekici */
+}
+.hero-subtitle, .lead, .home-hero p, .hero-section p {
+    color: #9F8584 !important; /* Kirli gül kurusu, sıcak ve yumuşak */
+}
+
+/* Mentora özel yazı rengi */
+.mentora-title {
+    color: #DB8473 !important;
+    font-weight: 700;
+    font-size: 2.2rem;
+    letter-spacing: 1px;
+}
+.mentora-desc {
+    color: #9F8584 !important;
+    font-size: 1.15rem;
+    font-weight: 500;
+}
+
+.auth-card, .glass-effect {
+    background: linear-gradient(135deg, #FFFFFF 60%, #F1B59D 100%);
+    box-shadow: 0 8px 32px 0 rgba(160, 108, 99, 0.18), 0 2px 8px 0 rgba(0,0,0,0.10);
+    border: 2.5px solid #DB8473;
+    border-radius: var(--border-radius);
+    /* Kartı arka plandan netçe ayırmak için daha parlak ve sıcak bir zemin + belirgin kenarlık */
+}
+
+.auth-header h2, .auth-header .auth-icon {
+    color: #A06C63 !important;
+}

@@ -1,0 +1,119 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using PsikologProje_Void.Models
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+
+@{
+    User? currentUser = null;
+    if (SignInManager.IsSignedIn(User))
+    {
+        currentUser = await UserManager.GetUserAsync(User);
+    }
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Mentora</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top custom-navbar">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                <img src="~/images/logo.png" alt="Mentora Logo" class="brand-logo me-2" />
+                <span class="brand-text">Mentora</span>
+            </a>
+
+            <button class="navbar-toggler custom-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="toggler-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+
+                <ul class="navbar-nav mx-auto">
+                    @if (currentUser != null)
+                    {
+                        if (User.IsInRole("Doctor"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="DoctorDashboard" asp-action="Index"><i class="fas fa-calendar-plus me-1"></i>Randevularım</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Request" asp-action="Index"><i class="fas fa-inbox me-1"></i>Gelen Talepler</a>
+                            </li>
+                        }
+                        else if (User.IsInRole("Patient"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="PatientDashboard" asp-action="Index"><i class="fas fa-search-location me-1"></i>Randevu Ara</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Request" asp-action="MyRequests"><i class="fas fa-tasks me-1"></i>Randevu Taleplerim</a>
+                            </li>
+                        }
+                    }
+                </ul>
+
+                <ul class="navbar-nav ms-auto">
+                    @if (currentUser != null)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="@(string.IsNullOrEmpty(currentUser.ProfilePhotoPath) ? "/images/default-avatar.png" : currentUser.ProfilePhotoPath)" class="navbar-profile-img" alt="Profil">
+                                <span class="navbar-user-name">@currentUser.FirstName @currentUser.LastName</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end custom-dropdown" aria-labelledby="navbarDropdownUser">
+                                <li><h6 class="dropdown-header">@currentUser.Email</h6></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" method="post">
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link login-link" asp-controller="Account" asp-action="Login">
+                                <i class="fas fa-sign-in-alt me-1"></i>Giriş Yap
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-primary nav-btn" asp-controller="Account" asp-action="Register">
+                                <i class="fas fa-user-plus me-1"></i>Kayıt Ol
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main role="main">
+        @RenderBody()
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,471 @@
+﻿@model PsikologProje_Void.ViewModels.PatientDashboardViewModel
+@{
+    ViewData["Title"] = "Randevu Ara";
+}
+
+@section Styles {
+    <style>
+        .dashboard-container {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .filter-sidebar {
+            flex: 0 0 300px;
+            position: sticky;
+            top: 100px; /* Navbar height + margin */
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+
+        .main-content {
+            flex: 1;
+        }
+
+        /* DÜZENLEME: Panel ve kartların saydamlığı azaltıldı ve sıcak tonlara geçirildi. */
+        .filter-panel, .glass-panel {
+            background: rgba(248, 241, 237, 0.7); /* Sıcak bej, azaltılmış saydamlık */
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(219, 132, 115, 0.35); /* Sıcak, yarı saydam kenarlık */
+            border-radius: 15px;
+            padding: 1.5rem;
+        }
+
+        .appointment-card {
+            background: rgba(248, 241, 237, 0.8); /* Filtre panelinden biraz daha opak */
+            border: 1px solid rgba(219, 132, 115, 0.4); /* Biraz daha belirgin sıcak kenarlık */
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            padding: 1.5rem;
+        }
+
+        .appointment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .doctor-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .doctor-rating {
+            font-size: 0.9rem;
+            color: #ffc107;
+        }
+
+        .card-info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .top-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        #appointments-map {
+            height: 75vh;
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        /* Google Maps InfoWindow stillendirme */
+        .gm-style .gm-style-iw-c {
+            background-color: #2c3e50 !important;
+            border-radius: 10px !important;
+            padding: 1rem !important;
+        }
+
+        .gm-style .gm-style-iw-d {
+            color: #ecf0f1;
+            overflow: auto !important;
+        }
+
+        .gm-style .gm-style-iw-t::after {
+            background: #2c3e50 !important;
+        }
+
+        .gm-style-iw-d strong {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .modal-map {
+            height: 400px;
+            width: 100%;
+            border-radius: 10px;
+        }
+
+    </style>
+}
+
+<div class="container py-4 mt-4">
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="filter-panel">
+                <h4 class="text-center mb-4">Randevu Ara</h4>
+                <form id="filterForm" asp-action="Index" method="get">
+                    <input type="hidden" asp-for="Filter.SortBy" id="sortBy" />
+                    <input type="hidden" asp-for="Filter.SortDirection" id="sortDirection" />
+                    <input type="hidden" asp-for="Filter.Latitude" id="userLat" />
+                    <input type="hidden" asp-for="Filter.Longitude" id="userLon" />
+
+                    <input class="d-none" type="checkbox" asp-for="Filter.UseProfileLocation" id="useProfileLocationInput">
+
+                    <div class="mb-3">
+                        <label asp-for="Filter.DoctorId" class="form-label">Doktor</label>
+                        <select asp-for="Filter.DoctorId" asp-items="Model.Doctors" class="form-select">
+                            <option value="">Tüm Doktorlar</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Filter.SpecialtyId" class="form-label">Uzmanlık Alanı</label>
+                        <select asp-for="Filter.SpecialtyId" asp-items="Model.Specialties" class="form-select">
+                            <option value="">Tüm Alanlar</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Filter.StartDate" class="form-label">Başlangıç Tarihi</label>
+                        <input asp-for="Filter.StartDate" type="date" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Filter.EndDate" class="form-label">Bitiş Tarihi</label>
+                        <input asp-for="Filter.EndDate" type="date" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Filter.MinPrice" class="form-label">Min. Fiyat</label>
+                        <input asp-for="Filter.MinPrice" type="number" class="form-control" placeholder="Örn: 100" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Filter.MaxPrice" class="form-label">Maks. Fiyat</label>
+                        <input asp-for="Filter.MaxPrice" type="number" class="form-control" placeholder="Örn: 500" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Filter.DistanceKm" class="form-label">Mesafe (km)</label>
+                        <input asp-for="Filter.DistanceKm" type="number" class="form-control" placeholder="Konumunuza olan uzaklık" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Randevu Tipi</label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" asp-for="Filter.IsOnline" value="true">
+                            <label class="form-check-label" asp-for="Filter.IsOnline">Online</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" asp-for="Filter.IsInPerson" value="true">
+                            <label class="form-check-label" asp-for="Filter.IsInPerson">Yüz Yüze</label>
+                        </div>
+                    </div>
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary">Filtrele</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            <div class="top-controls">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="useProfileLocationSwitch" checked="@Model.Filter.UseProfileLocation">
+                    <label class="form-check-label" for="useProfileLocationSwitch">Profil Konumumu Kullan</label>
+                </div>
+
+                <button type="button" class="btn btn-info" id="viewOnMapBtn" data-bs-toggle="modal" data-bs-target="#appointmentsMapModal" disabled>
+                    <i class="fas fa-map-marked-alt me-2"></i> Haritada Gör
+                </button>
+
+                <div class="dropdown">
+                    <button class="btn btn-outline-light dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-sort-amount-down me-2"></i> Sırala
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sortDropdown">
+                        <li><a class="dropdown-item sort-option" href="#" data-sortby="date" data-sortdir="asc">Tarih (Yeniden Eskiye)</a></li>
+                        <li><a class="dropdown-item sort-option" href="#" data-sortby="price" data-sortdir="asc">Fiyat (Düşükten Yükseğe)</a></li>
+                        <li><a class="dropdown-item sort-option" href="#" data-sortby="price" data-sortdir="desc">Fiyat (Yüksekten Düşüğe)</a></li>
+                        <li><a class="dropdown-item sort-option" href="#" data-sortby="rating" data-sortdir="desc">Doktor Puanı (Yüksekten Düşüğe)</a></li>
+                        <li><a class="dropdown-item sort-option" href="#" data-sortby="distance" data-sortdir="asc">Mesafe (Yakından Uzağa)</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                @if (Model.Appointments.Any())
+                {
+                    @foreach (var item in Model.Appointments)
+                    {
+                        <div class="col-md-6 col-lg-6">
+                            @await Html.PartialAsync("_AppointmentCardPartial", item)
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12">
+                        <div class="text-center py-5 glass-panel">
+                            <i class="far fa-calendar-times fa-3x mb-3"></i>
+                            <h4>Uygun Randevu Bulunamadı</h4>
+                            <p class="text-white-50">Lütfen filtre kriterlerinizi değiştirerek tekrar deneyin.</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="requestModal" tabindex="-1" aria-labelledby="requestModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-effect">
+            <form asp-controller="AppointmentRequest" asp-action="CreateRequest" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="requestModalLabel">Randevu Talebi</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="appointmentId" id="modalAppointmentId" />
+                    <input type="hidden" name="doctorId" id="modalDoctorId" />
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Doktora Notunuz (Opsiyonel)</label>
+                        <textarea name="message" class="form-control" rows="4" placeholder="Randevu talebinizle ilgili doktora iletmek istediğiniz bir not varsa buraya yazabilirsiniz..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" class="btn btn-primary">Talep Gönder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="locationModal" tabindex="-1" aria-labelledby="locationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-effect">
+            <div class="modal-header">
+                <h5 class="modal-title" id="locationModalLabel">Randevu Konumu</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="map-modal-body" class="modal-map"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="appointmentsMapModal" tabindex="-1" aria-labelledby="appointmentsMapModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content glass-effect">
+            <div class="modal-header">
+                <h5 class="modal-title" id="appointmentsMapModalLabel">Filtrelenen Randevular Haritası</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="appointments-map"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=[GOOGLE_MAPS_API_KEY]"></script>
+    <script>
+            // Global değişkenler
+            let singlePinMap, singlePinMarker;
+            let overviewMap, activeInfoWindow;
+            let currentUserPosition = null;
+
+            const appointmentsWithLocation = @Html.Raw(Json.Serialize(
+        Model.Appointments
+            .Where(a => a.Location != null)
+            .Select(a => new
+            {
+                lat = a.Location.Y,
+                lng = a.Location.X,
+                doctor = a.DoctorName,
+                price = a.PriceRange,
+                time = a.StartTime.ToString("g")
+            })
+    ));
+
+            function initSinglePinMap(lat, lon, doctorName) {
+                const location = { lat: lat, lng: lon };
+                const mapElement = document.getElementById('map-modal-body');
+                if(mapElement) {
+                     singlePinMap = new google.maps.Map(mapElement, {
+                        zoom: 15,
+                        center: location,
+                    });
+                    singlePinMarker = new google.maps.Marker({
+                        position: location,
+                        map: singlePinMap,
+                        title: doctorName
+                    });
+                }
+            }
+
+            function initOverviewMap() {
+                if (!currentUserPosition) {
+                    console.error("Haritayı başlatmak için kullanıcı konumu gerekli.");
+                    return;
+                }
+
+                const mapElement = document.getElementById('appointments-map');
+                const bounds = new google.maps.LatLngBounds();
+
+                overviewMap = new google.maps.Map(mapElement, {
+                    // Harita başlangıç merkezi, daha sonra bounds'a göre ayarlanacak
+                });
+
+                const userMarker = new google.maps.Marker({
+                    position: currentUserPosition,
+                    map: overviewMap,
+                    title: "Sizin Konumunuz",
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 8,
+                        fillColor: "#4285F4",
+                        fillOpacity: 1,
+                        strokeWeight: 2,
+                        strokeColor: "#ffffff"
+                    }
+                });
+                bounds.extend(userMarker.getPosition());
+
+                appointmentsWithLocation.forEach(app => {
+                    const appPosition = { lat: app.lat, lng: app.lng };
+                    const marker = new google.maps.Marker({
+                        position: appPosition,
+                        map: overviewMap,
+                        title: app.doctor
+                    });
+
+                    const infoWindowContent = `
+                        <div>
+                            <strong>${app.doctor}</strong><br>
+                            Tarih: ${app.time}<br>
+                            Fiyat: ${app.price}
+                        </div>`;
+
+                    const infoWindow = new google.maps.InfoWindow({
+                        content: infoWindowContent
+                    });
+
+                    marker.addListener('click', () => {
+                        if (activeInfoWindow) {
+                            activeInfoWindow.close();
+                        }
+                        infoWindow.open(overviewMap, marker);
+                        activeInfoWindow = infoWindow;
+                    });
+
+                    bounds.extend(marker.getPosition());
+                });
+
+                if (appointmentsWithLocation.length > 0) {
+                    overviewMap.fitBounds(bounds);
+                } else {
+                    overviewMap.setCenter(bounds.getCenter());
+                    overviewMap.setZoom(12);
+                }
+            }
+
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const useProfileLocationSwitch = document.getElementById('useProfileLocationSwitch');
+                const useProfileLocationInput = document.getElementById('useProfileLocationInput');
+                const filterForm = document.getElementById('filterForm');
+                const viewOnMapBtn = document.getElementById('viewOnMapBtn');
+
+                function handleLocation(isInitialLoad = false) {
+                     if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(function (position) {
+                            const lat = position.coords.latitude;
+                            const lon = position.coords.longitude;
+
+                            document.getElementById('userLat').value = lat;
+                            document.getElementById('userLon').value = lon;
+
+                            currentUserPosition = { lat: lat, lng: lon };
+                            if(viewOnMapBtn) viewOnMapBtn.disabled = false;
+
+                            if (isInitialLoad) {
+                                filterForm.submit();
+                            }
+                        }, function(error) {
+                            console.error("Geolocation hatası: ", error.message);
+                            if(viewOnMapBtn) viewOnMapBtn.disabled = true;
+                        });
+                    } else {
+                         if(viewOnMapBtn) viewOnMapBtn.disabled = true;
+                    }
+                }
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const isInitialLoad = !urlParams.has('Filter.Latitude') && !urlParams.has('Filter.Longitude');
+
+                if (useProfileLocationSwitch && !useProfileLocationSwitch.checked) {
+                    handleLocation(isInitialLoad);
+                } else {
+                    if(isInitialLoad) {
+                        navigator.geolocation.getCurrentPosition(pos => {
+                            currentUserPosition = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                             if(viewOnMapBtn) viewOnMapBtn.disabled = false;
+                        });
+                    } else {
+                        currentUserPosition = {
+                            lat: parseFloat(document.getElementById('userLat').value),
+                            lng: parseFloat(document.getElementById('userLon').value)
+                        };
+                        if(viewOnMapBtn) viewOnMapBtn.disabled = false;
+                    }
+                }
+
+                if (useProfileLocationSwitch) {
+                    useProfileLocationSwitch.addEventListener('change', function() {
+                        useProfileLocationInput.checked = this.checked;
+                        filterForm.submit();
+                    });
+                }
+
+                document.getElementById('locationModal')?.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const lat = parseFloat(button.getAttribute('data-lat'));
+                    const lon = parseFloat(button.getAttribute('data-lon'));
+                    const doctor = button.getAttribute('data-doctor');
+                    const modalTitle = this.querySelector('.modal-title');
+                    modalTitle.textContent = doctor + ' - Konum';
+                    setTimeout(() => initSinglePinMap(lat, lon, doctor), 200);
+                });
+
+                document.getElementById('appointmentsMapModal')?.addEventListener('show.bs.modal', function() {
+                    setTimeout(initOverviewMap, 200);
+                });
+
+                document.getElementById('requestModal')?.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget;
+                    document.getElementById('modalAppointmentId').value = button.getAttribute('data-appointment-id');
+                    document.getElementById('modalDoctorId').value = button.getAttribute('data-doctor-id');
+                });
+
+                document.querySelectorAll('.sort-option').forEach(option => {
+                    option.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        document.getElementById('sortBy').value = this.dataset.sortby;
+                        document.getElementById('sortDirection').value = this.dataset.sortdir;
+                        filterForm.submit();
+                    });
+                });
+            });
+    </script>
+}

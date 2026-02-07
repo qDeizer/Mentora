@@ -1,0 +1,182 @@
+﻿@model PsikologProje_Void.ViewModels.DoctorDashboardViewModel
+@using PsikologProje_Void.Models
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Randevularım";
+    ViewBag.Specialties = ViewBag.Specialties ?? new List<Specialty>();
+    var culture = new CultureInfo("tr-TR");
+}
+
+@section Styles {
+    <style>
+        /* Bu sayfaya özel stiller, global .content-card stilini kullanmak için kaldırıldı. */
+        /* Bu sayede daha tutarlı ve istenen opak görünüm elde edildi. */
+        .appointments-container {
+            max-height: 80vh;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .card-patient-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card-patient-info img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #C4D9E4; /* Updated border color */
+        }
+
+        .card-patient-info .patient-details {
+            line-height: 1.3;
+        }
+
+        .card-patient-info .patient-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .card-patient-info .patient-name {
+            font-weight: 500;
+        }
+
+        .card-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .card-details-grid > div > small {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+    </style>
+}
+
+<div class="container py-5 mt-4">
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="row g-5">
+        <div class="col-lg-7">
+            <div class="text-center mb-4">
+                <i class="fas fa-calendar-check fa-2x mb-2" style="color: var(--primary-color);"></i>
+                <h2 style="color: var(--text-color);">Randevularım</h2>
+            </div>
+            <div class="appointments-container">
+                @if (Model.Appointments.Any())
+                {
+                    foreach (var item in Model.Appointments)
+                    {
+                        <div class="content-card mb-4">
+                            <div class="card-header-pills">
+                                <div>
+                                    <h5 class="mb-1">ID #@item.Id</h5>
+                                </div>
+                                @if (item.Status == "Müsait")
+                                {
+                                    <span class="badge bg-success">@item.Status</span>
+                                }
+                                else if (item.Status == "Rezerve Edildi")
+                                {
+                                    <span class="badge bg-warning text-dark">@item.Status</span>
+                                }
+                                else if (item.Status == "Gerçekleşmedi")
+                                {
+                                    <span class="badge bg-danger">@item.Status</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@item.Status</span>
+                                }
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(item.PatientName) && item.PatientName != "-")
+                            {
+                                <div class="card-patient-info">
+                                    <img src="@(string.IsNullOrEmpty(item.PatientProfileImageUrl) ? "/images/default-avatar.png" : item.PatientProfileImageUrl)" alt="@item.PatientName">
+                                    <div class="patient-details">
+                                        <span class="patient-label">Hasta</span>
+                                        <div class="patient-name">@item.PatientName</div>
+                                    </div>
+                                </div>
+                            }
+
+                            <div class="card-details-grid">
+                                <div><small>Başlangıç</small> <div>@item.StartTime.ToString("d MMMM yyyy, HH:mm", culture)</div></div>
+                                <div><small>Süre</small> <div>@item.DurationInMinutes dk</div></div>
+                                <div><small>Bitiş</small> <div>@item.EndTime.ToString("HH:mm")</div></div>
+                            </div>
+                            <div class="card-details-grid">
+                                <div><small>Tür</small> <div>@string.Join(", ", item.AppointmentTypes)</div></div>
+                                <div><small>Fiyat</small> <div>@item.PriceRange</div></div>
+                                <div><small>Konum</small> <div>@(item.Location != null ? "Mevcut" : "-")</div></div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(item.Notes) && item.Notes != "-")
+                            {
+                                <div class="mt-3">
+                                    <small>Not</small>
+                                    <p class="mb-0 fst-italic opacity-90">"@item.Notes"</p>
+                                </div>
+                            }
+
+                            <div class="card-actions">
+                                <a asp-controller="Request" asp-action="Index" asp-route-AppointmentId="@item.Id" class="btn btn-sm btn-outline-warning" title="Bu Randevunun Talepleri">
+                                    <i class="fas fa-users"></i> Talepler
+                                </a>
+                                <form asp-controller="Appointment" asp-action="Delete" asp-route-appointmentId="@item.Id" method="post" onsubmit="return confirm('Bu randevuyu ve ilgili tüm talepleri kalıcı olarak silmek istediğinizden emin misiniz?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Sil">
+                                        <i class="fas fa-trash"></i> Sil
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="glass-effect text-center py-5">
+                        <i class="far fa-calendar-alt fa-3x mb-3"></i>
+                        <p>Oluşturulmuş randevu bulunamadı.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="glass-effect p-4">
+                @await Html.PartialAsync("_CreateAppointmentPartial", Model.CreateAppointment)
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,235 @@
+﻿@model PsikologProje_Void.ViewModels.RegisterViewModel
+@using PsikologProje_Void.Models
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Kayıt Ol";
+    var specialties = ViewBag.Specialties as List<Specialty> ?? new List<Specialty>();
+    var specialtyList = new SelectList(specialties, "Id", "Name");
+}
+
+<div class="auth-container">
+    <div class="auth-card glass-effect register-card">
+        <div class="auth-header">
+            <i class="fas fa-user-plus auth-icon"></i>
+            <h2>Hesap Oluştur</h2>
+            <p>Topluluğumuza katılmak için bilgilerinizi girin.</p>
+        </div>
+
+        <form asp-action="Register" method="post" enctype="multipart/form-data" class="auth-form">
+            <div asp-validation-summary="All" class="text-danger validation-summary"></div>
+
+
+            <div class="user-type-selector">
+                <p>Kayıt olmak istediğiniz hesap türünü seçin:</p>
+                <div class="btn-group" role="group">
+                    <button type="button" id="patientBtn" class="btn btn-outline-primary active" data-usertype="@((int)UserType.Patient)">
+
+                        <i class="fas fa-user"></i> Hasta
+                    </button>
+                    <button type="button" id="doctorBtn" class="btn btn-outline-primary" data-usertype="@((int)UserType.Doctor)">
+                        <i class="fas fa-user-md"></i> Doktor
+
+                    </button>
+                </div>
+                <input type="hidden" asp-for="UserType" id="userTypeInput" value="@((int)UserType.Patient)" />
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-6 form-floating-group">
+                    <input asp-for="FirstName" class="form-control" placeholder="İsim" />
+                    <label asp-for="FirstName"><i class="fas fa-user"></i> İsim</label>
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 form-floating-group">
+                    <input asp-for="LastName" class="form-control" placeholder="Soy İsim" />
+                    <label asp-for="LastName"><i class="fas fa-user"></i> Soy İsim</label>
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+
+            </div>
+
+            <div class="form-floating-group">
+                <input asp-for="Email" class="form-control" placeholder="E-posta" />
+                <label asp-for="Email"><i class="fas fa-envelope"></i> E-posta</label>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-floating-group">
+                <input asp-for="PhoneNumber" class="form-control" placeholder="Telefon" />
+                <label asp-for="PhoneNumber"><i class="fas fa-phone"></i> Telefon</label>
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-6 form-floating-group">
+                    <input asp-for="BirthDate" class="form-control" placeholder="Doğum Tarihi" type="date" />
+                    <label asp-for="BirthDate"><i class="fas fa-calendar-alt"></i> Doğum Tarihi</label>
+                    <span asp-validation-for="BirthDate" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 form-floating-group">
+                    <select asp-for="Gender" asp-items="Html.GetEnumSelectList<Gender>()" class="form-select">
+                        <option selected disabled>Cinsiyet Seçin...</option>
+                    </select>
+
+                    <span asp-validation-for="Gender" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 form-floating-group">
+                    <input asp-for="Password" class="form-control" placeholder="Şifre" />
+
+                    <label asp-for="Password"><i class="fas fa-lock"></i> Şifre</label>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 form-floating-group">
+                    <input asp-for="ConfirmPassword" class="form-control" placeholder="Şifre Tekrar" />
+
+                    <label asp-for="ConfirmPassword"><i class="fas fa-lock"></i> Şifre Tekrar</label>
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mt-4">
+
+                <label class="form-label fw-bold">Konumunuzu Haritadan Seçin (Opsiyonel)</label>
+                <div class="mb-3">
+                    <input id="pac-input" class="form-control" type="text" placeholder="Adres Ara..." />
+                </div>
+                <div id="map" style="height: 400px;
+width: 100%; border-radius: 12px; margin-bottom: 1.5rem;"></div>
+                <input type="hidden" asp-for="Latitude" id="latitude" />
+                <input type="hidden" asp-for="Longitude" id="longitude" />
+            </div>
+
+            <div class="form-floating-group">
+                <textarea asp-for="About" class="form-control" placeholder="Hakkımda" style="height: 100px"></textarea>
+
+                <label asp-for="About"><i class="fas fa-info-circle"></i> Hakkımda</label>
+                <span asp-validation-for="About" class="text-danger"></span>
+            </div>
+
+            <div class="file-upload-group">
+                <label asp-for="ProfilePhoto" class="form-label">Profil Fotoğrafı</label>
+                <input asp-for="ProfilePhoto" type="file" class="form-control" id="profilePhotoInput" accept="image/*">
+
+                <img id="profilePhotoPreview" src="#" alt="Profil Fotoğrafı Önizleme" style="display:none; max-width: 150px;
+margin-top: 10px;" />
+            </div>
+
+            <div id="doctorFields" style="display: none;">
+                <hr />
+                <h4 class="text-center">Doktor Bilgileri</h4>
+                <div class="row">
+
+                    <div class="col-md-6 form-floating-group">
+                        <input asp-for="ExperienceStartDate" class="form-control" placeholder="Mesleğe Başlangıç Tarihi" type="date" />
+                        <label asp-for="ExperienceStartDate"><i class="fas fa-briefcase"></i> Mesleğe Başlangıç</label>
+
+                        <span asp-validation-for="ExperienceStartDate" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 form-floating-group">
+                        <select asp-for="Title" asp-items="Html.GetEnumSelectList<DoctorTitle>()" class="form-select">
+
+                            <option selected disabled>Statü Seçin...</option>
+                        </select>
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-floating-group">
+                    <input asp-for="University" class="form-control" placeholder="Üniversite" />
+                    <label asp-for="University"><i class="fas fa-university"></i> Üniversite</label>
+                    <span asp-validation-for="University" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="SelectedSpecialtyIds" class="form-label">Uzmanlık Alanları</label>
+                    <select asp-for="SelectedSpecialtyIds" asp-items="specialtyList" class="form-control" multiple="multiple">
+                    </select>
+                    <span asp-validation-for="SelectedSpecialtyIds"
+                          class="text-danger"></span>
+                </div>
+                <div class="file-upload-group">
+                    <label asp-for="Certificates" class="form-label">Sertifika/Diploma (Birden fazla seçebilirsiniz)</label>
+                    <input asp-for="Certificates" type="file" class="form-control" id="certificatesInput" accept="image/*,application/pdf" multiple>
+
+                    <div id="certificatesPreview" class="d-flex flex-wrap gap-2 mt-2"></div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-auth">Kayıt Ol</button>
+
+            <div class="auth-footer">
+                <p>
+                    Zaten bir hesabınız var mı?
+                    <a asp-action="Login" class="link-primary">Giriş Yap</a>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=[GOOGLE_MAPS_API_KEY]&libraries=places&callback=initMap"></script>
+    <script>
+        let map;
+        let marker;
+        const turkeyCenter = { lat: 39.925533, lng: 32.866287 };
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: turkeyCenter,
+                zoom: 5,
+            });
+            marker = new google.maps.Marker({
+                position: turkeyCenter,
+                map: map,
+                draggable: true,
+                title: "Konumunuzu buraya sürükleyin"
+            });
+            function updateCoordinates(latLng) {
+                document.getElementById('latitude').value = latLng.lat().toFixed(7).replace(',', '.');
+                document.getElementById('longitude').value = latLng.lng().toFixed(7).replace(',', '.');
+            }
+
+            google.maps.event.addListener(marker, 'dragend', function(event) {
+                updateCoordinates(event.latLng);
+            });
+            google.maps.event.addListener(map, 'click', function(event) {
+                marker.setPosition(event.latLng);
+                updateCoordinates(event.latLng);
+            });
+            const input = document.getElementById("pac-input");
+            const searchBox = new google.maps.places.SearchBox(input);
+            map.controls[google.maps.ControlPosition.TOP_CENTER].push(input);
+            searchBox.addListener("places_changed", () => {
+                const places = searchBox.getPlaces();
+                if (places.length == 0) return;
+
+                const bounds = new google.maps.LatLngBounds();
+                places.forEach((place) => {
+
+                    if (!place.geometry || !place.geometry.location) return;
+
+                    marker.setPosition(place.geometry.location);
+                    updateCoordinates(place.geometry.location);
+
+                    if (place.geometry.viewport) {
+                        bounds.union(place.geometry.viewport);
+
+                    } else {
+                        bounds.extend(place.geometry.location);
+                    }
+                });
+                map.fitBounds(bounds);
+
+            });
+        }
+    </script>
+}

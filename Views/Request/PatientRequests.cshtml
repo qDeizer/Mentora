@@ -1,0 +1,123 @@
+﻿@model PsikologProje_Void.ViewModels.RequestsViewModel
+@{
+    ViewData["Title"] = "Randevu Taleplerim";
+}
+
+@section Styles {
+    <style>
+        .doctor-photo-requests {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #C4D9E4;
+        }
+
+        /* YAZI RENKLERİNİ DÜZENLEYEN STİLLER */
+        .request-card h6,
+        .request-card .card-note strong {
+            color: #000000 !important; /* Başlıkları ve "NOT" etiketlerini simsiyah yapar */
+        }
+
+        .request-card,
+        .request-card p,
+        .request-card small,
+        .request-card .card-note {
+            color: #383838 !important; /* Diğer tüm metinleri okunabilir koyu gri yapar */
+        }
+    </style>
+}
+
+<div class="container py-5 mt-4">
+    <div class="text-center mb-5">
+        <i class="fas fa-tasks fa-2x mb-2 text-white"></i>
+        <h2 class="text-white">@ViewData["Title"]</h2>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    @if (Model.Requests.Any())
+    {
+        <div class="row g-4">
+            @foreach (var request in Model.Requests)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="content-card d-flex flex-column request-card">
+                        <div class="card-header-pills">
+                            <div>
+                            </div>
+                            @if (request.Status == RequestStatus.Pending)
+                            {
+                                <span class="badge bg-warning text-dark align-self-start">Beklemede</span>
+                            }
+                            else if (request.Status == RequestStatus.Approved)
+                            {
+                                <span class="badge bg-success align-self-start">Onaylandı</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger align-self-start">Reddedildi</span>
+                            }
+                        </div>
+
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="@(string.IsNullOrEmpty(request.DoctorProfilePhoto) ? "/images/default-avatar.png" : request.DoctorProfilePhoto)" class="doctor-photo-requests" alt="@request.DoctorName">
+                            <div class="ms-3">
+                                <h6 class="mb-1">@request.DoctorName</h6>
+                                <small>Randevu: @request.AppointmentStartTime.ToString("g")</small>
+                            </div>
+                        </div>
+
+
+                        <div class="my-3 flex-grow-1">
+                            <p class="mb-2"><small>Talep Tarihi:</small><br>@request.RequestDate.ToLocalTime().ToString("g")</p>
+
+                            @if (!string.IsNullOrEmpty(request.RequestMessage))
+                            {
+                                <div class="card-note">
+                                    <strong>SİZİN NOTUNUZ</strong>
+                                    @request.RequestMessage
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(request.ResponseMessage))
+                            {
+                                <div class="card-note mt-2">
+                                    <strong>DOKTORUN CEVABI</strong>
+                                    @request.ResponseMessage
+                                </div>
+                            }
+                        </div>
+
+                        <div class="mt-auto text-end">
+                            @if (request.Status == RequestStatus.Pending)
+                            {
+                                <form asp-action="Cancel" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="requestId" value="@request.RequestId" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Bu talebi iptal etmek istediğinizden emin misiniz?')">
+                                        <i class="fas fa-times me-1"></i>İptal Et
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5 glass-effect">
+            <i class="far fa-envelope-open fa-3x mb-3"></i>
+            <h4>Hiç randevu talebiniz bulunmuyor.</h4>
+            <p>Bir randevu aramak ve talep oluşturmak için <a asp-controller="PatientDashboard" asp-action="Index">tıklayın</a>.</p>
+        </div>
+    }
+</div>

@@ -1,0 +1,36 @@
+﻿@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Ana Sayfa";
+}
+
+<div class="hero-section">
+    <img src="~/images/logo.png" alt="Mentora Logo" class="hero-logo" />
+    <h1 class="hero-title">Mentora</h1>
+    <p class="hero-subtitle">Zihinsel sağlığınız ve kişisel gelişiminiz için doğru uzmanla, doğru zamanda buluşun. Mentora, size en uygun psikologu bulma yolculuğunuzda yanınızda.</p>
+
+    <div class="hero-actions">
+        @if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            if (User.IsInRole("Patient"))
+            {
+                <a asp-controller="PatientDashboard" asp-action="Index" class="hero-btn btn-hero-primary">Randevu Bul</a>
+                <a asp-controller="Request" asp-action="MyRequests" class="hero-btn btn-hero-secondary">Taleplerim</a>
+            }
+            else if (User.IsInRole("Doctor"))
+            {
+                <a asp-controller="DoctorDashboard" asp-action="Index" class="hero-btn btn-hero-primary">Randevularım</a>
+                <a asp-controller="Request" asp-action="Index" class="hero-btn btn-hero-secondary">Taleplerim</a>
+            }
+            else
+            {
+                <p class="h4">Hoş geldiniz, @User.Identity.Name!</p>
+            }
+        }
+        else
+        {
+            <a asp-controller="Account" asp-action="Register" class="hero-btn btn-hero-primary">Hemen Başlayın</a>
+            <a asp-controller="Account" asp-action="Login" class="hero-btn btn-hero-secondary">Giriş Yap</a>
+        }
+    </div>
+</div>

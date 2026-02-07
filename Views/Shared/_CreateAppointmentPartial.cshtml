@@ -1,0 +1,166 @@
+﻿@model PsikologProje_Void.ViewModels.CreateAppointmentViewModel
+@using PsikologProje_Void.Models
+@{
+    // ViewBag'den gelen uzmanlık alanları listesi alınıyor.
+    var specialties = ViewBag.Specialties as List<Specialty> ?? new List<Specialty>();
+}
+
+<div class="auth-header">
+    <i class="fas fa-calendar-plus auth-icon"></i>
+    <h2>Yeni Randevu Oluştur</h2>
+    <p>Müsaitlik durumunuzu belirterek yeni bir randevu aralığı oluşturun.</p>
+</div>
+
+<form asp-controller="Appointment" asp-action="Create" method="post" class="auth-form">
+    @* Tüm doğrulama hatalarını göstermek için "All" olarak değiştirildi *@
+    <div asp-validation-summary="All" class="text-danger validation-summary"></div>
+
+    <div class="row">
+        <div class="col-md-6 form-floating-group">
+            @* Varsayılan değer ve min attribute kaldırıldı. *@
+            <input asp-for="StartTime" class="form-control" id="startTime" type="datetime-local" />
+            <label asp-for="StartTime"></label>
+            <span asp-validation-for="StartTime" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 form-floating-group">
+            <input asp-for="DurationInMinutes" type="number" class="form-control" id="duration" placeholder="Süre (dk)" />
+            <label asp-for="DurationInMinutes"></label>
+            <span asp-validation-for="DurationInMinutes" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="form-floating-group">
+        @* Varsayılan değer ve min attribute kaldırıldı. *@
+        <input asp-for="EndTime" class="form-control" id="endTime" type="datetime-local" />
+        <label asp-for="EndTime"></label>
+        <span asp-validation-for="EndTime" class="text-danger"></span>
+    </div>
+
+    <p class="text-center text-white-50 small">Bitiş saatini veya süreyi girdiğinizde diğeri otomatik hesaplanır.</p>
+
+    <hr style="border-color: var(--border-color); margin: 1.5rem 0;" />
+
+    <div class="form-group mb-3">
+        <label class="form-label">Randevu Türü (En az birini seçin)</label>
+        <div class="d-flex gap-4">
+            <div class="form-check form-switch">
+                <input asp-for="IsOnline" class="form-check-input" type="checkbox" role="switch">
+                <label class="form-check-label" asp-for="IsOnline">Online</label>
+            </div>
+            <div class="form-check form-switch">
+                <input asp-for="IsInPerson" class="form-check-input" type="checkbox" role="switch">
+                <label class="form-check-label" asp-for="IsInPerson">Yüz Yüze</label>
+            </div>
+        </div>
+        @* AtLeastOneRequired attribute'ünden gelen hata mesajı burada gösterilir *@
+        <span asp-validation-for="IsOnline" class="text-danger"></span>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-6 form-floating-group">
+            <input asp-for="MinPrice" class="form-control" placeholder="Minimum Fiyat (Opsiyonel)" />
+            <label asp-for="MinPrice"></label>
+            <span asp-validation-for="MinPrice" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 form-floating-group">
+            <input asp-for="MaxPrice" class="form-control" placeholder="Maksimum Fiyat (Opsiyonel)" />
+            <label asp-for="MaxPrice"></label>
+            <span asp-validation-for="MaxPrice" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="SelectedSpecialtyIds" class="form-label">İlgili Uzmanlık Alanları (Opsiyonel)</label>
+        <select asp-for="SelectedSpecialtyIds" class="form-control" multiple="multiple">
+            @foreach (var specialty in specialties)
+            {
+                <option value="@specialty.Id">@specialty.Name</option>
+            }
+        </select>
+        <span asp-validation-for="SelectedSpecialtyIds" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating-group">
+        <textarea asp-for="Notes" class="form-control" placeholder="Randevu Notu (Opsiyonel)" style="height: 100px"></textarea>
+        <label asp-for="Notes"></label>
+        <span asp-validation-for="Notes" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-auth">Randevuyu Oluştur</button>
+</form>
+
+@* Tarih hesaplama için script, bileşenin içine alındı *@
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const startTimeInput = document.getElementById('startTime');
+        const endTimeInput = document.getElementById('endTime');
+        const durationInput = document.getElementById('duration');
+
+        if (!startTimeInput || !endTimeInput || !durationInput) {
+            return;
+        }
+
+        // Helper function to format a Date object into 'YYYY-MM-DDTHH:MM' string.
+        // This avoids timezone conversion issues caused by toISOString().
+        function toLocalISOString(date) {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+
+        function calculateEndTime() {
+            if (startTimeInput.value && durationInput.value) {
+                const startDate = new Date(startTimeInput.value);
+                const duration = parseInt(durationInput.value, 10);
+                if (!isNaN(duration) && duration > 0) {
+                    startDate.setMinutes(startDate.getMinutes() + duration);
+                    endTimeInput.value = toLocalISOString(startDate);
+                }
+            }
+        }
+
+        function calculateDuration() {
+            if (startTimeInput.value && endTimeInput.value) {
+                const startDate = new Date(startTimeInput.value);
+                const endDate = new Date(endTimeInput.value);
+                if (endDate > startDate) {
+                    const diffMs = endDate - startDate;
+                    const diffMins = Math.round(diffMs / 60000);
+                    durationInput.value = diffMins;
+                } else {
+                    durationInput.value = ''; // Clear duration if end time is not after start time
+                }
+            }
+        }
+
+        // Event Listeners
+        durationInput.addEventListener('input', function() {
+            // When duration is typed, clear end time to avoid conflict and then calculate it.
+            if (this.value) {
+                endTimeInput.value = '';
+            }
+            calculateEndTime();
+        });
+
+        endTimeInput.addEventListener('input', function() {
+            // When end time is typed, clear duration to avoid conflict and then calculate it.
+            if (this.value) {
+                durationInput.value = '';
+            }
+            calculateDuration();
+        });
+
+        startTimeInput.addEventListener('input', function() {
+            // When start time changes, recalculate based on which field (duration or end time) has a value.
+            if (durationInput.value) {
+                calculateEndTime();
+            } else if (endTimeInput.value) {
+                calculateDuration();
+            }
+        });
+    });
+</script>

@@ -2,11 +2,11 @@
 
 Mentora, psikolog/psikiyatrist randevu yönetimi icin rol tabanli ve konum destekli bir ASP.NET Core MVC uygulamasidir. Hasta ve doktor kullanicilari icin randevu arama, talep ve onay akislari; sistem tarafinda ise otomatik durum guncellemeleri saglar.
 
-**One Cikanlar**
-- Doktor ve Hasta rolleri ile kayit/giris (ASP.NET Core Identity).
-- Konum tabanli arama ve mesafe filtreleme (NetTopologySuite, SRID 4326).
-- Randevu talep/onay mekanizmasi ve cakisma engelleme.
-- Arka planda calisan servis ile otomatik durum guncelleme.
+**Genel Ozellikler**
+- Rol bazli kayit ve giris (Doktor/Hasta).
+- Konum kaydi (enlem/boylam) ve profil yonetimi.
+- Gelismis arama altyapisi: konum, uzmanlik, fiyat, tarih ve gorusme tipi filtreleri.
+- Konum tabanli mesafe hesaplama (NetTopologySuite, SRID 4326).
 
 **Hasta Ozellikleri**
 - Uzmanlik, fiyat araligi, tarih araligi, gorusme tipi ve mesafe filtreleri ile arama.

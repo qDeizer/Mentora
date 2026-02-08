@@ -1,22 +1,20 @@
-ï»¿// File: C:/Users/deize/Desktop/Proje/PsikologProje_Void/PsikologProje_Void/Models/Doctor.cs
-
 using System.ComponentModel.DataAnnotations;
 namespace PsikologProje_Void.Models
 {
     public class Doctor : User
     {
         [Required]
-        [Display(Name = "MesleÄŸe BaÅŸlangÄ±Ã§ Tarihi")]
+        [Display(Name = "Mesleðe Baþlangýç Tarihi")]
         [DataType(DataType.Date)]
         public DateTime ExperienceStartDate { get; set; }
 
         [Required]
-        [Display(Name = "StatÃ¼")]
+        [Display(Name = "Statü")]
         public DoctorTitle Title { get; set; }
 
-        [Display(Name = "Ãœniversite")]
+        [Display(Name = "Üniversite")]
         [StringLength(100)]
-        // Ãœniversite alanÄ± da isteÄŸe baÄŸlÄ± olabileceÄŸinden nullable (string?) yapÄ±ldÄ±.
+        // Üniversite alaný da isteðe baðlý olabileceðinden nullable (string?) yapýldý.
         public string? University { get; set; }
 
         // Navigation properties
@@ -32,7 +30,7 @@ namespace PsikologProje_Void.Models
         ClinicalPsychologist = 2,
         [Display(Name = "Dr. Psikolog")]
         DrPsychologist = 3,
-        [Display(Name = "DoÃ§. Dr.")]
+        [Display(Name = "Doç. Dr.")]
         AssociateProfessor = 4,
         [Display(Name = "Prof. Dr.")]
         Professor = 5

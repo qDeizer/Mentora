@@ -35,3 +35,12 @@ project.lock.json
 # Custom additions for this project
 PsikologProje_Void.csproj.user
 Properties/launchSettings.json
+
+# Local configuration
+appsettings.Development.json
+
+# User uploads
+wwwroot/images/profiles/*
+wwwroot/images/certificates/*
+!wwwroot/images/profiles/.gitkeep
+!wwwroot/images/certificates/.gitkeep

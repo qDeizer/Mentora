@@ -1,0 +1,319 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "Mentora Logo Mentora" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Mentora Logo" [ref=e5]
+        - generic [ref=e6]: Mentora
+      - generic [ref=e7]:
+        - list [ref=e8]:
+          - listitem [ref=e9]:
+            - link " Randevu Ara" [ref=e10] [cursor=pointer]:
+              - /url: /PatientDashboard
+              - generic [ref=e11]: 
+              - text: Randevu Ara
+          - listitem [ref=e12]:
+            - link " Taleplerim" [ref=e13] [cursor=pointer]:
+              - /url: /Request/MyRequests
+              - generic [ref=e14]: 
+              - text: Taleplerim
+          - listitem [ref=e15]:
+            - link " Ozel Randevular" [ref=e16] [cursor=pointer]:
+              - /url: /PrivateAppointments
+              - generic [ref=e17]: 
+              - text: Ozel Randevular
+          - listitem [ref=e18]:
+            - link " Notlarim" [ref=e19] [cursor=pointer]:
+              - /url: /ClinicalNotes/MyNotes
+              - generic [ref=e20]: 
+              - text: Notlarim
+          - listitem [ref=e21]:
+            - link " Doktorlarim" [ref=e22] [cursor=pointer]:
+              - /url: /People
+              - generic [ref=e23]: 
+              - text: Doktorlarim
+        - list [ref=e24]:
+          - listitem [ref=e25]:
+            - button " Profil konumu tanimsiz" [ref=e26] [cursor=pointer]:
+              - generic [ref=e27]: 
+              - generic [ref=e28]: Profil konumu tanimsiz
+          - listitem [ref=e29]:
+            - button "" [ref=e30] [cursor=pointer]:
+              - generic [ref=e31]: 
+          - listitem [ref=e32]:
+            - button "Profil Test Patient" [ref=e33] [cursor=pointer]:
+              - img "Profil" [ref=e34]
+              - generic [ref=e35]: Test Patient
+            - text:   
+  - main [ref=e36]:
+    - generic [ref=e37]:
+      - generic [ref=e38]:
+        - heading "Appointment Discovery" [level=1] [ref=e39]
+        - paragraph [ref=e40]: Doktor, uzmanlik, tarih, gun, ucret ve mesafeye gore filtreleyin. Konum secimi ust bardaki global kaynaktan alinır.
+      - generic [ref=e41]:
+        - complementary [ref=e42]:
+          - generic [ref=e43]:
+            - heading "Filtreler" [level=2] [ref=e44]
+            - generic [ref=e45]:
+              - generic [ref=e46]:
+                - generic [ref=e47]: Doktorlar (coklu)
+                - group [ref=e48]:
+                  - generic "Doktor secimi (0)" [ref=e49] [cursor=pointer]
+              - generic [ref=e50]:
+                - generic [ref=e51]: Uzmanliklar (coklu)
+                - group [ref=e52]:
+                  - generic "Uzmanlik secimi (0)" [ref=e53] [cursor=pointer]
+              - generic [ref=e54]:
+                - generic [ref=e55]: Gunler
+                - generic [ref=e56]:
+                  - generic [ref=e57] [cursor=pointer]:
+                    - checkbox "Pzt" [ref=e58]
+                    - text: Pzt
+                  - generic [ref=e59] [cursor=pointer]:
+                    - checkbox "Sal" [ref=e60]
+                    - text: Sal
+                  - generic [ref=e61] [cursor=pointer]:
+                    - checkbox "Car" [ref=e62]
+                    - text: Car
+                  - generic [ref=e63] [cursor=pointer]:
+                    - checkbox "Per" [ref=e64]
+                    - text: Per
+                  - generic [ref=e65] [cursor=pointer]:
+                    - checkbox "Cum" [ref=e66]
+                    - text: Cum
+                  - generic [ref=e67] [cursor=pointer]:
+                    - checkbox "Cmt" [ref=e68]
+                    - text: Cmt
+                  - generic [ref=e69] [cursor=pointer]:
+                    - checkbox "Paz" [ref=e70]
+                    - text: Paz
+              - generic [ref=e71]:
+                - generic [ref=e72]:
+                  - generic [ref=e73]: Baslangic
+                  - textbox "Baslangic" [ref=e74]
+                - generic [ref=e75]:
+                  - generic [ref=e76]: Bitis
+                  - textbox "Bitis" [ref=e77]
+              - generic [ref=e78]:
+                - generic [ref=e79]:
+                  - generic [ref=e80]: Min fiyat
+                  - generic [ref=e81]:
+                    - generic [ref=e82]: TL
+                    - spinbutton "Min fiyat" [ref=e83]
+                - generic [ref=e84]:
+                  - generic [ref=e85]: Max fiyat
+                  - generic [ref=e86]:
+                    - generic [ref=e87]: TL
+                    - spinbutton "Max fiyat" [ref=e88]
+              - generic [ref=e89]:
+                - generic [ref=e90]: Mesafe (km)
+                - spinbutton "Mesafe (km)" [ref=e91]
+              - generic [ref=e92]:
+                - generic [ref=e93]: Randevu tipi
+                - generic [ref=e94]:
+                  - generic [ref=e95]:
+                    - checkbox "Online" [ref=e96]
+                    - generic [ref=e97]: Online
+                  - generic [ref=e98]:
+                    - checkbox "Yuz yuze" [ref=e99]
+                    - generic [ref=e100]: Yuz yuze
+        - generic [ref=e101]:
+          - generic [ref=e102]:
+            - generic [ref=e103]:
+              - button " Haritada gor" [ref=e104] [cursor=pointer]:
+                - generic [ref=e105]: 
+                - text: Haritada gor
+              - generic [ref=e106]: "Konum: Profil konumu tanimsiz"
+            - generic [ref=e107]:
+              - combobox [ref=e108]:
+                - option "Tarih" [selected]
+                - option "Doktor"
+                - option "Fiyat"
+                - option "Puan"
+                - option "Mesafe"
+              - button "DESC" [ref=e109] [cursor=pointer]
+          - generic [ref=e110]:
+            - article [ref=e112]:
+              - generic [ref=e113]:
+                - img "celal şengör" [ref=e114]
+                - generic [ref=e115]:
+                  - heading "celal şengör" [level=3] [ref=e116]
+                  - generic [ref=e117]:
+                    - generic [ref=e118]: 
+                    - text: 0,0
+              - generic [ref=e119]:
+                - generic [ref=e120]:
+                  - generic [ref=e121]: 
+                  - text: 31 Mart, Salı
+                  - generic [ref=e122]: Bugun
+                - generic [ref=e123]:
+                  - generic [ref=e124]: 
+                  - text: 10:37 - 11:26 (49 dk)
+                - generic [ref=e125]:
+                  - generic [ref=e126]: 
+                  - text: "-"
+              - generic [ref=e127]:
+                - generic [ref=e128]: Online
+                - generic [ref=e129]: Yuz yuze
+              - generic [ref=e130]:
+                - button " Konum" [ref=e131] [cursor=pointer]:
+                  - generic [ref=e132]: 
+                  - text: Konum
+                - link " Yol Tarifi Al" [ref=e133] [cursor=pointer]:
+                  - /url: https://www.google.com/maps/dir/?api=1&destination=37.767481%2C30.562538&travelmode=driving&origin=0,0
+                  - generic [ref=e134]: 
+                  - text: Yol Tarifi Al
+                - button " Randevu Talebi" [ref=e135] [cursor=pointer]:
+                  - generic [ref=e136]: 
+                  - text: Randevu Talebi
+              - generic [ref=e137]: "Konum notu: dünyanın öbür ucu."
+            - article [ref=e139]:
+              - generic [ref=e140]:
+                - img "Test Doctor" [ref=e141]
+                - generic [ref=e142]:
+                  - heading "Test Doctor" [level=3] [ref=e143]
+                  - generic [ref=e144]:
+                    - generic [ref=e145]: 
+                    - text: 0,0
+              - generic [ref=e146]: Depresyon Tedavisi
+              - generic [ref=e147]:
+                - generic [ref=e148]:
+                  - generic [ref=e149]: 
+                  - text: 31 Mart, Salı
+                  - generic [ref=e150]: Bugun
+                - generic [ref=e151]:
+                  - generic [ref=e152]: 
+                  - text: 14:00 - 14:50 (50 dk)
+                - generic [ref=e153]:
+                  - generic [ref=e154]: 
+                  - text: ₺500,00 - ₺900,00
+              - generic [ref=e156]: Online
+              - button " Randevu Talebi" [ref=e158] [cursor=pointer]:
+                - generic [ref=e159]: 
+                - text: Randevu Talebi
+            - article [ref=e161]:
+              - generic [ref=e162]:
+                - img "taha arvas" [ref=e163]
+                - generic [ref=e164]:
+                  - heading "taha arvas" [level=3] [ref=e165]
+                  - generic [ref=e166]:
+                    - generic [ref=e167]: 
+                    - text: 0,0
+              - generic [ref=e168]: Anksiyete Bozukluklari, Travma Terapisi, Bagimlilik Tedavisi, Ergen Psikolojisi, Kariyer Danismanligi, Stres Yonetimi
+              - generic [ref=e169]:
+                - generic [ref=e170]:
+                  - generic [ref=e171]: 
+                  - text: 07 Nisan, Salı
+                  - generic [ref=e172]: Haftaya Salı
+                - generic [ref=e173]:
+                  - generic [ref=e174]: 
+                  - text: 09:00 - 09:50 (50 dk)
+                - generic [ref=e175]:
+                  - generic [ref=e176]: 
+                  - text: ₺6.000,00 - ₺9.000,00
+              - generic [ref=e178]: Online
+              - button " Randevu Talebi" [ref=e180] [cursor=pointer]:
+                - generic [ref=e181]: 
+                - text: Randevu Talebi
+              - generic [ref=e182]: "Konum notu: bina üstü."
+            - article [ref=e184]:
+              - generic [ref=e185]:
+                - img "celal şengör" [ref=e186]
+                - generic [ref=e187]:
+                  - heading "celal şengör" [level=3] [ref=e188]
+                  - generic [ref=e189]:
+                    - generic [ref=e190]: 
+                    - text: 0,0
+              - generic [ref=e191]: Aile Terapisi, Depresyon Tedavisi, Yasli Psikolojisi, Ergen Psikolojisi, Kariyer Danismanligi, Sosyal Fobi
+              - generic [ref=e192]:
+                - generic [ref=e193]:
+                  - generic [ref=e194]: 
+                  - text: 10 Nisan, Cuma
+                  - generic [ref=e195]: Haftaya Cuma
+                - generic [ref=e196]:
+                  - generic [ref=e197]: 
+                  - text: 11:59 - 12:46 (47 dk)
+                - generic [ref=e198]:
+                  - generic [ref=e199]: 
+                  - text: "- ₺123.213,00"
+              - generic [ref=e201]: Yuz yuze
+              - generic [ref=e202]:
+                - button " Konum" [ref=e203] [cursor=pointer]:
+                  - generic [ref=e204]: 
+                  - text: Konum
+                - link " Yol Tarifi Al" [ref=e205] [cursor=pointer]:
+                  - /url: https://www.google.com/maps/dir/?api=1&destination=37.767481%2C30.562538&travelmode=driving&origin=0,0
+                  - generic [ref=e206]: 
+                  - text: Yol Tarifi Al
+                - button " Randevu Talebi" [ref=e207] [cursor=pointer]:
+                  - generic [ref=e208]: 
+                  - text: Randevu Talebi
+              - generic [ref=e209]: "Konum notu: dünyanın öbür ucu."
+            - article [ref=e211]:
+              - generic [ref=e212]:
+                - img "celal şengör" [ref=e213]
+                - generic [ref=e214]:
+                  - heading "celal şengör" [level=3] [ref=e215]
+                  - generic [ref=e216]:
+                    - generic [ref=e217]: 
+                    - text: 0,0
+              - generic [ref=e218]: Cift Terapisi, Ofke Yonetimi, Sosyal Fobi
+              - generic [ref=e219]:
+                - generic [ref=e220]:
+                  - generic [ref=e221]: 
+                  - text: 11 Nisan, Cumartesi
+                  - generic [ref=e222]: Haftaya Cumartesi
+                - generic [ref=e223]:
+                  - generic [ref=e224]: 
+                  - text: 09:00 - 09:50 (50 dk)
+                - generic [ref=e225]:
+                  - generic [ref=e226]: 
+                  - text: ₺100,00 - ₺900,00
+              - generic [ref=e227]:
+                - generic [ref=e228]: Online
+                - generic [ref=e229]: Yuz yuze
+              - generic [ref=e230]:
+                - button " Konum" [ref=e231] [cursor=pointer]:
+                  - generic [ref=e232]: 
+                  - text: Konum
+                - link " Yol Tarifi Al" [ref=e233] [cursor=pointer]:
+                  - /url: https://www.google.com/maps/dir/?api=1&destination=37.767481%2C30.562538&travelmode=driving&origin=0,0
+                  - generic [ref=e234]: 
+                  - text: Yol Tarifi Al
+                - button " Randevu Talebi" [ref=e235] [cursor=pointer]:
+                  - generic [ref=e236]: 
+                  - text: Randevu Talebi
+              - generic [ref=e237]: "Konum notu: bina üstü."
+            - article [ref=e239]:
+              - generic [ref=e240]:
+                - img "celal şengör" [ref=e241]
+                - generic [ref=e242]:
+                  - heading "celal şengör" [level=3] [ref=e243]
+                  - generic [ref=e244]:
+                    - generic [ref=e245]: 
+                    - text: 0,0
+              - generic [ref=e246]: Aile Terapisi, Depresyon Tedavisi, Travma Terapisi, Kisilik Bozukluklari, Stres Yonetimi
+              - generic [ref=e247]:
+                - generic [ref=e248]:
+                  - generic [ref=e249]: 
+                  - text: 19 Nisan, Pazar
+                  - generic [ref=e250]: Pazar
+                - generic [ref=e251]:
+                  - generic [ref=e252]: 
+                  - text: 16:31 - 17:32 (61 dk)
+                - generic [ref=e253]:
+                  - generic [ref=e254]: 
+                  - text: ₺500,00 - ₺1.000,00
+              - generic [ref=e256]: Yuz yuze
+              - generic [ref=e257]:
+                - button " Konum" [ref=e258] [cursor=pointer]:
+                  - generic [ref=e259]: 
+                  - text: Konum
+                - link " Yol Tarifi Al" [ref=e260] [cursor=pointer]:
+                  - /url: https://www.google.com/maps/dir/?api=1&destination=37.747643%2C30.581474&travelmode=driving&origin=0,0
+                  - generic [ref=e261]: 
+                  - text: Yol Tarifi Al
+                - button " Randevu Talebi" [ref=e262] [cursor=pointer]:
+                  - generic [ref=e263]: 
+                  - text: Randevu Talebi
+              - generic [ref=e264]: "Konum notu: dünyanın öbür ucu."

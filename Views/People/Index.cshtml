@@ -1,0 +1,82 @@
+@model PsikologProje_Void.ViewModels.PeopleIndexViewModel
+
+@{
+    ViewData["Title"] = "Kisilerim";
+}
+
+<div class="container app-page">
+    <div class="page-header">
+        <h1 class="page-title">Kisilerim</h1>
+        <p class="page-subtitle">
+            @if (Model.IsDoctorView)
+            {
+                <text>Randevu/talep geçmişi bulunan hastaları tek noktadan yönetin.</text>
+            }
+            else
+            {
+                <text>Etkileşimde bulunduğunuz doktorları görüntüleyin ve hızlı aksiyon alın.</text>
+            }
+        </p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="app-card mb-3">
+        <form method="get" asp-action="Index" class="row g-2 align-items-end">
+            <div class="col-md-8">
+                <label for="search" class="form-label">Ara</label>
+                <input id="search" name="search" class="form-control" value="@Model.SearchTerm" placeholder="İsim veya e-posta ara" />
+            </div>
+            <div class="col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-grow-1">Ara</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Temizle</a>
+            </div>
+        </form>
+    </div>
+
+    @if (!Model.People.Any())
+    {
+        <div class="app-card text-center py-4 text-muted">
+            Henuz aktif bir baglanti bulunamadi.
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var person in Model.People)
+            {
+                var photo = string.IsNullOrWhiteSpace(person.ProfilePhotoPath) ? "/images/default-avatar.png" : person.ProfilePhotoPath;
+                <div class="col-md-6 col-xl-4">
+                    <article class="content-card h-100">
+                        <div class="d-flex align-items-start gap-2 mb-2">
+                            <img src="@photo" alt="@person.FullName" class="inline-profile-avatar" style="width:52px;height:52px;" />
+                            <div class="flex-grow-1">
+                                <h3 class="h6 mb-1">@person.FullName</h3>
+                                <div class="small text-muted">@person.UserTypeLabel</div>
+                            </div>
+                        </div>
+
+                        <div class="small mb-1"><b>E-posta:</b> @(!string.IsNullOrWhiteSpace(person.Email) ? person.Email : "-")</div>
+                        <div class="small mb-1"><b>Telefon:</b> @(!string.IsNullOrWhiteSpace(person.PhoneNumber) ? person.PhoneNumber : "-")</div>
+                        <div class="small mb-1"><b>Son etkileşim:</b> @(person.LastInteractionAt?.ToLocalTime().ToString("dd.MM.yyyy HH:mm") ?? "-")</div>
+                        <div class="small mb-1"><b>Randevu:</b> @person.TotalAppointmentCount | <b>Talep:</b> @person.TotalRequestCount</div>
+                        <div class="small"><b>Paylaşılan not:</b> @person.SharedNoteCount</div>
+
+                        <div class="action-row mt-3">
+                            <a asp-action="Profile" asp-route-id="@person.UserId" class="btn btn-sm btn-primary">
+                                <i class="fas fa-user me-1"></i>Profili Ac
+                            </a>
+                        </div>
+                    </article>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,385 @@
+@model PsikologProje_Void.ViewModels.DoctorWeeklyScheduleViewModel
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Haftalık Seans Çizelgesi";
+    var culture = new CultureInfo("tr-TR");
+    var totalRange = Math.Max(1, Model.GridEndMinute - Model.GridStartMinute);
+    var hourTicks = Enumerable.Range(0, Math.Max(1, (int)Math.Ceiling((Model.GridEndMinute - Model.GridStartMinute) / 60d) + 1))
+        .Select(i => Model.GridStartMinute + (i * 60))
+        .Where(m => m <= Model.GridEndMinute)
+        .ToList();
+    var isMonthView = string.Equals(Model.ViewMode, "month", StringComparison.OrdinalIgnoreCase);
+}
+
+<div class="container app-page">
+    <div class="page-header page-header-compact">
+        <h1 class="page-title">Haftalık Çizelge</h1>
+        <p class="page-subtitle">Sarı bloklar müsait seansları, yeşil bloklar atanmış seansları gösterir.</p>
+    </div>
+
+    <div class="scheduler-nav-card">
+        <div class="scheduler-nav-header">
+            <div class="btn-group btn-group-sm">
+                <a class="btn @(isMonthView ? "btn-outline-light" : "btn-light")"
+                   asp-action="Scheduler"
+                   asp-route-view="week"
+                   asp-route-weekStart="@Model.WeekStartDate.ToString("yyyy-MM-dd")"
+                   asp-route-monthDate="@Model.MonthDate.ToString("yyyy-MM-dd")">
+                    Hafta
+                </a>
+                <a class="btn @(isMonthView ? "btn-light" : "btn-outline-light")"
+                   asp-action="Scheduler"
+                   asp-route-view="month"
+                   asp-route-monthDate="@Model.MonthDate.ToString("yyyy-MM-dd")"
+                   asp-route-weekStart="@Model.WeekStartDate.ToString("yyyy-MM-dd")">
+                    Ay
+                </a>
+            </div>
+
+            @if (isMonthView)
+            {
+                <a class="btn btn-sm btn-outline-light"
+                   asp-action="Scheduler"
+                   asp-route-view="month"
+                   asp-route-monthDate="@Model.PreviousMonthDate.ToString("yyyy-MM-dd")"
+                   asp-route-weekStart="@Model.WeekStartDate.ToString("yyyy-MM-dd")">
+                    <i class="fas fa-chevron-left me-1"></i>Önceki ay
+                </a>
+                <div class="scheduler-range">@Model.MonthLabel</div>
+                <a class="btn btn-sm btn-outline-light"
+                   asp-action="Scheduler"
+                   asp-route-view="month"
+                   asp-route-monthDate="@Model.NextMonthDate.ToString("yyyy-MM-dd")"
+                   asp-route-weekStart="@Model.WeekStartDate.ToString("yyyy-MM-dd")">
+                    Sonraki ay<i class="fas fa-chevron-right ms-1"></i>
+                </a>
+            }
+            else
+            {
+                <a class="btn btn-sm btn-outline-light"
+                   asp-action="Scheduler"
+                   asp-route-view="week"
+                   asp-route-weekStart="@Model.PreviousWeekStartDate.ToString("yyyy-MM-dd")"
+                   asp-route-monthDate="@Model.MonthDate.ToString("yyyy-MM-dd")">
+                    <i class="fas fa-chevron-left me-1"></i>Önceki hafta
+                </a>
+                <div class="scheduler-range">@Model.WeekRangeLabel</div>
+                <a class="btn btn-sm btn-outline-light"
+                   asp-action="Scheduler"
+                   asp-route-view="week"
+                   asp-route-weekStart="@Model.NextWeekStartDate.ToString("yyyy-MM-dd")"
+                   asp-route-monthDate="@Model.MonthDate.ToString("yyyy-MM-dd")">
+                    Sonraki hafta<i class="fas fa-chevron-right ms-1"></i>
+                </a>
+            }
+        </div>
+
+        @if (!isMonthView)
+        {
+            <form method="get" asp-action="Scheduler" class="scheduler-date-form">
+                <input type="hidden" name="view" value="week" />
+                <input type="hidden" name="monthDate" value="@Model.MonthDate.ToString("yyyy-MM-dd")" />
+                <label for="weekStart" class="form-label mb-0">Hafta başlangıcı</label>
+                <input id="weekStart"
+                       name="weekStart"
+                       type="date"
+                       class="form-control form-control-sm"
+                       value="@Model.WeekStartDate.ToString("yyyy-MM-dd")"
+                       onchange="this.form.submit();" />
+            </form>
+        }
+    </div>
+
+    @if (isMonthView)
+    {
+        <section class="scheduler-month-grid">
+            @foreach (var day in Model.MonthDays)
+            {
+                var itemClass = day.IsCurrentMonth ? "month-day-item" : "month-day-item is-out-month";
+                if (day.IsToday)
+                {
+                    itemClass += " is-today";
+                }
+                if (day.IsSelectedWeek)
+                {
+                    itemClass += " is-selected-week";
+                }
+                if (day.IsCurrentMonth)
+                {
+                    itemClass += day.TotalSessionCount > 0 ? " has-appointments" : " has-no-appointments";
+                }
+
+                <a class="@itemClass"
+                   asp-action="Scheduler"
+                   asp-route-view="week"
+                   asp-route-weekStart="@day.WeekStartDate.ToString("yyyy-MM-dd")"
+                   asp-route-monthDate="@Model.MonthDate.ToString("yyyy-MM-dd")">
+                    <div class="month-day-head">
+                        <span class="month-day-name">@day.Date.ToString("ddd", culture)</span>
+                        <span class="month-day-number">@day.Date.Day</span>
+                    </div>
+                    <div class="month-day-metrics">
+                        <span class="status-chip status-neutral">@day.TotalSessionCount seans</span>
+                        <span class="status-chip status-info">@day.AssignedSessionCount dolu</span>
+                        <span class="status-chip status-pending">@day.AvailableSessionCount boş</span>
+                    </div>
+                </a>
+            }
+        </section>
+    }
+    else
+    {
+        <section class="scheduler-pulse" aria-label="Haftalık yoğunluk">
+            @foreach (var day in Model.Days)
+            {
+                var activity = day.TotalSessionCount == 0
+                    ? 0
+                    : Math.Max(8, Math.Min(100, (int)Math.Round((day.TotalSessionCount / (double)Math.Max(1, Model.Days.Max(x => x.TotalSessionCount))) * 100)));
+                <button type="button"
+                        class="pulse-day @(day.DayIndex == Model.ActiveDayIndex ? "is-active" : string.Empty)"
+                        data-day-index="@day.DayIndex"
+                        title="@($"{day.DayName} | {day.TotalSessionCount} seans | {day.TotalHours:0.#} saat")">
+                    <div class="pulse-day-name">@day.DayName</div>
+                    <div class="pulse-day-date">@day.Date.ToString("dd MMM", culture)</div>
+                    <div class="pulse-bars">
+                        <div class="pulse-bar pulse-available" style="height:@Math.Max(6, activity * 0.7)%"></div>
+                        <div class="pulse-bar pulse-assigned" style="height:@Math.Max(6, activity)%"></div>
+                    </div>
+                    <div class="pulse-meta">@day.TotalSessionCount seans | @day.TotalHours:0.# saat</div>
+                </button>
+            }
+        </section>
+
+        <div class="scheduler-grid-wrapper">
+            @if (!Model.HasAnyAppointment)
+            {
+                <div class="scheduler-empty-strip">
+                    <span>Bu hafta seans yok</span>
+                    <span>00:00 - 23:59</span>
+                </div>
+            }
+            else
+            {
+                <div class="scheduler-grid" style="--total-range:@totalRange;">
+                    <div class="time-axis">
+                        @foreach (var minute in hourTicks)
+                        {
+                            var tick = TimeSpan.FromMinutes(minute);
+                            <div class="time-tick">@($"{tick.Hours:00}:{tick.Minutes:00}")</div>
+                        }
+                    </div>
+
+                    <div class="day-columns">
+                        @foreach (var day in Model.Days)
+                        {
+                            <section class="day-column @(day.DayIndex == Model.ActiveDayIndex ? "is-active" : string.Empty)"
+                                     data-day-column="@day.DayIndex">
+                                <header class="day-column-header"
+                                        title="@($"{day.DayName}: {day.TotalSessionCount} seans, {day.TotalHours:0.#} saat")">
+                                    <div class="d-flex justify-content-between align-items-start gap-2">
+                                        <div>
+                                            <div class="day-column-title">@day.DayName</div>
+                                            <div class="day-column-subtitle">@day.Date.ToString("dd MMM", culture)</div>
+                                        </div>
+                                        <a class="btn btn-sm btn-outline-primary day-add-slot-btn"
+                                           asp-controller="Appointment"
+                                           asp-action="Create"
+                                           asp-route-date="@day.Date.ToString("yyyy-MM-dd")"
+                                           title="@($"{day.DayName} icin seans ekle")">
+                                            <i class="fas fa-plus"></i>
+                                        </a>
+                                    </div>
+                                </header>
+
+                                <div class="day-column-canvas">
+                                    @for (var row = 0; row < hourTicks.Count; row++)
+                                    {
+                                        <div class="hour-line"></div>
+                                    }
+
+                                    @{
+                                        var daySlots = Model.Slots.Where(x => x.DayIndex == day.DayIndex)
+                                            .OrderBy(x => x.StartMinuteOfDay).ToList();
+                                        var overlapTracker = new List<List<PsikologProje_Void.ViewModels.DoctorWeeklyScheduleSlotViewModel>>();
+                                        foreach (var s in daySlots)
+                                        {
+                                            var grp = overlapTracker.FirstOrDefault(g => g.Any(x => x.StartMinuteOfDay < s.EndMinuteOfDay && x.EndMinuteOfDay > s.StartMinuteOfDay));
+                                            if (grp == null)
+                                            {
+                                                overlapTracker.Add(new List<PsikologProje_Void.ViewModels.DoctorWeeklyScheduleSlotViewModel> { s });
+                                            }
+                                            else
+                                            {
+                                                grp.Add(s);
+                                            }
+                                        }
+                                    }
+                                    @foreach (var group in overlapTracker)
+                                    {
+                                        var groupSize = group.Count;
+                                        for (var idx = 0; idx < group.Count; idx++)
+                                        {
+                                            var slot = group[idx];
+                                            var topPercent = Math.Max(0, ((slot.StartMinuteOfDay - Model.GridStartMinute) / (double)totalRange) * 100);
+                                            var heightPercent = Math.Max(5, ((slot.EndMinuteOfDay - slot.StartMinuteOfDay) / (double)totalRange) * 100);
+                                            var widthPercent = 100d / groupSize;
+                                            var leftPercent = idx * widthPercent;
+                                            var hasAssignedPatient = !string.IsNullOrWhiteSpace(slot.PatientId) && slot.PatientName != "Atanmamış seans";
+                                            var photo = string.IsNullOrWhiteSpace(slot.PatientProfilePhotoPath) ? "/images/default-avatar.png" : slot.PatientProfilePhotoPath;
+                                            var slotCssClass = slot.IsAssigned ? "slot-assigned" : "slot-available";
+                                            if (slot.StatusLabel == "Hasta Onayı Bekliyor")
+                                            {
+                                                slotCssClass = "slot-pending-patient";
+                                            }
+                                            else if (slot.StatusLabel == "Reddedildi" || slot.StatusLabel == "Süresi Doldu")
+                                            {
+                                                slotCssClass = "slot-rejected";
+                                            }
+                                            <button type="button"
+                                                    class="slot-chip @slotCssClass @(groupSize > 1 ? "slot-chip-overlap" : string.Empty)"
+                                                    style="top:@topPercent%;height:@heightPercent%;@(groupSize > 1 ? $"left:{leftPercent}%;width:calc({widthPercent}% - 2px);" : string.Empty)"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#scheduleSlotModal"
+                                                    data-slot-id="@slot.AppointmentId"
+                                                    data-slot-patient="@slot.PatientName"
+                                                    data-slot-patient-id="@slot.PatientId"
+                                                    data-slot-photo="@(hasAssignedPatient ? photo : "")"
+                                                    data-slot-time="@slot.TimeLabel"
+                                                    data-slot-status="@slot.StatusLabel"
+                                                    data-slot-price="@slot.PriceLabel"
+                                                    data-slot-notes="@slot.Notes"
+                                                    data-slot-location-note="@slot.LocationNote"
+                                                    data-slot-type="@slot.AppointmentTypeLabel"
+                                                    data-slot-relative="@slot.RelativeDayLabel"
+                                                    data-slot-date="@slot.StartTime.ToString("dd.MM.yyyy")">
+                                                <span class="slot-chip-time">@slot.TimeLabel</span>
+                                                <span class="slot-chip-name">@slot.PatientName</span>
+                                            </button>
+                                        }
+                                    }
+                                </div>
+                            </section>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<div class="modal fade" id="scheduleSlotModal" tabindex="-1" aria-labelledby="scheduleSlotModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content app-card">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scheduleSlotModalLabel">Seans Detayi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <img id="scheduleSlotPhoto" src="/images/default-avatar.png" alt="Profil" class="inline-profile-avatar" style="width:48px;height:48px;" />
+                    <div>
+                        <div class="fw-semibold" id="scheduleSlotPatient">-</div>
+                        <div class="small text-muted" id="scheduleSlotStatus">-</div>
+                    </div>
+                </div>
+                <div class="small mb-1"><b>Gun:</b> <span id="scheduleSlotRelative">-</span> | <span id="scheduleSlotDate">-</span></div>
+                <div class="small mb-1"><b>Saat:</b> <span id="scheduleSlotTime">-</span></div>
+                <div class="small mb-1"><b>Tur:</b> <span id="scheduleSlotType">-</span></div>
+                <div class="small mb-1"><b>Ucret:</b> <span id="scheduleSlotPrice">-</span></div>
+                <div class="small mb-1"><b>Konum notu:</b> <span id="scheduleSlotLocationNote">-</span></div>
+                <div class="small mb-3"><b>Not:</b> <span id="scheduleSlotNotes">-</span></div>
+                <a id="scheduleSlotPatientProfileLink" href="#" class="btn btn-sm btn-outline-primary d-none">
+                    <i class="fas fa-user me-1"></i>Hasta Profilini Ac
+                </a>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    (function () {
+        const dayButtons = document.querySelectorAll(".pulse-day");
+        const dayColumns = document.querySelectorAll("[data-day-column]");
+
+        function setActiveDay(dayIndex) {
+            dayButtons.forEach((button) => {
+                button.classList.toggle("is-active", button.dataset.dayIndex === String(dayIndex));
+            });
+
+            dayColumns.forEach((column) => {
+                column.classList.toggle("is-active", column.dataset.dayColumn === String(dayIndex));
+            });
+        }
+
+        dayButtons.forEach((button) => {
+            button.addEventListener("click", function () {
+                const dayIndex = Number(button.dataset.dayIndex || "0");
+                setActiveDay(dayIndex);
+            });
+        });
+
+        const slotModal = document.getElementById("scheduleSlotModal");
+        slotModal?.addEventListener("show.bs.modal", function (event) {
+            const trigger = event.relatedTarget;
+            if (!trigger) {
+                return;
+            }
+
+            const patient = trigger.getAttribute("data-slot-patient") || "-";
+            const patientId = trigger.getAttribute("data-slot-patient-id") || "";
+            const photo = trigger.getAttribute("data-slot-photo") || "/images/default-avatar.png";
+            const status = trigger.getAttribute("data-slot-status") || "-";
+            const time = trigger.getAttribute("data-slot-time") || "-";
+            const price = trigger.getAttribute("data-slot-price") || "-";
+            const notes = trigger.getAttribute("data-slot-notes") || "-";
+            const locationNote = trigger.getAttribute("data-slot-location-note") || "-";
+            const type = trigger.getAttribute("data-slot-type") || "-";
+            const relative = trigger.getAttribute("data-slot-relative") || "-";
+            const dateText = trigger.getAttribute("data-slot-date") || "-";
+
+            const setText = (id, value) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.textContent = value && value.trim() ? value : "-";
+                }
+            };
+
+            const photoEl = document.getElementById("scheduleSlotPhoto");
+            if (photoEl) {
+                if (photo) {
+                    photoEl.setAttribute("src", photo);
+                    photoEl.classList.remove("d-none");
+                } else {
+                    photoEl.classList.add("d-none");
+                }
+            }
+
+            setText("scheduleSlotPatient", patient);
+            setText("scheduleSlotStatus", status);
+            setText("scheduleSlotTime", time);
+            setText("scheduleSlotPrice", price);
+            setText("scheduleSlotNotes", notes);
+            setText("scheduleSlotLocationNote", locationNote);
+            setText("scheduleSlotType", type);
+            setText("scheduleSlotRelative", relative);
+            setText("scheduleSlotDate", dateText);
+
+            const profileLink = document.getElementById("scheduleSlotPatientProfileLink");
+            if (profileLink) {
+                if (patientId && patient.toLowerCase() !== "atanmamis seans") {
+                    profileLink.classList.remove("d-none");
+                    profileLink.setAttribute("href", `/People/Profile?id=${encodeURIComponent(patientId)}`);
+                } else {
+                    profileLink.classList.add("d-none");
+                    profileLink.setAttribute("href", "#");
+                }
+            }
+        });
+    })();
+</script>
+}

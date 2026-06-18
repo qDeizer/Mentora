@@ -1,0 +1,223 @@
+@model PsikologProje_Void.ViewModels.PersonProfileViewModel
+
+@{
+    ViewData["Title"] = "Profil Detayi";
+    var photo = string.IsNullOrWhiteSpace(Model.TargetProfilePhotoPath) ? "/images/default-avatar.png" : Model.TargetProfilePhotoPath;
+}
+
+<div class="container app-page">
+    <div class="page-header">
+        <h1 class="page-title">Profil Detayi</h1>
+        <p class="page-subtitle">Yetki kapsamındaki randevu, talep ve not bağlantılarını tek ekranda yönetin.</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="row g-3">
+        <div class="col-xl-4">
+            <div class="app-card">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <img src="@photo" alt="@Model.TargetFullName" class="inline-profile-avatar" style="width:84px;height:84px;" />
+                    <div>
+                        <h2 class="h5 mb-1">@Model.TargetFullName</h2>
+                        <div class="small text-muted">@Model.TargetRoleLabel</div>
+                    </div>
+                </div>
+
+                <div class="small mb-1"><b>E-posta:</b> @(!string.IsNullOrWhiteSpace(Model.TargetEmail) ? Model.TargetEmail : "-")</div>
+                <div class="small mb-1"><b>Telefon:</b> @(!string.IsNullOrWhiteSpace(Model.TargetPhoneNumber) ? Model.TargetPhoneNumber : "-")</div>
+                <div class="small mb-1"><b>Doğum tarihi:</b> @(Model.TargetBirthDate?.ToString("dd.MM.yyyy") ?? "-")</div>
+                <div class="small mb-1"><b>Son etkileşim:</b> @(Model.LastInteractionAt?.ToLocalTime().ToString("dd.MM.yyyy HH:mm") ?? "-")</div>
+                <div class="small"><b>Hakkında:</b> @(!string.IsNullOrWhiteSpace(Model.TargetAbout) ? Model.TargetAbout : "-")</div>
+
+                <hr />
+                <h3 class="h6">Hizli Aksiyonlar</h3>
+                <div class="d-grid gap-2">
+                    @if (Model.ViewerIsDoctor)
+                    {
+                        <a class="btn btn-sm btn-outline-primary" asp-controller="ClinicalNotes" asp-action="Index" asp-route-patientIds="@Model.TargetUserId">
+                            <i class="fas fa-notes-medical me-1"></i>Hasta Notlarina Git / Not Ekle
+                        </a>
+                        <a class="btn btn-sm btn-outline-primary" asp-controller="Appointment" asp-action="Create" asp-route-targetPatientId="@Model.TargetUserId" asp-route-isPrivateOffer="true">
+                            <i class="fas fa-gem me-1"></i>Hastaya Özel Randevu
+                        </a>
+                        <a class="btn btn-sm btn-outline-primary" asp-controller="Request" asp-action="Index" asp-route-selectedPatientIds="@Model.TargetUserId">
+                            <i class="fas fa-inbox me-1"></i>Talepleri Filtrele
+                        </a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-sm btn-outline-primary" asp-controller="PatientDashboard" asp-action="Index" asp-route-selectedDoctorIds="@Model.TargetUserId">
+                            <i class="fas fa-paper-plane me-1"></i>Randevu Talep Et
+                        </a>
+                        <a class="btn btn-sm btn-outline-primary" asp-controller="ClinicalNotes" asp-action="MyNotes" asp-route-selectedDoctorIds="@Model.TargetUserId">
+                            <i class="fas fa-file-medical me-1"></i>Notlarimda Doktoru Filtrele
+                        </a>
+                        <a class="btn btn-sm btn-outline-primary" asp-controller="Request" asp-action="MyRequests" asp-route-selectedDoctorIds="@Model.TargetUserId">
+                            <i class="fas fa-tasks me-1"></i>Taleplerimde Doktoru Filtrele
+                        </a>
+                    }
+                </div>
+
+                <button type="button" class="btn btn-sm btn-outline-danger w-100 mt-3" data-bs-toggle="modal" data-bs-target="#disconnectConfirmModal">
+                    <i class="fas fa-link-slash me-1"></i>İlişkiyi Kes
+                </button>
+                <div class="small text-muted mt-1">
+                    İlişkiyi kestiğinizde bu kişi sizin Kişilerim listenizde gözükmez, hızlı aksiyonlara erişemez ve onun profilini açamazsınız. Yeni bir talep/randevu ile ilişki tekrar canlanır.
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-8">
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Toplam randevu</div>
+                    <div class="metric-value">@Model.TotalAppointmentCount</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Bekleyen talep</div>
+                    <div class="metric-value">@Model.PendingRequestCount</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Onayli talep</div>
+                    <div class="metric-value">@Model.ApprovedRequestCount</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Paylasilan not</div>
+                    <div class="metric-value">@Model.SharedNoteCount</div>
+                </div>
+            </div>
+
+            <div class="app-card mt-3">
+                <h3 class="h6 mb-3">Son Randevular</h3>
+                @if (!Model.RecentAppointments.Any())
+                {
+                    <div class="text-muted small">Gösterilecek randevu yok.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Zaman</th>
+                                    <th>Durum</th>
+                                    <th>Ucret</th>
+                                    <th>Konum notu</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var item in Model.RecentAppointments)
+                            {
+                                <tr>
+                                    <td>@item.AppointmentId</td>
+                                    <td>@item.StartTime.ToString("dd.MM.yyyy HH:mm") - @item.EndTime.ToString("HH:mm")</td>
+                                    <td>@item.StatusLabel</td>
+                                    <td>@item.PriceLabel</td>
+                                    <td>@(!string.IsNullOrWhiteSpace(item.LocationNote) ? item.LocationNote : "-")</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+
+            <div class="app-card mt-3">
+                <h3 class="h6 mb-3">Son Talepler</h3>
+                @if (!Model.RecentRequests.Any())
+                {
+                    <div class="text-muted small">Gösterilecek talep yok.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Talep #</th>
+                                    <th>Randevu</th>
+                                    <th>Talep zamani</th>
+                                    <th>Durum</th>
+                                    <th>Mesajlar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var item in Model.RecentRequests)
+                            {
+                                <tr>
+                                    <td>@item.RequestId</td>
+                                    <td>@item.AppointmentStartTime.ToString("dd.MM.yyyy HH:mm")</td>
+                                    <td>@item.RequestedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                                    <td>@item.StatusLabel</td>
+                                    <td>
+                                        <div class="small"><b>Talep:</b> @(!string.IsNullOrWhiteSpace(item.RequestMessage) ? item.RequestMessage : "-")</div>
+                                        <div class="small"><b>Cevap:</b> @(!string.IsNullOrWhiteSpace(item.ResponseMessage) ? item.ResponseMessage : "-")</div>
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade mentora-confirm-modal mentora-confirm-modal--warn" id="disconnectConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content app-card">
+            <form asp-action="Disconnect" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="targetUserId" value="@Model.TargetUserId" />
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-link-slash me-2 text-warning"></i>İlişkiyi Kes</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mentora-confirm-subject">
+                        <img src="@photo" alt="@Model.TargetFullName" />
+                        <div class="subject-meta">
+                            <span class="subject-name">@Model.TargetFullName</span>
+                            <span class="subject-when">@Model.TargetRoleLabel</span>
+                        </div>
+                    </div>
+                    <p class="mb-2">Bu kişi ile olan ilişkinizi kesmek istediğinize emin misiniz?</p>
+                    <ul class="small text-muted mb-2">
+                        <li>Bu kullanıcı Kişilerim listenizde gözükmeyecek.</li>
+                        <li>Profil sayfası açılamayacak.</li>
+                        <li>Hızlı aksiyonlara erişemeyeceksiniz.</li>
+                        <li>Onay işleyen randevular/talepler korunur, sadece ilişki kapatılır.</li>
+                    </ul>
+                    <label class="form-label small">Onaylamak icin asagiya <strong>EVET</strong> yazin:</label>
+                    <input type="text" class="form-control" id="disconnectConfirmText" pattern="EVET" required />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" class="btn btn-danger" id="disconnectConfirmSubmit" disabled>İlişkiyi Kes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const txt = document.getElementById("disconnectConfirmText");
+            const btn = document.getElementById("disconnectConfirmSubmit");
+            txt?.addEventListener("input", function () {
+                btn.disabled = (txt.value.trim().toUpperCase() !== "EVET");
+            });
+        })();
+    </script>
+}

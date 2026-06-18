@@ -1,0 +1,615 @@
+@model PsikologProje_Void.ViewModels.RequestsViewModel
+@using PsikologProje_Void.Models
+
+@{
+    ViewData["Title"] = "Gelen Talepler";
+    var selectedStatuses = Model.Filter.SelectedStatuses?.Distinct().ToHashSet() ?? new HashSet<RequestStatus>();
+    if (selectedStatuses.Count == 0)
+    {
+        selectedStatuses = Enum.GetValues<RequestStatus>().ToHashSet();
+    }
+    var selectedPatientIds = Model.Filter.SelectedPatientIds?.Distinct().ToHashSet() ?? new HashSet<string>();
+    var sortDirectionAscending = Model.Filter.SortDirection == "asc";
+}
+
+<div class="container app-page">
+    <div class="page-header">
+        <h1 class="page-title">Gelen Talepler</h1>
+        <p class="page-subtitle">Filtreler değiştiği anda liste otomatik güncellenir. Onay sırasında çakışan slotlar otomatik kapanır.</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="row g-3">
+        <aside class="col-lg-4 col-xl-3">
+            <div class="app-card sticky-panel">
+                <h2 class="h6 mb-3">Filtreler</h2>
+                <form asp-action="Index" method="get" id="doctorRequestFilterForm">
+                    @if (Model.Filter.AppointmentId.HasValue)
+                    {
+                        <input type="hidden" name="AppointmentId" value="@Model.Filter.AppointmentId" />
+                        <div class="info-callout mb-3">
+                            Sadece randevu #@Model.Filter.AppointmentId filtreleniyor.
+                            <div class="mt-1"><a asp-action="Index">Tümünü göster</a></div>
+                        </div>
+                    }
+
+                    <input type="hidden" id="doctorRequestSortDirection" name="SortDirection" value="@Model.Filter.SortDirection" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Hastalar (çoklu)</label>
+                        <div class="dropdown multi-avatar-dropdown">
+                            <button class="form-select form-select-sm text-start d-flex align-items-center" type="button" id="doctorRequestPatientsDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                <span class="multi-avatar-summary" id="doctorRequestPatientsSummary">Hasta seçimi (@selectedPatientIds.Count)</span>
+                            </button>
+                            <div class="dropdown-menu p-2 multi-avatar-menu" aria-labelledby="doctorRequestPatientsDropdown">
+                                @foreach (var patient in Model.PatientOptions)
+                                {
+                                    var photo = string.IsNullOrWhiteSpace(patient.ProfilePhotoPath) ? "/images/default-avatar.png" : patient.ProfilePhotoPath;
+                                    <label class="multi-avatar-item w-100">
+                                        <input type="checkbox"
+                                               class="form-check-input"
+                                               name="SelectedPatientIds"
+                                               value="@patient.Id"
+                                               @(selectedPatientIds.Contains(patient.Id) ? "checked" : null) />
+                                        <img src="@photo" alt="@patient.FullName" class="inline-profile-avatar" style="width:26px;height:26px;" />
+                                        <span>@patient.FullName</span>
+                                    </label>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label d-block">Durum</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <label class="btn btn-sm btn-outline-warning">
+                                <input type="checkbox" class="me-1" name="SelectedStatuses" value="@RequestStatus.Pending" @(selectedStatuses.Contains(RequestStatus.Pending) ? "checked" : null) />
+                                Beklemede
+                            </label>
+                            <label class="btn btn-sm btn-outline-success">
+                                <input type="checkbox" class="me-1" name="SelectedStatuses" value="@RequestStatus.Approved" @(selectedStatuses.Contains(RequestStatus.Approved) ? "checked" : null) />
+                                Onaylandı
+                            </label>
+                            <label class="btn btn-sm btn-outline-danger">
+                                <input type="checkbox" class="me-1" name="SelectedStatuses" value="@RequestStatus.Rejected" @(selectedStatuses.Contains(RequestStatus.Rejected) ? "checked" : null) />
+                                Reddedildi
+                            </label>
+                        </div>
+                        <div class="small text-muted mt-1">Hiçbiri veya hepsi seçiliyse tüm durumlar gelir.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Talep tarihi aralığı</label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="input-group input-group-sm">
+                                    <input type="datetime-local" name="RequestDateFrom" value="@(Model.Filter.RequestDateFrom?.ToString("yyyy-MM-ddTHH:mm"))" class="form-control clearable-date-input" />
+                                    <button type="button" class="btn btn-outline-secondary clear-date-btn" title="Temizle">x</button>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="input-group input-group-sm">
+                                    <input type="datetime-local" name="RequestDateTo" value="@(Model.Filter.RequestDateTo?.ToString("yyyy-MM-ddTHH:mm"))" class="form-control clearable-date-input" />
+                                    <button type="button" class="btn btn-outline-secondary clear-date-btn" title="Temizle">x</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Randevu tarihi aralığı</label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="input-group input-group-sm">
+                                    <input type="datetime-local" name="AppointmentDateFrom" value="@(Model.Filter.AppointmentDateFrom?.ToString("yyyy-MM-ddTHH:mm"))" class="form-control clearable-date-input" />
+                                    <button type="button" class="btn btn-outline-secondary clear-date-btn" title="Temizle">x</button>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="input-group input-group-sm">
+                                    <input type="datetime-local" name="AppointmentDateTo" value="@(Model.Filter.AppointmentDateTo?.ToString("yyyy-MM-ddTHH:mm"))" class="form-control clearable-date-input" />
+                                    <button type="button" class="btn btn-outline-secondary clear-date-btn" title="Temizle">x</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Siralama</label>
+                        <div class="d-flex gap-2">
+                            <select name="SortBy" class="form-select form-select-sm">
+                                <option value="requestDate" selected="@(Model.Filter.SortBy == "requestDate")">Talep tarihi</option>
+                                <option value="appointmentDate" selected="@(Model.Filter.SortBy == "appointmentDate")">Randevu tarihi</option>
+                                <option value="patient" selected="@(Model.Filter.SortBy == "patient")">Hasta adı</option>
+                            </select>
+                            <button type="button" id="doctorRequestSortDirectionToggle" class="btn btn-sm btn-outline-secondary" title="Artan/Azalan">
+                                <i class="fas @(sortDirectionAscending ? "fa-arrow-up-wide-short" : "fa-arrow-down-wide-short")"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <a asp-action="Index" class="btn btn-sm btn-outline-secondary w-100">Filtreyi temizle</a>
+                </form>
+            </div>
+        </aside>
+
+        <section class="col-lg-8 col-xl-9">
+            @if (!Model.Requests.Any())
+            {
+                <div class="app-card text-center py-4 text-muted">Gösterilecek talep bulunamadı.</div>
+            }
+            else
+            {
+                <div class="row g-3">
+                    @foreach (var request in Model.Requests)
+                    {
+                        var statusClass = request.Status switch
+                        {
+                            RequestStatus.Pending => "status-pending",
+                            RequestStatus.Approved => "status-active",
+                            RequestStatus.Rejected => "status-danger",
+                            _ => "status-neutral"
+                        };
+                        var statusText = request.Status switch
+                        {
+                            RequestStatus.Pending => "Beklemede",
+                            RequestStatus.Approved => "Onaylandı",
+                            RequestStatus.Rejected => "Reddedildi",
+                            _ => request.Status.ToString()
+                        };
+                        var otherApplicantsJson = System.Text.Json.JsonSerializer.Serialize(request.OtherPendingApplicants.Select(x => new
+                        {
+                            name = x.PatientName,
+                            email = x.PatientEmail,
+                            phone = x.PatientPhone,
+                            photo = string.IsNullOrWhiteSpace(x.PatientProfilePhoto) ? "/images/default-avatar.png" : x.PatientProfilePhoto
+                        }));
+                        var conflictSlotsJson = System.Text.Json.JsonSerializer.Serialize(request.ConflictingSlots.Select(x => new
+                        {
+                            label = x.Label,
+                            pending = x.PendingRequestCount
+                        }));
+                        var defaultRejectMessage = "Bu randevu başka bir hastaya verildi. Dilerseniz diğer uygun randevulara tekrar başvurabilirsiniz.";
+
+                        <div class="col-md-6">
+                            <article class="content-card h-100">
+                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                    <div>
+                                        <h3 class="h6 mb-1">Talep #@request.RequestId</h3>
+                                        <div class="small text-muted">Randevu: @request.AppointmentStartTime.ToString("dd.MM.yyyy HH:mm")</div>
+                                        <div class="small text-muted">Talep: @request.RequestDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+                                    </div>
+                                    <span class="status-chip @statusClass">@statusText</span>
+                                </div>
+                                @if (request.IsPrivateOffer)
+                                {
+                                    <div class="small mt-1"><span class="status-chip status-info">Özel Randevu</span></div>
+                                }
+
+                                <div class="d-flex align-items-center gap-2 my-2">
+                                    <img src="@(string.IsNullOrWhiteSpace(request.PatientProfilePhoto) ? "/images/default-avatar.png" : request.PatientProfilePhoto)"
+                                         alt="@request.PatientName"
+                                         class="inline-profile-avatar"
+                                         style="width:40px;height:40px;" />
+                                    <div class="small"><b>Hasta:</b> <a asp-controller="People" asp-action="Profile" asp-route-id="@request.PatientId">@request.PatientName</a></div>
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(request.RequestMessage))
+                                {
+                                    <div class="small"><b>Hasta notu:</b> @request.RequestMessage</div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(request.ReasonForVisit))
+                                {
+                                    <div class="small"><b>Başvuru sebebi:</b> @request.ReasonForVisit</div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(request.UrgencyLevel))
+                                {
+                                    <div class="small"><b>Aciliyet:</b> @request.UrgencyLevel</div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(request.PreviousSupportInfo))
+                                {
+                                    <div class="small"><b>Önceki destek:</b> @request.PreviousSupportInfo</div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(request.Expectations))
+                                {
+                                    <div class="small"><b>Beklenti:</b> @request.Expectations</div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(request.AppointmentLocationNote))
+                                {
+                                    <div class="small"><b>Konum notu:</b> @request.AppointmentLocationNote</div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(request.ResponseMessage))
+                                {
+                                    <div class="small"><b>Cevabiniz:</b> @request.ResponseMessage</div>
+                                }
+
+                                @if (request.AppointmentLatitude.HasValue && request.AppointmentLongitude.HasValue)
+                                {
+                                    var destination = $"{request.AppointmentLatitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)},{request.AppointmentLongitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+                                    <div class="action-row">
+                                        <a class="btn btn-sm btn-outline-secondary route-link"
+                                           data-destination="@destination"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           href="https://www.google.com/maps/dir/?api=1&destination=@destination&travelmode=driving">
+                                            <i class="fas fa-directions me-1"></i>Yol Tarifi Al
+                                        </a>
+                                    </div>
+                                }
+
+                                <div class="mt-auto">
+                                    @if (request.Status == RequestStatus.Pending)
+                                    {
+                                        <div class="warning-callout mb-2">
+                                            Bu randevuya başvuran @request.OtherPendingApplicants.Count hasta daha var.
+                                            Onay sonrası @request.ConflictingSlots.Count çakışan slot kapanır.
+                                        </div>
+
+                                        <div class="d-flex gap-2">
+                                            <button type="button"
+                                                    class="btn btn-outline-danger w-50 open-reject-modal"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#rejectRequestModal"
+                                                    data-request-id="@request.RequestId"
+                                                    data-patient-name="@request.PatientName"
+                                                    data-patient-photo="@(string.IsNullOrWhiteSpace(request.PatientProfilePhoto) ? "/images/default-avatar.png" : request.PatientProfilePhoto)"
+                                                    data-appointment-when="@request.AppointmentStartTime.ToString("dd.MM.yyyy HH:mm")"
+                                                    data-appointment-end="@request.AppointmentEndTime.ToString("HH:mm")"
+                                                    data-appointment-type="@request.AppointmentTypeText"
+                                                    data-appointment-price="@request.PriceRange">
+                                                <i class="fas fa-times me-1"></i>Reddet
+                                            </button>
+                                            <button type="button"
+                                                    class="btn btn-primary w-50 open-approve-modal"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#approveRequestModal"
+                                                    data-request-id="@request.RequestId"
+                                                    data-patient-name="@request.PatientName"
+                                                    data-patient-photo="@(string.IsNullOrWhiteSpace(request.PatientProfilePhoto) ? "/images/default-avatar.png" : request.PatientProfilePhoto)"
+                                                    data-appointment-when="@request.AppointmentStartTime.ToString("dd.MM.yyyy HH:mm")"
+                                                    data-appointment-end="@request.AppointmentEndTime.ToString("HH:mm")"
+                                                    data-appointment-type="@request.AppointmentTypeText"
+                                                    data-appointment-price="@request.PriceRange"
+                                                    data-other-applicants="@otherApplicantsJson"
+                                                    data-conflict-slots="@conflictSlotsJson"
+                                                    data-conflict-pending-count="@request.ConflictPendingRequestCount"
+                                                    data-estimated-mail-count="@request.EstimatedMailCount"
+                                                    data-default-reject-message="@defaultRejectMessage">
+                                                <i class="fas fa-check me-1"></i>Onayla
+                                            </button>
+                                        </div>
+                                    }
+                                </div>
+                            </article>
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+    </div>
+</div>
+
+<div class="modal fade mentora-confirm-modal mentora-confirm-modal--approve" id="approveRequestModal" tabindex="-1" aria-labelledby="approveRequestModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content app-card">
+            <form asp-action="Approve" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title" id="approveRequestModalLabel"><i class="fas fa-check-circle text-success me-2"></i>Talep Onayı</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="requestId" id="approveRequestId" />
+
+                    <div class="mentora-confirm-subject">
+                        <img id="approvePatientPhoto" src="/images/default-avatar.png" alt="Hasta" />
+                        <div class="subject-meta">
+                            <span class="subject-name" id="approvePatientName">-</span>
+                            <span class="subject-when" id="approveAppointmentWhen">-</span>
+                        </div>
+                    </div>
+
+                    <div class="warning-callout mb-3" id="approveImpactSummary">
+                        Bu işlem randevuyu rezerve eder ve varsa diğer başvuruları otomatik reddeder.
+                    </div>
+
+                    <div class="card-info-grid small mb-3">
+                        <div><b>Tür:</b> <span id="approveAppointmentType">-</span></div>
+                        <div><b>Saat:</b> <span id="approveAppointmentRange">-</span></div>
+                        <div><b>Ücret:</b> <span id="approveAppointmentPrice">-</span></div>
+                    </div>
+
+                    <div class="mb-3" id="approveOtherApplicantsBlock" style="display:none;">
+                        <div class="fw-semibold mb-1">Otomatik reddedilecek hastalar</div>
+                        <div id="approveOtherApplicantsList" class="approval-preview-list"></div>
+                    </div>
+
+                    <div class="mb-3" id="approveConflictBlock" style="display:none;">
+                        <div class="fw-semibold mb-1">Çakışma nedeniyle kapanacak slotlar</div>
+                        <ul id="approveConflictList" class="small mb-0"></ul>
+                    </div>
+
+                    <label for="approveResponseMessage" class="form-label">Hastaya gönderilecek onay notu</label>
+                    <textarea id="approveResponseMessage"
+                              name="responseMessage"
+                              class="form-control"
+                              rows="3"
+                              placeholder="Örn: Talebiniz onaylandı, görüşmeden 10 dakika önce hazır olun."></textarea>
+
+                    <label for="approveAutoRejectMessage" class="form-label mt-3">Diğer hastalara gidecek otomatik red mesajı</label>
+                    <textarea id="approveAutoRejectMessage"
+                              name="autoRejectMessage"
+                              class="form-control"
+                              rows="3"></textarea>
+
+                    <div class="info-callout mt-3">
+                        Onaylanan hastaya mail/bildirim gönderilir. Otomatik reddedilen hastalara da tercihleri açıksa mail ve uygulama içi bildirim gider.
+                    </div>
+
+                    <div class="mt-3" id="approveTextConfirmBlock" style="display:none;">
+                        <label for="approveTextConfirm" class="form-label">Bu işlem geri alınamaz. Devam etmek için <b>ONAYLA</b> yazın.</label>
+                        <input id="approveTextConfirm" class="form-control" autocomplete="off" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" class="btn btn-success" id="approveSubmitBtn"><i class="fas fa-check me-1"></i>Onayla</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade mentora-confirm-modal mentora-confirm-modal--reject" id="rejectRequestModal" tabindex="-1" aria-labelledby="rejectRequestModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content app-card">
+            <form asp-action="Reject" method="post" id="rejectRequestForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rejectRequestModalLabel"><i class="fas fa-times-circle text-danger me-2"></i>Talep Reddi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="requestId" id="rejectRequestId" />
+
+                    <div class="mentora-confirm-subject">
+                        <img id="rejectPatientPhoto" src="/images/default-avatar.png" alt="Hasta" />
+                        <div class="subject-meta">
+                            <span class="subject-name" id="rejectPatientName">-</span>
+                            <span class="subject-when" id="rejectAppointmentWhen">-</span>
+                        </div>
+                    </div>
+
+                    <label for="rejectResponseMessage" class="form-label">Reddetme nedeni <span class="text-danger">*</span></label>
+                    <textarea id="rejectResponseMessage"
+                              name="responseMessage"
+                              class="form-control"
+                              rows="3"
+                              required
+                              minlength="3"
+                              placeholder="Örn: Bu saatte başka bir randevum olduğu için maalesef yapamayacağım."></textarea>
+                    <div class="small text-muted mt-1">Hasta bu mesajı görür. Lütfen kibarca ve açıklayıcı yazın.</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" class="btn btn-danger"><i class="fas fa-times me-1"></i>Reddet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    (function () {
+        const form = document.getElementById("doctorRequestFilterForm");
+        const sortDirectionInput = document.getElementById("doctorRequestSortDirection");
+        const sortDirectionToggle = document.getElementById("doctorRequestSortDirectionToggle");
+        const patientsSummary = document.getElementById("doctorRequestPatientsSummary");
+        let pendingSubmit = null;
+
+        function scheduleSubmit() {
+            if (!form) {
+                return;
+            }
+            if (pendingSubmit) {
+                window.clearTimeout(pendingSubmit);
+            }
+            pendingSubmit = window.setTimeout(() => {
+                sessionStorage.setItem("mentora:doctorRequests:scrollY", String(window.scrollY || 0));
+                form.requestSubmit();
+            }, 120);
+        }
+
+        function restoreScroll() {
+            const value = sessionStorage.getItem("mentora:doctorRequests:scrollY");
+            if (!value) {
+                return;
+            }
+            sessionStorage.removeItem("mentora:doctorRequests:scrollY");
+            const y = Number(value);
+            if (Number.isFinite(y) && y > 0) {
+                window.scrollTo({ top: y, behavior: "auto" });
+            }
+        }
+
+        function updatePatientsSummary() {
+            if (!form || !patientsSummary) {
+                return;
+            }
+            const selectedCount = form.querySelectorAll("input[name='SelectedPatientIds']:checked").length;
+            patientsSummary.textContent = `Hasta seçimi (${selectedCount})`;
+        }
+
+        function parseJsonData(value) {
+            if (!value) {
+                return [];
+            }
+            try {
+                const parsed = JSON.parse(value);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch {
+                return [];
+            }
+        }
+
+        function escapeHtml(value) {
+            return String(value || "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#39;");
+        }
+
+        form?.querySelectorAll("input[type='checkbox'], input[type='datetime-local'], select").forEach((el) => {
+            el.addEventListener("change", function () {
+                updatePatientsSummary();
+                scheduleSubmit();
+            });
+        });
+
+        document.querySelectorAll(".clear-date-btn").forEach((button) => {
+            button.addEventListener("click", function () {
+                const wrapper = button.closest(".input-group");
+                const input = wrapper?.querySelector("input[type='datetime-local']");
+                if (!input) {
+                    return;
+                }
+                input.value = "";
+                scheduleSubmit();
+            });
+        });
+
+        sortDirectionToggle?.addEventListener("click", function () {
+            if (!sortDirectionInput) {
+                return;
+            }
+            sortDirectionInput.value = sortDirectionInput.value === "asc" ? "desc" : "asc";
+            sortDirectionToggle.innerHTML = sortDirectionInput.value === "asc"
+                ? "<i class='fas fa-arrow-up-wide-short'></i>"
+                : "<i class='fas fa-arrow-down-wide-short'></i>";
+            scheduleSubmit();
+        });
+
+        const approveModal = document.getElementById("approveRequestModal");
+        approveModal?.addEventListener("show.bs.modal", function (event) {
+            const trigger = event.relatedTarget;
+            if (!trigger) {
+                return;
+            }
+
+            const requestId = trigger.getAttribute("data-request-id") || "";
+            const patientName = trigger.getAttribute("data-patient-name") || "-";
+            const patientPhoto = trigger.getAttribute("data-patient-photo") || "/images/default-avatar.png";
+            const appointmentWhen = trigger.getAttribute("data-appointment-when") || "-";
+            const appointmentEnd = trigger.getAttribute("data-appointment-end") || "-";
+            const appointmentType = trigger.getAttribute("data-appointment-type") || "-";
+            const appointmentPrice = trigger.getAttribute("data-appointment-price") || "-";
+            const otherApplicants = parseJsonData(trigger.getAttribute("data-other-applicants"));
+            const conflictSlots = parseJsonData(trigger.getAttribute("data-conflict-slots"));
+            const conflictPendingCount = Number(trigger.getAttribute("data-conflict-pending-count") || "0");
+            const estimatedMailCount = Number(trigger.getAttribute("data-estimated-mail-count") || "1");
+            const defaultRejectMessage = trigger.getAttribute("data-default-reject-message") || "";
+
+            const requestIdInput = document.getElementById("approveRequestId");
+            const patientNameText = document.getElementById("approvePatientName");
+            const patientPhotoImg = document.getElementById("approvePatientPhoto");
+            const whenText = document.getElementById("approveAppointmentWhen");
+            const responseText = document.getElementById("approveResponseMessage");
+            const autoRejectText = document.getElementById("approveAutoRejectMessage");
+            const impactSummary = document.getElementById("approveImpactSummary");
+            const appointmentTypeText = document.getElementById("approveAppointmentType");
+            const appointmentRangeText = document.getElementById("approveAppointmentRange");
+            const appointmentPriceText = document.getElementById("approveAppointmentPrice");
+            const otherBlock = document.getElementById("approveOtherApplicantsBlock");
+            const otherList = document.getElementById("approveOtherApplicantsList");
+            const conflictBlock = document.getElementById("approveConflictBlock");
+            const conflictList = document.getElementById("approveConflictList");
+            const confirmBlock = document.getElementById("approveTextConfirmBlock");
+            const confirmInput = document.getElementById("approveTextConfirm");
+            const submitBtn = document.getElementById("approveSubmitBtn");
+
+            if (requestIdInput) requestIdInput.value = requestId;
+            if (patientNameText) patientNameText.textContent = patientName;
+            if (patientPhotoImg) patientPhotoImg.src = patientPhoto;
+            if (whenText) whenText.textContent = "Randevu: " + appointmentWhen;
+            if (responseText) responseText.value = "";
+            if (autoRejectText) autoRejectText.value = defaultRejectMessage;
+            if (appointmentTypeText) appointmentTypeText.textContent = appointmentType;
+            if (appointmentRangeText) appointmentRangeText.textContent = appointmentWhen + " - " + appointmentEnd;
+            if (appointmentPriceText) appointmentPriceText.textContent = appointmentPrice;
+
+            const hasHighImpact = otherApplicants.length > 0 || conflictSlots.length > 0 || conflictPendingCount > 0;
+            if (impactSummary) {
+                impactSummary.textContent = hasHighImpact
+                    ? `Bu randevuya başvuran ${otherApplicants.length} hasta daha var. Onay sonrası ${conflictSlots.length} slot kapanacak, ${otherApplicants.length + conflictPendingCount} talep otomatik reddedilecek ve yaklaşık ${estimatedMailCount} mail kuyruğa alınacak.`
+                    : "Bu talep onaylanınca randevu rezerve edilir ve hastaya mail/bildirim hazırlanır.";
+            }
+
+            if (otherBlock && otherList) {
+                otherBlock.style.display = otherApplicants.length > 0 ? "" : "none";
+                otherList.innerHTML = otherApplicants.map((applicant) => `
+                    <div class="approval-preview-person">
+                        <img src="${escapeHtml(applicant.photo || "/images/default-avatar.png")}" alt="${escapeHtml(applicant.name)}" />
+                        <div>
+                            <div class="fw-semibold">${escapeHtml(applicant.name)}</div>
+                            <div class="text-muted">${escapeHtml(applicant.email || "E-posta yok")} ${applicant.phone ? " / " + escapeHtml(applicant.phone) : ""}</div>
+                        </div>
+                    </div>`).join("");
+            }
+
+            if (conflictBlock && conflictList) {
+                conflictBlock.style.display = conflictSlots.length > 0 ? "" : "none";
+                conflictList.innerHTML = conflictSlots.map((slot) =>
+                    `<li>${escapeHtml(slot.label)} (${Number(slot.pending || 0)} bekleyen talep)</li>`).join("");
+            }
+
+            if (confirmBlock && confirmInput && submitBtn) {
+                confirmInput.value = "";
+                confirmBlock.style.display = hasHighImpact ? "" : "none";
+                submitBtn.disabled = hasHighImpact;
+                confirmInput.oninput = function () {
+                    submitBtn.disabled = confirmInput.value.trim() !== "ONAYLA";
+                };
+            }
+        });
+
+        const rejectModal = document.getElementById("rejectRequestModal");
+        rejectModal?.addEventListener("show.bs.modal", function (event) {
+            const trigger = event.relatedTarget;
+            if (!trigger) {
+                return;
+            }
+
+            const requestId = trigger.getAttribute("data-request-id") || "";
+            const patientName = trigger.getAttribute("data-patient-name") || "-";
+            const patientPhoto = trigger.getAttribute("data-patient-photo") || "/images/default-avatar.png";
+            const appointmentWhen = trigger.getAttribute("data-appointment-when") || "-";
+
+            const requestIdInput = document.getElementById("rejectRequestId");
+            const patientNameText = document.getElementById("rejectPatientName");
+            const patientPhotoImg = document.getElementById("rejectPatientPhoto");
+            const whenText = document.getElementById("rejectAppointmentWhen");
+            const responseText = document.getElementById("rejectResponseMessage");
+
+            if (requestIdInput) requestIdInput.value = requestId;
+            if (patientNameText) patientNameText.textContent = patientName;
+            if (patientPhotoImg) patientPhotoImg.src = patientPhoto;
+            if (whenText) whenText.textContent = "Randevu: " + appointmentWhen;
+            if (responseText) responseText.value = "";
+        });
+
+        restoreScroll();
+        updatePatientsSummary();
+    })();
+</script>
+}

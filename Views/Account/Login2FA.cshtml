@@ -1,0 +1,50 @@
+@{
+    ViewData["Title"] = "İki Aşamalı Doğrulama";
+}
+
+<div class="auth-container">
+    <div class="auth-card glass-effect login-card">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success mb-3">@TempData["SuccessMessage"]</div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger mb-3">@TempData["ErrorMessage"]</div>
+        }
+
+        <div class="auth-header">
+            <i class="fas fa-shield-halved auth-icon"></i>
+            <h2>İki Aşamalı Doğrulama</h2>
+            <p>E-posta adresinize gönderdiğimiz 6 haneli kodu girin.</p>
+        </div>
+
+        <form asp-action="Login2FA" method="post" class="auth-form">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger validation-summary"></div>
+
+            <div class="form-floating-group">
+                <input type="text"
+                       name="code"
+                       maxlength="6"
+                       minlength="6"
+                       autocomplete="one-time-code"
+                       inputmode="numeric"
+                       pattern="[0-9]{6}"
+                       required
+                       class="form-control"
+                       placeholder="6 haneli kod" />
+                <label><i class="fas fa-key"></i> 6 haneli kod</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-auth">Doğrula ve Giriş Yap</button>
+            <div class="auth-footer">
+                <p><a asp-action="Login" class="link-primary">Vazgeç</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

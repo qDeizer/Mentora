@@ -1,0 +1,53 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "Mentora Logo Mentora" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Mentora Logo" [ref=e5]
+        - generic [ref=e6]: Mentora
+      - generic [ref=e7]:
+        - list [ref=e8]:
+          - listitem [ref=e9]:
+            - link " Randevu Ara" [ref=e10] [cursor=pointer]:
+              - /url: /PatientDashboard
+              - generic [ref=e11]: 
+              - text: Randevu Ara
+          - listitem [ref=e12]:
+            - link " Taleplerim" [ref=e13] [cursor=pointer]:
+              - /url: /Request/MyRequests
+              - generic [ref=e14]: 
+              - text: Taleplerim
+          - listitem [ref=e15]:
+            - link " Ozel Randevular" [ref=e16] [cursor=pointer]:
+              - /url: /PrivateAppointments
+              - generic [ref=e17]: 
+              - text: Ozel Randevular
+          - listitem [ref=e18]:
+            - link " Notlarim" [ref=e19] [cursor=pointer]:
+              - /url: /ClinicalNotes/MyNotes
+              - generic [ref=e20]: 
+              - text: Notlarim
+          - listitem [ref=e21]:
+            - link " Doktorlarim" [ref=e22] [cursor=pointer]:
+              - /url: /People
+              - generic [ref=e23]: 
+              - text: Doktorlarim
+        - list [ref=e24]:
+          - listitem [ref=e25]:
+            - button " Profil konumu tanimsiz" [ref=e26] [cursor=pointer]:
+              - generic [ref=e27]: 
+              - generic [ref=e28]: Profil konumu tanimsiz
+          - listitem [ref=e29]:
+            - button "" [ref=e30] [cursor=pointer]:
+              - generic [ref=e31]: 
+          - listitem [ref=e32]:
+            - button "Profil Test Patient" [ref=e33] [cursor=pointer]:
+              - img "Profil" [ref=e34]
+              - generic [ref=e35]: Test Patient
+            - text:   
+  - main [ref=e36]:
+    - generic [ref=e37]:
+      - generic [ref=e38]:
+        - heading "Ozel Randevu Teklifleri" [level=1] [ref=e39]
+        - paragraph [ref=e40]: Doktorunuzun size ozel actigi randevulari buradan kabul veya reddedebilirsiniz.
+      - generic [ref=e41]: Bekleyen ozel randevu teklifi bulunmuyor.

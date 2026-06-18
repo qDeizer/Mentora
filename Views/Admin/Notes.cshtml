@@ -1,0 +1,126 @@
+@model List<PsikologProje_Void.Models.ClinicalNote>
+
+@{
+    ViewData["Title"] = "Admin - Klinik Notlar";
+    var query = ViewBag.Query as string ?? string.Empty;
+}
+
+<div class="container app-page">
+    <div class="page-header">
+        <h1 class="page-title">Klinik Notlar</h1>
+        <p class="page-subtitle">Tüm klinik notları listeler. Bir notu sildiğinizde yazara tam içerik mail olarak gönderilir.</p>
+        <a class="btn btn-sm btn-outline-secondary mt-2" asp-action="Index">Admin Paneline Dön</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <form method="get" asp-action="Notes" class="d-flex gap-2 mb-3">
+        <input type="text" name="q" class="form-control" placeholder="Not içeriği veya kullanıcı ara" value="@query" />
+        <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
+    </form>
+
+    <div class="row g-3">
+        @foreach (var note in Model)
+        {
+            var preview = note.Content.Length > 200 ? note.Content[..200] + "..." : note.Content;
+            <div class="col-lg-6">
+                <article class="content-card h-100">
+                    <div class="d-flex justify-content-between gap-2">
+                        <div>
+                            <h3 class="h6 mb-1">Not #@note.Id</h3>
+                            <div class="small text-muted">
+                                @note.CreatedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
+                            </div>
+                        </div>
+                        <span class="status-chip status-neutral">@note.Visibility</span>
+                    </div>
+
+                    <div class="small mt-1">
+                        <b>Yazar:</b> @(note.AuthorDoctor != null ? $"{note.AuthorDoctor.FirstName} {note.AuthorDoctor.LastName}" : "-")
+                    </div>
+                    <div class="small">
+                        <b>Hasta:</b> @(note.Patient != null ? $"{note.Patient.FirstName} {note.Patient.LastName}" : "-")
+                    </div>
+
+                    <pre class="small p-2 mt-2" style="background:#f8fafc;border-radius:6px;white-space:pre-wrap;">@preview</pre>
+
+                    <div class="action-row">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger open-admin-delete-note"
+                                data-bs-toggle="modal"
+                                data-bs-target="#adminDeleteNoteModal"
+                                data-note-id="@note.Id"
+                                data-author="@(note.AuthorDoctor != null ? $"{note.AuthorDoctor.FirstName} {note.AuthorDoctor.LastName}" : "-")"
+                                data-patient="@(note.Patient != null ? $"{note.Patient.FirstName} {note.Patient.LastName}" : "-")">
+                            <i class="fas fa-trash me-1"></i>Sil (Mail Gönderir)
+                        </button>
+                    </div>
+                </article>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="modal fade mentora-confirm-modal mentora-confirm-modal--reject" id="adminDeleteNoteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content app-card">
+            <form asp-action="DeleteNote" method="post" id="adminDeleteNoteForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="noteId" id="adminDeleteNoteId" />
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Klinik Notu Sil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mentora-confirm-subject">
+                        <div class="subject-meta">
+                            <span class="subject-name">Not <span id="adminDeleteNoteAuthor">-</span></span>
+                            <span class="subject-when">Hasta: <span id="adminDeleteNotePatient">-</span></span>
+                        </div>
+                    </div>
+                    <p class="mb-2">Bu işlem geri alınamaz. Not silinince yazara notun <strong>tam içeriği</strong> mail olarak gönderilecektir.</p>
+                    <label class="form-label small">Onaylamak icin asagiya <strong>SIL</strong> yazin:</label>
+                    <input type="text" name="confirmText" class="form-control" id="adminDeleteNoteConfirmText" pattern="SIL" required />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" class="btn btn-danger" id="adminDeleteNoteSubmit" disabled>Sil</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const modal = document.getElementById("adminDeleteNoteModal");
+            const idInput = document.getElementById("adminDeleteNoteId");
+            const authorTxt = document.getElementById("adminDeleteNoteAuthor");
+            const patientTxt = document.getElementById("adminDeleteNotePatient");
+            const confirmTxt = document.getElementById("adminDeleteNoteConfirmText");
+            const submitBtn = document.getElementById("adminDeleteNoteSubmit");
+
+            modal?.addEventListener("show.bs.modal", function (event) {
+                const t = event.relatedTarget;
+                if (!t) return;
+                idInput.value = t.getAttribute("data-note-id") || "";
+                authorTxt.textContent = "#" + idInput.value + " - " + (t.getAttribute("data-author") || "");
+                patientTxt.textContent = t.getAttribute("data-patient") || "-";
+                if (confirmTxt) confirmTxt.value = "";
+                submitBtn.disabled = true;
+            });
+
+            confirmTxt?.addEventListener("input", function () {
+                submitBtn.disabled = (confirmTxt.value.trim().toUpperCase() !== "SIL");
+            });
+        })();
+    </script>
+}

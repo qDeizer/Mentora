@@ -1,0 +1,125 @@
+@model PsikologProje_Void.ViewModels.NotificationSettingsViewModel
+
+@{
+    ViewData["Title"] = "Bildirim Ayarlari";
+}
+
+<div class="container app-page">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            <div class="page-header">
+                <h1 class="page-title">Bildirim Ayarları</h1>
+                <p class="page-subtitle">E-posta bildirimlerini, hatırlatma dakikasını ve SMTP test akışlarını yönetin.</p>
+            </div>
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+            }
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+            }
+
+            <div class="app-card mb-3">
+                <h2 class="h5 mb-3">Tercihler</h2>
+                <form asp-action="Notifications" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="All" class="text-danger"></div>
+
+                    <div class="form-check form-switch mb-2">
+                        <input asp-for="EmailEnabled" class="form-check-input" />
+                        <label asp-for="EmailEnabled" class="form-check-label">E-posta bildirimleri açık</label>
+                    </div>
+
+                    <div class="form-check form-switch mb-2">
+                        <input asp-for="AppointmentReminderEnabled" class="form-check-input" />
+                        <label asp-for="AppointmentReminderEnabled" class="form-check-label">Randevu hatırlatma e-postası</label>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <input asp-for="RequestStatusEmailsEnabled" class="form-check-input" />
+                        <label asp-for="RequestStatusEmailsEnabled" class="form-check-label">Talep durum e-postaları</label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="EmailDigestMode" class="form-label">Mail gönderim sıklığı</label>
+                        <select asp-for="EmailDigestMode" asp-items="Html.GetEnumSelectList<PsikologProje_Void.Models.EmailDigestMode>()" class="form-select">
+                        </select>
+                        <div class="small text-muted mt-1">
+                            <strong>Anlık:</strong> mail hemen gönderilir. <strong>Saatlik:</strong> mailler her saatin başında toplu yollanır. <strong>Günlük:</strong> mailler ertesi gün 06:00 UTC'de toplu yollanır.
+                        </div>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <input asp-for="TwoFactorViaEmailEnabled" class="form-check-input" />
+                        <label asp-for="TwoFactorViaEmailEnabled" class="form-check-label">Mail kodlu çift aşamalı doğrulama (girişte mail kodu istensin)</label>
+                    </div>
+
+                    <hr />
+                    <h3 class="h6 mb-2">Uygulama içi bildirimler</h3>
+
+                    <div class="form-check form-switch mb-2">
+                        <input asp-for="InAppEnabled" class="form-check-input" />
+                        <label asp-for="InAppEnabled" class="form-check-label">Uygulama içi bildirimler açık</label>
+                    </div>
+
+                    <div class="form-check form-switch mb-2">
+                        <input asp-for="IncomingRequestInAppEnabled" class="form-check-input" />
+                        <label asp-for="IncomingRequestInAppEnabled" class="form-check-label">Gelen talep bildirimi</label>
+                    </div>
+
+                    <div class="form-check form-switch mb-2">
+                        <input asp-for="PrivateOfferInAppEnabled" class="form-check-input" />
+                        <label asp-for="PrivateOfferInAppEnabled" class="form-check-label">Özel randevu bildirimi</label>
+                    </div>
+
+                    <div class="form-check form-switch mb-2">
+                        <input asp-for="ClinicalNoteShareInAppEnabled" class="form-check-input" />
+                        <label asp-for="ClinicalNoteShareInAppEnabled" class="form-check-label">Not paylaşım bildirimi</label>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <input asp-for="ClinicalNoteCommentInAppEnabled" class="form-check-input" />
+                        <label asp-for="ClinicalNoteCommentInAppEnabled" class="form-check-label">Not yorum bildirimi</label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ReminderMinutesBefore" class="form-label">Hatırlatma süresi (dakika)</label>
+                        <input asp-for="ReminderMinutesBefore" type="number" min="10" max="720" class="form-control" />
+                        <div class="small text-muted mt-1">Geçerli aralık: 10 - 720 dakika.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="DefaultClinicalNoteVisibility" class="form-label">Varsayılan not görünürlüğü</label>
+                        <select asp-for="DefaultClinicalNoteVisibility" asp-items="Html.GetEnumSelectList<PsikologProje_Void.Models.ClinicalNoteVisibility>()" class="form-select">
+                        </select>
+                        <div class="small text-muted mt-1">Sizinle ilgili yeni notların varsayılan erişim seviyesi bu değerle başlar.</div>
+                    </div>
+
+                    <div class="info-callout mb-3">
+                        Bildirim ayarlarınız sadece hesabınız için geçerlidir. Test e-postası SMTP ayarlarının doğruluğu için kullanılır.
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Değişiklikleri kaydet</button>
+                </form>
+            </div>
+
+            <div class="app-card">
+                <h2 class="h6 mb-2">SMTP Testi</h2>
+                <form asp-action="TestEmail" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-2">
+                        <label class="form-label">Test e-posta adresi (boş ise kendi adresiniz)</label>
+                        <input type="email" name="testRecipient" class="form-control" placeholder="ornek@domain.com" />
+                    </div>
+                    <button type="submit" class="btn btn-outline-primary w-100">Test E-posta Gönder</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,71 @@
+@model List<PsikologProje_Void.Models.User>
+
+@{
+    ViewData["Title"] = "Admin - Kullanıcılar";
+    var query = ViewBag.Query as string ?? string.Empty;
+}
+
+<div class="container app-page">
+    <div class="page-header">
+        <h1 class="page-title">Kullanıcılar</h1>
+        <p class="page-subtitle">Sisteme kayıtlı tüm kullanıcıların listesi.</p>
+        <a class="btn btn-sm btn-outline-secondary mt-2" asp-action="Index">Admin Paneline Dön</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <form method="get" asp-action="Users" class="d-flex gap-2 mb-3">
+        <input type="text" name="q" class="form-control" placeholder="İsim, e-posta veya kullanıcı adı ara" value="@query" />
+        <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
+    </form>
+
+    <div class="app-card">
+        <div class="table-responsive">
+            <table class="table table-sm align-middle">
+                <thead>
+                <tr>
+                    <th>Foto</th>
+                    <th>Ad Soyad</th>
+                    <th>Kullanıcı Adı</th>
+                    <th>E-posta</th>
+                    <th>Telefon</th>
+                    <th>Tur</th>
+                    <th>Onayli</th>
+                    <th>E-posta Onayli</th>
+                    <th>İşlemler</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var user in Model)
+                {
+                    var photo = string.IsNullOrWhiteSpace(user.ProfilePhotoPath) ? "/images/default-avatar.png" : user.ProfilePhotoPath;
+                    <tr>
+                        <td><img src="@photo" class="inline-profile-avatar" style="width:36px;height:36px;" alt="@user.FirstName" /></td>
+                        <td>@user.FirstName @user.LastName</td>
+                        <td>@user.UserName</td>
+                        <td>@user.Email</td>
+                        <td>@user.PhoneNumber</td>
+                        <td>@user.UserType</td>
+                        <td>@(user.IsApproved ? "Evet" : "Hayir")</td>
+                        <td>@(user.EmailConfirmed ? "Evet" : "Hayir")</td>
+                        <td>
+                            <form asp-action="ToggleUserApproval" method="post" class="d-inline" onsubmit="return confirm('Bu kullanıcının onay durumunu değiştirmek istediğinize emin misiniz?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="userId" value="@user.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-warning">@(user.IsApproved ? "Onayi Kaldir" : "Onayla")</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

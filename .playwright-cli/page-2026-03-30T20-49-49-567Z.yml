@@ -1,0 +1,109 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "Mentora Logo Mentora" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Mentora Logo" [ref=e5]
+        - generic [ref=e6]: Mentora
+      - generic [ref=e7]:
+        - list [ref=e8]:
+          - listitem [ref=e9]:
+            - link " Randevularim" [ref=e10] [cursor=pointer]:
+              - /url: /DoctorDashboard
+              - generic [ref=e11]: 
+              - text: Randevularim
+          - listitem [ref=e12]:
+            - link " Haftalik Cizelge" [ref=e13] [cursor=pointer]:
+              - /url: /DoctorDashboard/Scheduler
+              - generic [ref=e14]: 
+              - text: Haftalik Cizelge
+          - listitem [ref=e15]:
+            - link " Oto Rutin" [ref=e16] [cursor=pointer]:
+              - /url: /Automation
+              - generic [ref=e17]: 
+              - text: Oto Rutin
+          - listitem [ref=e18]:
+            - link " Klinik Notlar" [ref=e19] [cursor=pointer]:
+              - /url: /ClinicalNotes
+              - generic [ref=e20]: 
+              - text: Klinik Notlar
+          - listitem [ref=e21]:
+            - link " Gelen Talepler" [ref=e22] [cursor=pointer]:
+              - /url: /Request
+              - generic [ref=e23]: 
+              - text: Gelen Talepler
+          - listitem [ref=e24]:
+            - link " Kisilerim" [ref=e25] [cursor=pointer]:
+              - /url: /People
+              - generic [ref=e26]: 
+              - text: Kisilerim
+        - list [ref=e27]:
+          - listitem [ref=e28]:
+            - button " Profil konumu tanimsiz" [ref=e29] [cursor=pointer]:
+              - generic [ref=e30]: 
+              - generic [ref=e31]: Profil konumu tanimsiz
+          - listitem [ref=e32]:
+            - button "" [ref=e33] [cursor=pointer]:
+              - generic [ref=e34]: 
+          - listitem [ref=e35]:
+            - button "Profil Test Doctor" [ref=e36] [cursor=pointer]:
+              - img "Profil" [ref=e37]
+              - generic [ref=e38]: Test Doctor
+            - text:   
+  - main [ref=e39]:
+    - generic [ref=e40]:
+      - generic [ref=e41]:
+        - heading "Haftalik Cizelge" [level=1] [ref=e42]
+        - paragraph [ref=e43]: Sari bloklar musait seanslari, yesil bloklar atanmis seanslari gosterir.
+      - generic [ref=e44]:
+        - generic [ref=e45]:
+          - generic [ref=e46]:
+            - link "Hafta" [ref=e47] [cursor=pointer]:
+              - /url: /DoctorDashboard/Scheduler?view=week&weekStart=2026-03-30&monthDate=2026-03-30
+            - link "Ay" [ref=e48] [cursor=pointer]:
+              - /url: /DoctorDashboard/Scheduler?view=month&monthDate=2026-03-30&weekStart=2026-03-30
+          - link " Onceki hafta" [ref=e49] [cursor=pointer]:
+            - /url: /DoctorDashboard/Scheduler?view=week&weekStart=2026-03-23&monthDate=2026-03-30
+            - generic [ref=e50]: 
+            - text: Onceki hafta
+          - generic [ref=e51]: 30 Mar - 05 Nis 2026
+          - link "Sonraki hafta " [ref=e52] [cursor=pointer]:
+            - /url: /DoctorDashboard/Scheduler?view=week&weekStart=2026-04-06&monthDate=2026-03-30
+            - text: Sonraki hafta
+            - generic [ref=e53]: 
+        - generic [ref=e54]:
+          - generic [ref=e55]: Hafta baslangici
+          - textbox "Hafta baslangici" [ref=e56]: 2026-03-30
+      - region "Haftalik yogunluk" [ref=e57]:
+        - button "Pazartesi 30 Mar 0 seans | 0:0.# saat" [ref=e58] [cursor=pointer]:
+          - generic [ref=e59]: Pazartesi
+          - generic [ref=e60]: 30 Mar
+          - generic [ref=e64]: 0 seans | 0:0.# saat
+        - button "Salı 31 Mar 0 seans | 0:0.# saat" [ref=e65] [cursor=pointer]:
+          - generic [ref=e66]: Salı
+          - generic [ref=e67]: 31 Mar
+          - generic [ref=e71]: 0 seans | 0:0.# saat
+        - button "Çarşamba 01 Nis 0 seans | 0:0.# saat" [ref=e72] [cursor=pointer]:
+          - generic [ref=e73]: Çarşamba
+          - generic [ref=e74]: 01 Nis
+          - generic [ref=e78]: 0 seans | 0:0.# saat
+        - button "Perşembe 02 Nis 0 seans | 0:0.# saat" [ref=e79] [cursor=pointer]:
+          - generic [ref=e80]: Perşembe
+          - generic [ref=e81]: 02 Nis
+          - generic [ref=e85]: 0 seans | 0:0.# saat
+        - button "Cuma 03 Nis 0 seans | 0:0.# saat" [ref=e86] [cursor=pointer]:
+          - generic [ref=e87]: Cuma
+          - generic [ref=e88]: 03 Nis
+          - generic [ref=e92]: 0 seans | 0:0.# saat
+        - button "Cumartesi 04 Nis 0 seans | 0:0.# saat" [ref=e93] [cursor=pointer]:
+          - generic [ref=e94]: Cumartesi
+          - generic [ref=e95]: 04 Nis
+          - generic [ref=e99]: 0 seans | 0:0.# saat
+        - button "Pazar 05 Nis 0 seans | 0:0.# saat" [ref=e100] [cursor=pointer]:
+          - generic [ref=e101]: Pazar
+          - generic [ref=e102]: 05 Nis
+          - generic [ref=e106]: 0 seans | 0:0.# saat
+      - generic [ref=e108]:
+        - generic [ref=e109]: Bu hafta seans yok
+        - generic [ref=e110]: 00:00 - 23:59
+    - text: 

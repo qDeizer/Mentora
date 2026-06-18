@@ -1,0 +1,245 @@
+- generic [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "Mentora Logo Mentora" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Mentora Logo" [ref=e5]
+        - generic [ref=e6]: Mentora
+      - generic [ref=e7]:
+        - list [ref=e8]:
+          - listitem [ref=e9]:
+            - link " Randevu Ara" [ref=e10] [cursor=pointer]:
+              - /url: /PatientDashboard
+              - generic [ref=e11]: 
+              - text: Randevu Ara
+          - listitem [ref=e12]:
+            - link " Taleplerim" [ref=e13] [cursor=pointer]:
+              - /url: /Request/MyRequests
+              - generic [ref=e14]: 
+              - text: Taleplerim
+          - listitem [ref=e15]:
+            - link " Ozel Randevular" [ref=e16] [cursor=pointer]:
+              - /url: /PrivateAppointments
+              - generic [ref=e17]: 
+              - text: Ozel Randevular
+          - listitem [ref=e18]:
+            - link " Notlarim" [ref=e19] [cursor=pointer]:
+              - /url: /ClinicalNotes/MyNotes
+              - generic [ref=e20]: 
+              - text: Notlarim
+          - listitem [ref=e21]:
+            - link " Doktorlarim" [ref=e22] [cursor=pointer]:
+              - /url: /People
+              - generic [ref=e23]: 
+              - text: Doktorlarim
+        - list [ref=e24]:
+          - listitem [ref=e25]:
+            - button " Profil konumu tanimsiz" [ref=e26] [cursor=pointer]:
+              - generic [ref=e27]: 
+              - generic [ref=e28]: Profil konumu tanimsiz
+          - listitem [ref=e29]:
+            - button "" [ref=e30] [cursor=pointer]:
+              - generic [ref=e31]: 
+          - listitem [ref=e32]:
+            - button "Profil Test Patient" [ref=e33] [cursor=pointer]:
+              - img "Profil" [ref=e34]
+              - generic [ref=e35]: Test Patient
+            - text:   
+  - main [ref=e36]:
+    - generic [ref=e38]:
+      - generic [ref=e39]:
+        - generic [ref=e40]: 
+        - heading "Hesap Oluştur" [level=2] [ref=e41]
+        - paragraph [ref=e42]: Topluluğumuza katılmak için bilgilerinizi girin.
+      - generic [ref=e43]:
+        - generic:
+          - list
+        - generic [ref=e44]:
+          - paragraph [ref=e45]: "Kayıt olmak istediğiniz hesap türünü seçin:"
+          - group [ref=e46]:
+            - button " Hasta" [ref=e47] [cursor=pointer]:
+              - generic [ref=e48]: 
+              - text: Hasta
+            - button " Doktor" [active] [ref=e49] [cursor=pointer]:
+              - generic [ref=e50]: 
+              - text: Doktor
+        - generic [ref=e51]:
+          - generic [ref=e52]:
+            - textbox " İsim" [ref=e53]:
+              - /placeholder: İsim
+            - generic [ref=e54]:
+              - generic [ref=e55]: 
+              - text: İsim
+          - generic [ref=e56]:
+            - textbox "@ Kullanici Adi" [ref=e57]:
+              - /placeholder: Kullanici Adi
+            - generic [ref=e58]:
+              - generic [ref=e59]: "@"
+              - text: Kullanici Adi
+        - generic [ref=e60]:
+          - generic [ref=e61]:
+            - textbox " Soy İsim" [ref=e62]:
+              - /placeholder: Soy İsim
+            - generic [ref=e63]:
+              - generic [ref=e64]: 
+              - text: Soy İsim
+          - generic [ref=e65]:
+            - textbox " E-posta" [ref=e66]:
+              - /placeholder: E-posta
+            - generic [ref=e67]:
+              - generic [ref=e68]: 
+              - text: E-posta
+        - generic [ref=e69]:
+          - textbox " Telefon" [ref=e70]:
+            - /placeholder: Telefon
+          - generic [ref=e71]:
+            - generic [ref=e72]: 
+            - text: Telefon
+        - generic [ref=e73]:
+          - generic [ref=e74]:
+            - textbox " Doğum Tarihi" [ref=e75]:
+              - /placeholder: Doğum Tarihi
+              - text: 0001-01-01
+            - generic [ref=e76]:
+              - generic [ref=e77]: 
+              - text: Doğum Tarihi
+          - combobox [ref=e79]:
+            - option "Cinsiyet Seçin..." [disabled]
+            - option "Male" [selected]
+            - option "Female"
+            - option "Other"
+        - generic [ref=e80]:
+          - generic [ref=e81]:
+            - textbox " Şifre" [ref=e82]:
+              - /placeholder: Şifre
+            - generic [ref=e83]:
+              - generic [ref=e84]: 
+              - text: Şifre
+          - generic [ref=e85]:
+            - textbox " Şifre Tekrar" [ref=e86]:
+              - /placeholder: Şifre Tekrar
+            - generic [ref=e87]:
+              - generic [ref=e88]: 
+              - text: Şifre Tekrar
+        - generic [ref=e89]:
+          - generic [ref=e90]: Konumunuzu Haritadan Seçin (Opsiyonel)
+          - generic [ref=e94]:
+            - generic:
+              - button "Klavye kısayolları"
+            - region "Harita" [ref=e95]
+            - generic [ref=e96]:
+              - img "Konumunuzu buraya surukleyin" [ref=e133]:
+                - generic:
+                  - generic "Konumunuzu buraya surukleyin"
+              - iframe [ref=e134]:
+                
+              - menubar [ref=e146] [cursor=pointer]:
+                - menuitemradio "Sokak haritasını göster" [checked] [ref=e148]: Harita
+                - menuitemradio "Uydu görüntülerini göster" [ref=e150]: Uydu
+              - textbox "Adres Ara..." [ref=e92]
+              - button "Tam ekran görünümü açma/kapama" [ref=e151] [cursor=pointer]
+              - generic:
+                - generic:
+                  - button "Harita kamerası kontrolleri" [ref=e153] [cursor=pointer]
+                  - button "Street View'u açmak için Pegman'i harita üzerine sürükleyin" [ref=e154] [cursor=pointer]:
+                    - generic:
+                      - img "Street View Pegman Kontrolü"
+              - link "Bu bölgeyi Google Haritalar'da açın (yeni pencerede açılır)" [ref=e156] [cursor=pointer]:
+                - /url: https://maps.google.com/maps?ll=39.925533,32.866287&z=5&t=m&hl=tr-TR&gl=US&mapclient=apiv3
+                - img "Google" [ref=e158]
+              - generic [ref=e159]:
+                - button "Klavye kısayolları" [ref=e165] [cursor=pointer]
+                - generic [ref=e170]: Harita verileri ©2026 GeoBasis-DE/BKG (©2009), Google, Inst. Geogr. Nacional, Mapa GISrael
+                - link "Şartlar (yeni sekmede açılır)" [ref=e175] [cursor=pointer]:
+                  - /url: https://www.google.com/intl/tr-TR_US/help/terms_maps.html
+                  - text: Şartlar
+        - generic [ref=e135]:
+          - textbox " Hakkımda" [ref=e136]:
+            - /placeholder: Hakkımda
+          - generic [ref=e137]:
+            - generic [ref=e138]: 
+            - text: Hakkımda
+        - generic [ref=e139]:
+          - generic [ref=e140]: Profil Fotoğrafı
+          - button "Choose File" [ref=e141] [cursor=pointer]
+          - text: Yalnizca JPG/PNG/WEBP, en fazla 2 MB. Yuz foto kare formatta optimize edilir.
+        - generic [ref=e176]:
+          - separator [ref=e177]
+          - heading "Doktor Bilgileri" [level=4] [ref=e178]
+          - generic [ref=e179]:
+            - generic [ref=e180]:
+              - textbox " Mesleğe Başlangıç" [ref=e181]:
+                - /placeholder: Mesleğe Başlangıç Tarihi
+              - generic [ref=e182]:
+                - generic [ref=e183]: 
+                - text: Mesleğe Başlangıç
+            - combobox [ref=e185]:
+              - option "Statü Seçin..." [disabled] [selected]
+              - option "Psikolog"
+              - option "Klinik Psikolog"
+              - option "Dr. Psikolog"
+              - option "Doç. Dr."
+              - option "Prof. Dr."
+          - generic [ref=e186]:
+            - textbox " Üniversite" [ref=e187]:
+              - /placeholder: Üniversite
+            - generic [ref=e188]:
+              - generic [ref=e189]: 
+              - text: Üniversite
+          - generic [ref=e190]:
+            - generic [ref=e191]: Uzmanlık Alanları
+            - generic [ref=e192]:
+              - generic [ref=e194]:
+                - checkbox "Aile Terapisi" [ref=e195]
+                - generic [ref=e196]: Aile Terapisi
+              - generic [ref=e198]:
+                - checkbox "Anksiyete Bozukluklari" [ref=e199]
+                - generic [ref=e200]: Anksiyete Bozukluklari
+              - generic [ref=e202]:
+                - checkbox "Bagimlilik Tedavisi" [ref=e203]
+                - generic [ref=e204]: Bagimlilik Tedavisi
+              - generic [ref=e206]:
+                - checkbox "Cift Terapisi" [ref=e207]
+                - generic [ref=e208]: Cift Terapisi
+              - generic [ref=e210]:
+                - checkbox "Cocuk Psikolojisi" [ref=e211]
+                - generic [ref=e212]: Cocuk Psikolojisi
+              - generic [ref=e214]:
+                - checkbox "Depresyon Tedavisi" [ref=e215]
+                - generic [ref=e216]: Depresyon Tedavisi
+              - generic [ref=e218]:
+                - checkbox "Ergen Psikolojisi" [ref=e219]
+                - generic [ref=e220]: Ergen Psikolojisi
+              - generic [ref=e222]:
+                - checkbox "Kariyer Danismanligi" [ref=e223]
+                - generic [ref=e224]: Kariyer Danismanligi
+              - generic [ref=e226]:
+                - checkbox "Kisilik Bozukluklari" [ref=e227]
+                - generic [ref=e228]: Kisilik Bozukluklari
+              - generic [ref=e230]:
+                - checkbox "Ofke Yonetimi" [ref=e231]
+                - generic [ref=e232]: Ofke Yonetimi
+              - generic [ref=e234]:
+                - checkbox "Sosyal Fobi" [ref=e235]
+                - generic [ref=e236]: Sosyal Fobi
+              - generic [ref=e238]:
+                - checkbox "Stres Yonetimi" [ref=e239]
+                - generic [ref=e240]: Stres Yonetimi
+              - generic [ref=e242]:
+                - checkbox "Travma Terapisi" [ref=e243]
+                - generic [ref=e244]: Travma Terapisi
+              - generic [ref=e246]:
+                - checkbox "Yasli Psikolojisi" [ref=e247]
+                - generic [ref=e248]: Yasli Psikolojisi
+              - generic [ref=e250]:
+                - checkbox "Yeme Bozukluklari" [ref=e251]
+                - generic [ref=e252]: Yeme Bozukluklari
+          - generic [ref=e253]:
+            - generic [ref=e254]: Sertifika/Diploma (Birden fazla seçebilirsiniz)
+            - button "Choose File" [ref=e255] [cursor=pointer]
+            - text: Yalnizca JPG/PNG/WEBP/PDF, her dosya en fazla 5 MB.
+        - button "Kayıt Ol" [ref=e142] [cursor=pointer]
+        - paragraph [ref=e144]:
+          - text: Zaten bir hesabınız var mı?
+          - link "Giriş Yap" [ref=e145] [cursor=pointer]:
+            - /url: /Account/Login

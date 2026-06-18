@@ -1,0 +1,107 @@
+- generic [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "Mentora Logo Mentora" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Mentora Logo" [ref=e5]
+        - generic [ref=e6]: Mentora
+      - generic [ref=e7]:
+        - list [ref=e8]:
+          - listitem [ref=e9]:
+            - link " Randevu Ara" [ref=e10] [cursor=pointer]:
+              - /url: /PatientDashboard
+              - generic [ref=e11]: 
+              - text: Randevu Ara
+          - listitem [ref=e12]:
+            - link " Taleplerim" [ref=e13] [cursor=pointer]:
+              - /url: /Request/MyRequests
+              - generic [ref=e14]: 
+              - text: Taleplerim
+          - listitem [ref=e15]:
+            - link " Ozel Randevular" [ref=e16] [cursor=pointer]:
+              - /url: /PrivateAppointments
+              - generic [ref=e17]: 
+              - text: Ozel Randevular
+          - listitem [ref=e18]:
+            - link " Notlarim" [ref=e19] [cursor=pointer]:
+              - /url: /ClinicalNotes/MyNotes
+              - generic [ref=e20]: 
+              - text: Notlarim
+          - listitem [ref=e21]:
+            - link " Doktorlarim" [ref=e22] [cursor=pointer]:
+              - /url: /People
+              - generic [ref=e23]: 
+              - text: Doktorlarim
+        - list [ref=e24]:
+          - listitem [ref=e25]:
+            - button " Profil konumu tanimsiz" [expanded] [active] [ref=e26] [cursor=pointer]:
+              - generic [ref=e27]: 
+              - generic [ref=e28]: Profil konumu tanimsiz
+            - generic " Profil konumu tanimsiz" [ref=e80]:
+              - generic [ref=e81]: Global Konum
+              - combobox [ref=e82]:
+                - option "Profil konumu" [selected]
+                - option "Cihaz konumu"
+                - option "Manuel harita secimi"
+              - generic [ref=e83]: Profile | 0.000000, 0.000000
+              - generic [ref=e84]:
+                - button "Cihazdan al" [ref=e85] [cursor=pointer]
+                - button "Haritadan sec" [ref=e86] [cursor=pointer]
+              - button "Profile kaydet" [ref=e87] [cursor=pointer]
+          - listitem [ref=e29]:
+            - button " 1" [ref=e30] [cursor=pointer]:
+              - generic [ref=e31]: 
+              - generic [ref=e32]: "1"
+          - listitem [ref=e33]:
+            - button "Profil Test Patient" [ref=e34] [cursor=pointer]:
+              - img "Profil" [ref=e35]
+              - generic [ref=e36]: Test Patient
+            - text:   
+  - main [ref=e37]:
+    - generic [ref=e38]:
+      - generic [ref=e39]:
+        - heading "My Requests" [level=1] [ref=e40]
+        - paragraph [ref=e41]: Talep durumlarinizi takip edin, doktor ve durum bazli hizli filtreleme yapin.
+      - generic [ref=e42]:
+        - heading "Filtreler" [level=2] [ref=e43]
+        - generic [ref=e44]:
+          - generic [ref=e45]:
+            - generic [ref=e46]: Doktorlar (coklu)
+            - group [ref=e47]:
+              - generic "Doktor secimi (0)" [ref=e48] [cursor=pointer]
+          - generic [ref=e49]:
+            - generic [ref=e50]: Durum
+            - generic [ref=e51]:
+              - generic [ref=e52] [cursor=pointer]:
+                - checkbox "Beklemede" [checked] [ref=e53]
+                - text: Beklemede
+              - generic [ref=e54] [cursor=pointer]:
+                - checkbox "Onaylandi" [checked] [ref=e55]
+                - text: Onaylandi
+              - generic [ref=e56] [cursor=pointer]:
+                - checkbox "Reddedildi" [checked] [ref=e57]
+                - text: Reddedildi
+          - generic [ref=e58]:
+            - generic [ref=e59]: Siralama
+            - generic [ref=e60]:
+              - combobox [ref=e61]:
+                - option "Talep tarihi" [selected]
+                - option "Randevu tarihi"
+                - option "Doktor adi"
+              - button "" [ref=e62] [cursor=pointer]:
+                - generic [ref=e63]: 
+          - link "Temizle" [ref=e65] [cursor=pointer]:
+            - /url: /Request/MyRequests
+      - article [ref=e68]:
+        - generic [ref=e69]:
+          - generic [ref=e70]:
+            - img "Test Doctor" [ref=e71]
+            - generic [ref=e72]:
+              - heading "Test Doctor" [level=3] [ref=e73]:
+                - link "Test Doctor" [ref=e74] [cursor=pointer]:
+                  - /url: /People/Profile/82ddc74c-11a8-43ed-bbde-7ed2705b806d
+              - generic [ref=e75]: 31.03.2026 14:00
+          - generic [ref=e76]: Onaylandi
+        - generic [ref=e77]: "Talep tarihi: 31.03.2026 00:08"
+        - generic [ref=e78]: "Notunuz: Smoke test patient request"
+        - generic [ref=e79]: "Doktor cevabi: Talebiniz onaylandi. 10 dk once hazir olun."

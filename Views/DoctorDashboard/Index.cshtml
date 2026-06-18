@@ -1,0 +1,189 @@
+@model PsikologProje_Void.ViewModels.DoctorDashboardViewModel
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Randevularim";
+    var culture = new CultureInfo("tr-TR");
+    var now = DateTime.Now;
+    var totalSlots = Model.Appointments.Count();
+    var todaySlots = Model.Appointments.Count(x => x.StartTime.Date == DateTime.Today);
+    var pendingRequestsHint = Model.Appointments.Count(x => x.Status == "Müsait");
+    var upcomingReserved = Model.Appointments.Count(x => (x.Status == "Rezerve edildi" || x.Status == "Onaylandı") && x.StartTime >= now);
+    var pendingPatientApproval = Model.Appointments.Count(x => x.Status == "Hasta Onayı Bekliyor");
+    var completedCount = Model.Appointments.Count(x => x.Status == "Tamamlandı");
+    var completionRate = totalSlots == 0 ? 0 : (int)Math.Round((completedCount * 100d) / totalSlots);
+}
+
+<div class="container app-page">
+    <div class="page-header">
+        <h1 class="page-title">Doktor Paneli</h1>
+        <p class="page-subtitle">Randevularınızı, talep akışlarını ve çakışma durumlarını tek yerden yönetin.</p>
+        <a asp-action="Scheduler" class="btn btn-outline-primary btn-sm mt-2">
+            <i class="fas fa-chart-column me-1"></i>Haftalık Çizelgeyi Aç
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="metric-grid">
+        <div class="metric-card">
+            <div class="metric-label">Bugün slot</div>
+            <div class="metric-value">@todaySlots</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Müsait</div>
+            <div class="metric-value">@pendingRequestsHint</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Yaklaşan rezerve</div>
+            <div class="metric-value">@upcomingReserved</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Hasta onayı bekliyor</div>
+            <div class="metric-value">@pendingPatientApproval</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Tamamlanma</div>
+            <div class="metric-value">@completionRate%</div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-xl-7">
+            <div class="app-card">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <h2 class="h5 mb-0">Randevu Akışı</h2>
+                    <span class="status-chip status-info">Toplam @totalSlots</span>
+                </div>
+
+                @if (!Model.Appointments.Any())
+                {
+                    <div class="text-center py-4 text-muted">
+                        Oluşturulmuş randevu bulunamadı.
+                    </div>
+                }
+                else
+                {
+                    foreach (var item in Model.Appointments.OrderBy(x => x.StartTime))
+                    {
+                        var statusClass = item.Status switch
+                        {
+                            "Müsait" => "status-active",
+                            "Rezerve edildi" => "status-pending",
+                            "Tamamlandı" => "status-neutral",
+                            "Gerçekleşmedi" => "status-danger",
+                            "Çakışma nedeniyle kapatıldı" => "status-danger",
+                            "Hasta Onayı Bekliyor" => "status-pending",
+                            "Onaylandı" => "status-active",
+                            "Reddedildi" => "status-danger",
+                            "Süresi Doldu" => "status-neutral",
+                            _ => "status-neutral"
+                        };
+
+                        <article class="content-card mb-2">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <div>
+                                    <h3 class="h6 mb-1">Slot #@item.Id</h3>
+                                    <div class="small text-muted">@item.StartTime.ToString("d MMMM yyyy, HH:mm", culture) - @item.EndTime.ToString("HH:mm", culture)</div>
+                                </div>
+                                <span class="status-chip @statusClass">@item.Status</span>
+                            </div>
+
+                            <div class="entity-meta">
+                                <div><b>Süre:</b> @item.DurationInMinutes dk</div>
+                                <div><b>Tür:</b> @string.Join(", ", item.AppointmentTypes)</div>
+                                <div><b>Ucret:</b> @item.PriceRange</div>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(item.PatientName) && item.PatientName != "-")
+                            {
+                                var patientPhoto = string.IsNullOrWhiteSpace(item.PatientProfileImageUrl) ? "/images/default-avatar.png" : item.PatientProfileImageUrl;
+                                <div class="small d-flex align-items-center gap-2">
+                                    <img src="@patientPhoto" alt="@item.PatientName" class="inline-profile-avatar" />
+                                    <span>
+                                        <b>Hasta:</b>
+                                        @if (!string.IsNullOrWhiteSpace(item.PatientId))
+                                        {
+                                            <a asp-controller="People" asp-action="Profile" asp-route-id="@item.PatientId">@item.PatientName</a>
+                                        }
+                                        else
+                                        {
+                                            @item.PatientName
+                                        }
+                                    </span>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(item.Notes) && item.Notes != "-")
+                            {
+                                <div class="small"><b>Not:</b> @item.Notes</div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(item.LocationNote))
+                            {
+                                <div class="small"><b>Konum notu:</b> @item.LocationNote</div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(item.MeetingLink))
+                            {
+                                <div class="small">
+                                    <b>Çevrim içi link:</b>
+                                    <a href="@item.MeetingLink" target="_blank" rel="noopener noreferrer">@item.MeetingLink</a>
+                                </div>
+                            }
+
+                            @if (item.Status == "Çakışma nedeniyle kapatıldı")
+                            {
+                                <div class="warning-callout">Bu slot çakışma nedeniyle otomatik kapatıldı.</div>
+                            }
+
+                            <div class="action-row">
+                                <a asp-controller="Request" asp-action="Index" asp-route-AppointmentId="@item.Id" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-inbox me-1"></i>Talepler
+                                </a>
+
+                                @if (item.Location != null)
+                                {
+                                    var destination = $"{item.Location.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)},{item.Location.X.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+                                    <a class="btn btn-sm btn-outline-secondary route-link"
+                                       data-destination="@destination"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       href="https://www.google.com/maps/dir/?api=1&destination=@destination&travelmode=driving">
+                                        <i class="fas fa-directions me-1"></i>Yol Tarifi Al
+                                    </a>
+                                }
+
+                                <form asp-controller="Appointment"
+                                      asp-action="Delete"
+                                      asp-route-appointmentId="@item.Id"
+                                      method="post"
+                                      data-confirm="Bu randevuyu silmek istediğinize emin misiniz?">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash me-1"></i>Sil
+                                    </button>
+                                </form>
+                            </div>
+                        </article>
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="col-xl-5">
+            <div class="app-card sticky-panel">
+                @await Html.PartialAsync("_CreateAppointmentPartial", Model.CreateAppointment)
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

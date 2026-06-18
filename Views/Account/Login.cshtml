@@ -1,0 +1,59 @@
+﻿@model PsikologProje_Void.ViewModels.LoginViewModel
+@using PsikologProje_Void.Models
+@{
+    ViewData["Title"] = "Giriş Yap";
+}
+
+<div class="auth-container">
+    <div class="auth-card glass-effect login-card">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success mb-3">@TempData["SuccessMessage"]</div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger mb-3">@TempData["ErrorMessage"]</div>
+        }
+        @if (TempData["WarningMessage"] != null)
+        {
+            <div class="alert alert-warning mb-3">@TempData["WarningMessage"]</div>
+        }
+
+        <div class="auth-header">
+            <i class="fas fa-sign-in-alt auth-icon"></i>
+            <h2>Giriş Yap</h2>
+            <p>Hesabınıza giriş yapın.</p>
+        </div>
+
+        <form asp-action="Login" method="post" class="auth-form">
+            <div asp-validation-summary="ModelOnly" class="text-danger validation-summary"></div>
+
+            <div class="form-floating-group">
+                <input asp-for="Email" class="form-control" placeholder="E-posta veya Kullanıcı Adı" />
+                <label asp-for="Email"><i class="fas fa-user"></i> E-posta veya Kullanıcı Adı</label>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating-group">
+                <input asp-for="Password" class="form-control" placeholder="Şifre" />
+                <label asp-for="Password"><i class="fas fa-lock"></i> Şifre</label>
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-check form-switch">
+                <input asp-for="RememberMe" class="form-check-input" type="checkbox" id="rememberMe">
+                <label class="form-check-label" for="rememberMe">Beni Hatırla</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-auth">Giriş Yap</button>
+            <div class="auth-footer">
+                <p><a asp-action="ForgotPassword" class="link-primary">Şifremi unuttum</a></p>
+                <p>Hesabınız yok mu? <a asp-action="Register" class="link-primary">Kayıt Ol</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

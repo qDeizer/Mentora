@@ -1,0 +1,428 @@
+@model PsikologProje_Void.ViewModels.ProfileEditViewModel
+@using PsikologProje_Void.Models
+@inject IConfiguration Configuration
+@{
+    ViewData["Title"] = "Profil";
+    var mapsApiKey = Configuration["GoogleMaps:ApiKey"];
+    if (string.IsNullOrWhiteSpace(mapsApiKey))
+    {
+        mapsApiKey = Configuration["GoogleMaps__ApiKey"];
+    }
+    if (string.IsNullOrWhiteSpace(mapsApiKey))
+    {
+        mapsApiKey = Configuration["GOOGLE_MAPS_API_KEY"];
+    }
+    if (string.IsNullOrWhiteSpace(mapsApiKey))
+    {
+        mapsApiKey = Configuration["GoogleMapsApiKey"];
+    }
+    var hasMapsApiKey = !string.IsNullOrWhiteSpace(mapsApiKey);
+}
+
+<div class="container app-page">
+    <div class="row justify-content-center">
+        <div class="col-lg-9 col-xl-8">
+            <div class="page-header">
+                <h1 class="page-title">Profil Ayarları</h1>
+                <p class="page-subtitle">Kişisel bilgilerinizi, profil fotoğrafınızı ve konumunuzu güncelleyin.</p>
+            </div>
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+            }
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+            }
+            @if (TempData["WarningMessage"] != null)
+            {
+                <div class="alert alert-warning">@TempData["WarningMessage"]</div>
+            }
+
+            @if (Model.ProfileChangeBlockedUntilUtc.HasValue && Model.ProfileChangeBlockedUntilUtc.Value > DateTime.UtcNow)
+            {
+                <div class="alert alert-danger">
+                    <strong>Bilgilendirme:</strong> Çok sık profil değişikliği yaptığınız için profil güncellemeleriniz
+                    <strong>@Model.ProfileChangeBlockedUntilUtc.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</strong>
+                    saatine kadar engellendi. Acil bir durumunuz varsa sistem yöneticisi ile iletişime geçiniz.
+                </div>
+            }
+            else if (Model.ProfileChangeCountInWindow >= 7 && Model.ProfileChangeWindowStartUtc.HasValue)
+            {
+                <div class="alert alert-info">
+                    Son 1 saat içinde <strong>@Model.ProfileChangeCountInWindow</strong> kez profil bilgisi güncellendi.
+                    Cok daha fazlasi engellenmeye yol acabilir.
+                </div>
+            }
+
+            <div class="app-card mb-3">
+                <h2 class="h5 mb-3">E-posta Durumu</h2>
+                <p class="mb-2"><strong>@Model.Email</strong></p>
+                @if (Model.IsEmailConfirmed)
+                {
+                    <span class="badge bg-success-subtle text-success-emphasis">Dogrulandi</span>
+                }
+                else
+                {
+                    <span class="badge bg-warning-subtle text-warning-emphasis">Dogrulanmadi</span>
+                    <form asp-action="ResendEmailConfirmation" method="post" class="mt-3">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-primary btn-sm">Doğrulama E-postasını Tekrar Gönder</button>
+                    </form>
+                }
+            </div>
+
+            <div class="app-card">
+                <form asp-action="Profile" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="All" class="text-danger"></div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="FirstName" class="form-label"></label>
+                            <input asp-for="FirstName" class="form-control" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="LastName" class="form-label"></label>
+                            <input asp-for="LastName" class="form-control" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="PhoneNumber" class="form-label"></label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="BirthDate" class="form-label"></label>
+                            <input asp-for="BirthDate" type="date" class="form-control" />
+                            <span asp-validation-for="BirthDate" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Gender" class="form-label"></label>
+                            <select asp-for="Gender" asp-items="Html.GetEnumSelectList<Gender>()" class="form-select"></select>
+                            <span asp-validation-for="Gender" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ProfilePhoto" class="form-label"></label>
+                            <input asp-for="ProfilePhoto" type="file" class="form-control" accept="image/*" />
+                            <div class="small text-muted mt-1">Yalnizca JPG/PNG/WEBP, maksimum 2 MB. Otomatik kare formatlanir.</div>
+                            <span asp-validation-for="ProfilePhoto" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.ExistingProfilePhotoPath))
+                    {
+                        <div class="mt-3">
+                            <label class="form-label">Mevcut Profil Fotografi</label>
+                            <div>
+                                <img src="@Model.ExistingProfilePhotoPath" alt="Profil Fotografi" style="width:96px;height:96px;border-radius:50%;object-fit:cover;" />
+                            </div>
+                        </div>
+                    }
+
+                    <div class="mt-3">
+                        <label asp-for="About" class="form-label"></label>
+                        <textarea asp-for="About" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="About" class="text-danger"></span>
+                    </div>
+
+                    @if (User.IsInRole("Doctor"))
+                    {
+                        <hr class="my-4" />
+                        <h2 class="h5 mb-3">Doktor Bilgileri</h2>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label asp-for="ExperienceStartDate" class="form-label"></label>
+                                <input asp-for="ExperienceStartDate" type="date" class="form-control" />
+                                <span asp-validation-for="ExperienceStartDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="Title" class="form-label"></label>
+                                <select asp-for="Title" asp-items="Html.GetEnumSelectList<DoctorTitle>()" class="form-select"></select>
+                                <span asp-validation-for="Title" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="University" class="form-label"></label>
+                                <input asp-for="University" class="form-control" />
+                                <span asp-validation-for="University" class="text-danger"></span>
+                            </div>
+                        </div>
+                    }
+
+                    <hr class="my-4" />
+                    <h2 class="h5 mb-3"><i class="fas fa-shield-halved me-2"></i>Hesap Guvenligi</h2>
+                    <div class="info-callout mb-0">
+                        Mail kodlu çift aşamalı doğrulamayı <a asp-controller="Settings" asp-action="Notifications">Bildirim Ayarları</a> sayfasından açabilirsiniz.
+                    </div>
+
+                    <hr class="my-4" />
+                    <h2 class="h5 mb-3">Konum</h2>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="Latitude" class="form-label"></label>
+                            <input asp-for="Latitude" class="form-control" id="latitude" />
+                            <span asp-validation-for="Latitude" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Longitude" class="form-label"></label>
+                            <input asp-for="Longitude" class="form-control" id="longitude" />
+                            <span asp-validation-for="Longitude" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-check mt-3">
+                        <input asp-for="ClearLocation" class="form-check-input" />
+                        <label asp-for="ClearLocation" class="form-check-label">Kayitli konumu temizle</label>
+                    </div>
+
+                    @if (hasMapsApiKey)
+                    {
+                        <div class="mt-3">
+                            <label class="form-label fw-bold">Konumu Haritadan Seç</label>
+                            <input id="pac-input" class="form-control mb-2" type="text" placeholder="Adres Ara..." />
+                            <div id="map" style="height: 360px; width: 100%; border-radius: 12px;"></div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning mt-3 mb-0">
+                            Harita anahtarı tanımlı değil. `GoogleMaps:ApiKey` ayarını girerek harita seçimini aktifleştirebilirsiniz.
+                        </div>
+                    }
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary">Profili Kaydet</button>
+                    </div>
+                </form>
+            </div>
+
+            @if (User.IsInRole("Doctor"))
+            {
+                <div class="app-card mt-3">
+                    <h2 class="h5 mb-3"><i class="fas fa-certificate me-2"></i>Diploma / Sertifikalar</h2>
+
+                    @if (!Model.Certificates.Any())
+                    {
+                        <div class="text-muted small mb-3">Eklenmis sertifika yok.</div>
+                    }
+                    else
+                    {
+                        <div class="row g-2 mb-3">
+                            @foreach (var cert in Model.Certificates)
+                            {
+                                <div class="col-md-6">
+                                    <div class="border rounded p-2 d-flex gap-2 align-items-start">
+                                        <div style="flex:0 0 80px;">
+                                            <a href="@cert.CertificateImagePath" target="_blank" rel="noopener">
+                                                <img src="@cert.CertificateImagePath" style="width:80px;height:80px;object-fit:cover;border-radius:6px;" onerror="this.src='/images/default-avatar.png';" alt="Sertifika" />
+                                            </a>
+                                        </div>
+                                        <div class="flex-grow-1 small">
+                                            <div><strong>#@cert.Id</strong></div>
+                                            <div class="text-muted">@cert.UploadedAt.ToLocalTime().ToString("dd.MM.yyyy")</div>
+                                            @if (!string.IsNullOrWhiteSpace(cert.Description))
+                                            {
+                                                <div>@cert.Description</div>
+                                            }
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-danger mt-1 open-cert-delete"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteCertModal"
+                                                    data-cert-id="@cert.Id"
+                                                    data-cert-desc="@(cert.Description ?? string.Empty)">
+                                                <i class="fas fa-trash me-1"></i>Sil
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCertModal">
+                        <i class="fas fa-plus me-1"></i>Yeni Sertifika Ekle
+                    </button>
+                </div>
+
+                <div class="modal fade mentora-confirm-modal mentora-confirm-modal--approve" id="addCertModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content app-card">
+                            <form asp-action="UploadCertificate" method="post" enctype="multipart/form-data">
+                                @Html.AntiForgeryToken()
+                                <div class="modal-header">
+                                    <h5 class="modal-title"><i class="fas fa-certificate me-2 text-success"></i>Yeni Sertifika</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-2">
+                                        <label class="form-label">Sertifika dosyasi (JPG/PNG/WEBP/PDF, max 5 MB)</label>
+                                        <input type="file" name="certificate" class="form-control" accept=".jpg,.jpeg,.png,.webp,.pdf" required />
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label">Açıklama (opsiyonel)</label>
+                                        <input type="text" name="description" class="form-control" maxlength="200" />
+                                    </div>
+                                    <label class="form-label small">Onaylamak icin asagiya <strong>EKLE</strong> yazin:</label>
+                                    <input type="text" name="confirmText" class="form-control" id="addCertConfirmText" pattern="EKLE" required />
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                                    <button type="submit" class="btn btn-success" id="addCertSubmit" disabled>Ekle</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade mentora-confirm-modal mentora-confirm-modal--reject" id="deleteCertModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content app-card">
+                            <form asp-action="DeleteCertificate" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="certificateId" id="deleteCertId" />
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-danger"><i class="fas fa-trash me-2"></i>Sertifikayi Sil</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p class="mb-2">Bu sertifikayi kalici olarak silmek istediginize emin misiniz?</p>
+                                    <div class="small text-muted mb-2" id="deleteCertDescription">-</div>
+                                    <label class="form-label small">Onaylamak icin asagiya <strong>SIL</strong> yazin:</label>
+                                    <input type="text" name="confirmText" class="form-control" id="deleteCertConfirmText" pattern="SIL" required />
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                                    <button type="submit" class="btn btn-danger" id="deleteCertSubmit" disabled>Sil</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@if (hasMapsApiKey)
+{
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=@mapsApiKey&libraries=places&loading=async&callback=initProfileMap"></script>
+        <script>
+            let map;
+            let marker;
+            const turkeyCenter = { lat: 39.925533, lng: 32.866287 };
+
+            function initProfileMap() {
+                const latInput = document.getElementById("latitude");
+                const lonInput = document.getElementById("longitude");
+                const hasLatLon = latInput.value && lonInput.value;
+                const initialLat = hasLatLon ? parseFloat(latInput.value) : turkeyCenter.lat;
+                const initialLon = hasLatLon ? parseFloat(lonInput.value) : turkeyCenter.lng;
+                const initialPosition = { lat: initialLat, lng: initialLon };
+
+                map = new google.maps.Map(document.getElementById("map"), {
+                    center: initialPosition,
+                    zoom: hasLatLon ? 13 : 6,
+                });
+
+                marker = new google.maps.Marker({
+                    position: initialPosition,
+                    map: map,
+                    draggable: true
+                });
+
+                const updateCoordinates = (latLng) => {
+                    latInput.value = latLng.lat().toFixed(6);
+                    lonInput.value = latLng.lng().toFixed(6);
+                };
+
+                google.maps.event.addListener(marker, "dragend", function(event) {
+                    updateCoordinates(event.latLng);
+                });
+
+                google.maps.event.addListener(map, "click", function(event) {
+                    marker.setPosition(event.latLng);
+                    updateCoordinates(event.latLng);
+                });
+
+                const input = document.getElementById("pac-input");
+                const autocomplete = new google.maps.places.Autocomplete(input, {
+                    fields: ["geometry", "name"]
+                });
+                map.controls[google.maps.ControlPosition.TOP_CENTER].push(input);
+
+                autocomplete.addListener("place_changed", () => {
+                    const place = autocomplete.getPlace();
+                    if (!place || !place.geometry || !place.geometry.location) {
+                        return;
+                    }
+
+                    marker.setPosition(place.geometry.location);
+                    updateCoordinates(place.geometry.location);
+
+                    if (place.geometry.viewport) {
+                        map.fitBounds(place.geometry.viewport);
+                    } else {
+                        map.panTo(place.geometry.location);
+                        map.setZoom(14);
+                    }
+                });
+            }
+        </script>
+        <script>
+            (function () {
+                const addTxt = document.getElementById("addCertConfirmText");
+                const addBtn = document.getElementById("addCertSubmit");
+                addTxt?.addEventListener("input", () => { if (addBtn) addBtn.disabled = (addTxt.value.trim().toUpperCase() !== "EKLE"); });
+
+                const delTxt = document.getElementById("deleteCertConfirmText");
+                const delBtn = document.getElementById("deleteCertSubmit");
+                const delId = document.getElementById("deleteCertId");
+                const delDesc = document.getElementById("deleteCertDescription");
+                delTxt?.addEventListener("input", () => { if (delBtn) delBtn.disabled = (delTxt.value.trim().toUpperCase() !== "SIL"); });
+
+                const delModal = document.getElementById("deleteCertModal");
+                delModal?.addEventListener("show.bs.modal", function (event) {
+                    const t = event.relatedTarget;
+                    if (!t) return;
+                    if (delId) delId.value = t.getAttribute("data-cert-id") || "";
+                    if (delDesc) delDesc.textContent = t.getAttribute("data-cert-desc") || "-";
+                    if (delTxt) delTxt.value = "";
+                    if (delBtn) delBtn.disabled = true;
+                });
+            })();
+        </script>
+    }
+}
+else
+{
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+        <script>
+            (function () {
+                const addTxt = document.getElementById("addCertConfirmText");
+                const addBtn = document.getElementById("addCertSubmit");
+                addTxt?.addEventListener("input", () => { if (addBtn) addBtn.disabled = (addTxt.value.trim().toUpperCase() !== "EKLE"); });
+
+                const delTxt = document.getElementById("deleteCertConfirmText");
+                const delBtn = document.getElementById("deleteCertSubmit");
+                const delId = document.getElementById("deleteCertId");
+                const delDesc = document.getElementById("deleteCertDescription");
+                delTxt?.addEventListener("input", () => { if (delBtn) delBtn.disabled = (delTxt.value.trim().toUpperCase() !== "SIL"); });
+
+                const delModal = document.getElementById("deleteCertModal");
+                delModal?.addEventListener("show.bs.modal", function (event) {
+                    const t = event.relatedTarget;
+                    if (!t) return;
+                    if (delId) delId.value = t.getAttribute("data-cert-id") || "";
+                    if (delDesc) delDesc.textContent = t.getAttribute("data-cert-desc") || "-";
+                    if (delTxt) delTxt.value = "";
+                    if (delBtn) delBtn.disabled = true;
+                });
+            })();
+        </script>
+    }
+}

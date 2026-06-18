@@ -1,0 +1,150 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "Mentora Logo Mentora" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Mentora Logo" [ref=e5]
+        - generic [ref=e6]: Mentora
+      - generic [ref=e7]:
+        - list [ref=e8]:
+          - listitem [ref=e9]:
+            - link " Randevu Ara" [ref=e10] [cursor=pointer]:
+              - /url: /PatientDashboard
+              - generic [ref=e11]: 
+              - text: Randevu Ara
+          - listitem [ref=e12]:
+            - link " Taleplerim" [ref=e13] [cursor=pointer]:
+              - /url: /Request/MyRequests
+              - generic [ref=e14]: 
+              - text: Taleplerim
+          - listitem [ref=e15]:
+            - link " Ozel Randevular" [ref=e16] [cursor=pointer]:
+              - /url: /PrivateAppointments
+              - generic [ref=e17]: 
+              - text: Ozel Randevular
+          - listitem [ref=e18]:
+            - link " Notlarim" [ref=e19] [cursor=pointer]:
+              - /url: /ClinicalNotes/MyNotes
+              - generic [ref=e20]: 
+              - text: Notlarim
+          - listitem [ref=e21]:
+            - link " Doktorlarim" [ref=e22] [cursor=pointer]:
+              - /url: /People
+              - generic [ref=e23]: 
+              - text: Doktorlarim
+        - list [ref=e24]:
+          - listitem [ref=e25]:
+            - button " Profil konumu tanimsiz" [ref=e26] [cursor=pointer]:
+              - generic [ref=e27]: 
+              - generic [ref=e28]: Profil konumu tanimsiz
+          - listitem [ref=e29]:
+            - button "" [ref=e30] [cursor=pointer]:
+              - generic [ref=e31]: 
+          - listitem [ref=e32]:
+            - button "Profil Test Patient" [ref=e33] [cursor=pointer]:
+              - img "Profil" [ref=e34]
+              - generic [ref=e35]: Test Patient
+            - text:   
+  - main [ref=e36]:
+    - generic [ref=e38]:
+      - generic [ref=e39]:
+        - generic [ref=e40]: 
+        - heading "Hesap Oluştur" [level=2] [ref=e41]
+        - paragraph [ref=e42]: Topluluğumuza katılmak için bilgilerinizi girin.
+      - generic [ref=e43]:
+        - generic:
+          - list
+        - generic [ref=e44]:
+          - paragraph [ref=e45]: "Kayıt olmak istediğiniz hesap türünü seçin:"
+          - group [ref=e46]:
+            - button " Hasta" [ref=e47] [cursor=pointer]:
+              - generic [ref=e48]: 
+              - text: Hasta
+            - button " Doktor" [ref=e49] [cursor=pointer]:
+              - generic [ref=e50]: 
+              - text: Doktor
+        - generic [ref=e51]:
+          - generic [ref=e52]:
+            - textbox " İsim" [ref=e53]:
+              - /placeholder: İsim
+            - generic [ref=e54]:
+              - generic [ref=e55]: 
+              - text: İsim
+          - generic [ref=e56]:
+            - textbox "@ Kullanici Adi" [ref=e57]:
+              - /placeholder: Kullanici Adi
+            - generic [ref=e58]:
+              - generic [ref=e59]: "@"
+              - text: Kullanici Adi
+        - generic [ref=e60]:
+          - generic [ref=e61]:
+            - textbox " Soy İsim" [ref=e62]:
+              - /placeholder: Soy İsim
+            - generic [ref=e63]:
+              - generic [ref=e64]: 
+              - text: Soy İsim
+          - generic [ref=e65]:
+            - textbox " E-posta" [ref=e66]:
+              - /placeholder: E-posta
+            - generic [ref=e67]:
+              - generic [ref=e68]: 
+              - text: E-posta
+        - generic [ref=e69]:
+          - textbox " Telefon" [ref=e70]:
+            - /placeholder: Telefon
+          - generic [ref=e71]:
+            - generic [ref=e72]: 
+            - text: Telefon
+        - generic [ref=e73]:
+          - generic [ref=e74]:
+            - textbox " Doğum Tarihi" [ref=e75]:
+              - /placeholder: Doğum Tarihi
+              - text: 0001-01-01
+            - generic [ref=e76]:
+              - generic [ref=e77]: 
+              - text: Doğum Tarihi
+          - combobox [ref=e79]:
+            - option "Cinsiyet Seçin..." [disabled]
+            - option "Male" [selected]
+            - option "Female"
+            - option "Other"
+        - generic [ref=e80]:
+          - generic [ref=e81]:
+            - textbox " Şifre" [ref=e82]:
+              - /placeholder: Şifre
+            - generic [ref=e83]:
+              - generic [ref=e84]: 
+              - text: Şifre
+          - generic [ref=e85]:
+            - textbox " Şifre Tekrar" [ref=e86]:
+              - /placeholder: Şifre Tekrar
+            - generic [ref=e87]:
+              - generic [ref=e88]: 
+              - text: Şifre Tekrar
+        - generic [ref=e89]:
+          - generic [ref=e90]: Konumunuzu Haritadan Seçin (Opsiyonel)
+          - textbox "Adres Ara..." [ref=e92]
+          - generic [ref=e94]:
+            - region "Harita" [ref=e95]
+            - generic [ref=e96]:
+              - img "Konumunuzu buraya surukleyin" [ref=e133]:
+                - generic:
+                  - generic "Konumunuzu buraya surukleyin"
+              - iframe [ref=e134]:
+                
+        - generic [ref=e135]:
+          - textbox " Hakkımda" [ref=e136]:
+            - /placeholder: Hakkımda
+          - generic [ref=e137]:
+            - generic [ref=e138]: 
+            - text: Hakkımda
+        - generic [ref=e139]:
+          - generic [ref=e140]: Profil Fotoğrafı
+          - button "Choose File" [ref=e141] [cursor=pointer]
+          - text: Yalnizca JPG/PNG/WEBP, en fazla 2 MB. Yuz foto kare formatta optimize edilir.
+        - text:  
+        - button "Kayıt Ol" [ref=e142] [cursor=pointer]
+        - paragraph [ref=e144]:
+          - text: Zaten bir hesabınız var mı?
+          - link "Giriş Yap" [ref=e145] [cursor=pointer]:
+            - /url: /Account/Login

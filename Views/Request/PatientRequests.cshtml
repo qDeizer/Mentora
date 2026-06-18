@@ -1,0 +1,272 @@
+@model PsikologProje_Void.ViewModels.RequestsViewModel
+@using PsikologProje_Void.Models
+
+@{
+    ViewData["Title"] = "Randevu Taleplerim";
+    var selectedStatuses = Model.Filter.SelectedStatuses?.Distinct().ToHashSet() ?? new HashSet<RequestStatus>();
+    if (selectedStatuses.Count == 0)
+    {
+        selectedStatuses = Enum.GetValues<RequestStatus>().ToHashSet();
+    }
+    var selectedDoctorIds = Model.Filter.SelectedDoctorIds?.Distinct().ToHashSet() ?? new HashSet<string>();
+    var sortDirectionAscending = Model.Filter.SortDirection == "asc";
+}
+
+<div class="container app-page">
+    <div class="page-header">
+        <h1 class="page-title">Taleplerim</h1>
+        <p class="page-subtitle">Talep durumlarınızı takip edin, doktor ve durum bazlı hızlı filtreleme yapın.</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="app-card mb-3">
+        <h2 class="h6 mb-3">Filtreler</h2>
+        <form asp-action="MyRequests" method="get" id="patientRequestFilterForm" class="row g-2 align-items-end">
+            <input type="hidden" id="patientRequestSortDirection" name="SortDirection" value="@Model.Filter.SortDirection" />
+
+            <div class="col-lg-5">
+                <label class="form-label">Doktorlar (çoklu)</label>
+                <div class="dropdown multi-avatar-dropdown">
+                    <button class="form-select form-select-sm text-start d-flex align-items-center" type="button" id="patientRequestDoctorsDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                        <span class="multi-avatar-summary" id="patientRequestDoctorsSummary">Doktor seçimi (@selectedDoctorIds.Count)</span>
+                    </button>
+                    <div class="dropdown-menu p-2 multi-avatar-menu" aria-labelledby="patientRequestDoctorsDropdown">
+                        @foreach (var doctor in Model.DoctorOptions)
+                        {
+                            var doctorPhoto = string.IsNullOrWhiteSpace(doctor.ProfilePhotoPath) ? "/images/default-avatar.png" : doctor.ProfilePhotoPath;
+                            <label class="multi-avatar-item w-100">
+                                <input type="checkbox"
+                                       class="form-check-input"
+                                       name="SelectedDoctorIds"
+                                       value="@doctor.Id"
+                                       @(selectedDoctorIds.Contains(doctor.Id) ? "checked" : null) />
+                                <img src="@doctorPhoto" alt="@doctor.FullName" class="inline-profile-avatar" style="width:26px;height:26px;" />
+                                <span>@doctor.FullName</span>
+                            </label>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <label class="form-label d-block">Durum</label>
+                <div class="d-flex flex-wrap gap-2">
+                    <label class="btn btn-sm btn-outline-warning">
+                        <input type="checkbox" class="me-1" name="SelectedStatuses" value="@RequestStatus.Pending" @(selectedStatuses.Contains(RequestStatus.Pending) ? "checked" : null) />
+                        Beklemede
+                    </label>
+                    <label class="btn btn-sm btn-outline-success">
+                        <input type="checkbox" class="me-1" name="SelectedStatuses" value="@RequestStatus.Approved" @(selectedStatuses.Contains(RequestStatus.Approved) ? "checked" : null) />
+                        Onaylandı
+                    </label>
+                    <label class="btn btn-sm btn-outline-danger">
+                        <input type="checkbox" class="me-1" name="SelectedStatuses" value="@RequestStatus.Rejected" @(selectedStatuses.Contains(RequestStatus.Rejected) ? "checked" : null) />
+                        Reddedildi
+                    </label>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                <label class="form-label">Siralama</label>
+                <div class="d-flex gap-2">
+                    <select name="SortBy" class="form-select form-select-sm">
+                        <option value="requestDate" selected="@(Model.Filter.SortBy == "requestDate")">Talep tarihi</option>
+                        <option value="appointmentDate" selected="@(Model.Filter.SortBy == "appointmentDate")">Randevu tarihi</option>
+                        <option value="doctor" selected="@(Model.Filter.SortBy == "doctor")">Doktor adı</option>
+                    </select>
+                    <button type="button" id="patientRequestSortDirectionToggle" class="btn btn-sm btn-outline-secondary" title="Artan/Azalan">
+                        <i class="fas @(sortDirectionAscending ? "fa-arrow-up-wide-short" : "fa-arrow-down-wide-short")"></i>
+                    </button>
+                    <a asp-action="MyRequests" class="btn btn-sm btn-outline-secondary">Temizle</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    @if (!Model.Requests.Any())
+    {
+        <div class="app-card text-center py-4">
+            Hiç randevu talebiniz bulunmuyor. <a asp-controller="PatientDashboard" asp-action="Index">Randevu ara</a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var request in Model.Requests)
+            {
+                var statusClass = request.Status switch
+                {
+                    RequestStatus.Pending => "status-pending",
+                    RequestStatus.Approved => "status-active",
+                    RequestStatus.Rejected => "status-danger",
+                    _ => "status-neutral"
+                };
+                var statusText = request.Status switch
+                {
+                    RequestStatus.Pending => "Beklemede",
+                    RequestStatus.Approved => "Onaylandı",
+                    RequestStatus.Rejected => "Reddedildi",
+                    _ => request.Status.ToString()
+                };
+
+                <div class="col-md-6 col-xl-4">
+                    <article class="content-card h-100">
+                        <div class="d-flex justify-content-between align-items-start gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="@(string.IsNullOrWhiteSpace(request.DoctorProfilePhoto) ? "/images/default-avatar.png" : request.DoctorProfilePhoto)"
+                                     alt="@request.DoctorName"
+                                     class="inline-profile-avatar"
+                                     style="width:40px;height:40px;" />
+                                <div>
+                                    <h3 class="h6 mb-1"><a asp-controller="People" asp-action="Profile" asp-route-id="@request.DoctorId">@request.DoctorName</a></h3>
+                                    <div class="small text-muted">@request.AppointmentStartTime.ToString("dd.MM.yyyy HH:mm")</div>
+                                </div>
+                            </div>
+                            <span class="status-chip @statusClass">@statusText</span>
+                        </div>
+                        @if (request.IsPrivateOffer)
+                        {
+                            <div class="small mt-1"><span class="status-chip status-info">Özel Randevu</span></div>
+                        }
+
+                        <div class="small"><b>Talep tarihi:</b> @request.RequestDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+
+                        @if (!string.IsNullOrWhiteSpace(request.RequestMessage))
+                        {
+                            <div class="small"><b>Notunuz:</b> @request.RequestMessage</div>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(request.ReasonForVisit))
+                        {
+                            <div class="small"><b>Başvuru sebebi:</b> @request.ReasonForVisit</div>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(request.UrgencyLevel))
+                        {
+                            <div class="small"><b>Aciliyet:</b> @request.UrgencyLevel</div>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(request.Expectations))
+                        {
+                            <div class="small"><b>Beklenti:</b> @request.Expectations</div>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(request.AppointmentLocationNote))
+                        {
+                            <div class="small"><b>Konum notu:</b> @request.AppointmentLocationNote</div>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(request.ResponseMessage))
+                        {
+                            <div class="small"><b>Doktor cevabı:</b> @request.ResponseMessage</div>
+                        }
+
+                        @if (request.Status == RequestStatus.Approved && !string.IsNullOrWhiteSpace(request.MeetingLink))
+                        {
+                            <a href="@request.MeetingLink" class="btn btn-sm btn-primary" target="_blank" rel="noopener noreferrer">
+                                <i class="fas fa-video me-1"></i>Çevrim İçi Görüşmeye Katıl
+                            </a>
+                        }
+
+                        <div class="action-row mt-auto">
+                            @if (request.AppointmentLatitude.HasValue && request.AppointmentLongitude.HasValue)
+                            {
+                                var destination = $"{request.AppointmentLatitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)},{request.AppointmentLongitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+                                <a class="btn btn-sm btn-outline-secondary route-link"
+                                   data-destination="@destination"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   href="https://www.google.com/maps/dir/?api=1&destination=@destination&travelmode=driving">
+                                    <i class="fas fa-directions me-1"></i>Yol Tarifi Al
+                                </a>
+                            }
+
+                            @if (request.Status == RequestStatus.Pending)
+                            {
+                                <form asp-action="Cancel" method="post" data-confirm="Bu randevu talebini iptal etmek istediğinize emin misiniz? Bu işlem geri alınamaz.">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="requestId" value="@request.RequestId" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">İptal et</button>
+                                </form>
+                            }
+                        </div>
+                    </article>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+<script>
+    (function () {
+        const form = document.getElementById("patientRequestFilterForm");
+        const sortDirectionInput = document.getElementById("patientRequestSortDirection");
+        const sortDirectionToggle = document.getElementById("patientRequestSortDirectionToggle");
+        const doctorsSummary = document.getElementById("patientRequestDoctorsSummary");
+        let pendingSubmit = null;
+
+        function submitWithScroll() {
+            if (!form) {
+                return;
+            }
+            if (pendingSubmit) {
+                window.clearTimeout(pendingSubmit);
+            }
+            pendingSubmit = window.setTimeout(() => {
+                sessionStorage.setItem("mentora:patientRequests:scrollY", String(window.scrollY || 0));
+                form.requestSubmit();
+            }, 120);
+        }
+
+        function restoreScroll() {
+            const value = sessionStorage.getItem("mentora:patientRequests:scrollY");
+            if (!value) {
+                return;
+            }
+            sessionStorage.removeItem("mentora:patientRequests:scrollY");
+            const y = Number(value);
+            if (Number.isFinite(y) && y > 0) {
+                window.scrollTo({ top: y, behavior: "auto" });
+            }
+        }
+
+        function updateDoctorsSummary() {
+            if (!form || !doctorsSummary) {
+                return;
+            }
+            const selectedCount = form.querySelectorAll("input[name='SelectedDoctorIds']:checked").length;
+            doctorsSummary.textContent = `Doktor seçimi (${selectedCount})`;
+        }
+
+        form?.querySelectorAll("input[type='checkbox'], select").forEach((el) => {
+            el.addEventListener("change", function () {
+                updateDoctorsSummary();
+                submitWithScroll();
+            });
+        });
+
+        sortDirectionToggle?.addEventListener("click", function () {
+            if (!sortDirectionInput) {
+                return;
+            }
+            sortDirectionInput.value = sortDirectionInput.value === "asc" ? "desc" : "asc";
+            sortDirectionToggle.innerHTML = sortDirectionInput.value === "asc"
+                ? "<i class='fas fa-arrow-up-wide-short'></i>"
+                : "<i class='fas fa-arrow-down-wide-short'></i>";
+            submitWithScroll();
+        });
+
+        restoreScroll();
+        updateDoctorsSummary();
+    })();
+</script>
+}

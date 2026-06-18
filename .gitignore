@@ -1,0 +1,17 @@
+bin/
+obj/
+logs/
+keys/
+tmp/
+.vs/
+*.user
+*.suo
+*.pfx
+.env
+node_modules/
+MentoraSnapshot*.txt
+ara_rapor_*.txt
+vize_raporu_*.docx
+~$*
+!wwwroot/images/logo*.png
+!wwwroot/images/default-avatar.png

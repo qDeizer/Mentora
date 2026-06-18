@@ -1,0 +1,102 @@
+@{
+    ViewData["Title"] = "Admin Paneli";
+    dynamic recentNotifications = ViewBag.RecentNotifications;
+}
+
+<div class="container app-page">
+    <div class="page-header">
+        <h1 class="page-title">Admin Paneli</h1>
+        <p class="page-subtitle">Sistem geneli özet, kullanıcılar, randevular ve klinik notlar.</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="metric-grid">
+        <div class="metric-card">
+            <div class="metric-label">Toplam Kullanıcı</div>
+            <div class="metric-value">@ViewBag.UserCount</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Doktor</div>
+            <div class="metric-value">@ViewBag.DoctorCount</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Hasta</div>
+            <div class="metric-value">@ViewBag.PatientCount</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Randevu</div>
+            <div class="metric-value">@ViewBag.AppointmentCount</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Klinik Not</div>
+            <div class="metric-value">@ViewBag.NoteCount</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Bekleyen Talep</div>
+            <div class="metric-value">@ViewBag.PendingRequestCount</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Bekleyen E-posta</div>
+            <div class="metric-value">@ViewBag.PendingEmailCount</div>
+        </div>
+    </div>
+
+    <div class="row g-3 mt-2">
+        <div class="col-lg-4">
+            <div class="app-card">
+                <h3 class="h6">Hızlı Erişim</h3>
+                <div class="d-grid gap-2">
+                    <a class="btn btn-sm btn-outline-primary" asp-action="Users"><i class="fas fa-users me-1"></i>Kullanıcılar</a>
+                    <a class="btn btn-sm btn-outline-primary" asp-action="Appointments"><i class="fas fa-calendar me-1"></i>Randevular</a>
+                    <a class="btn btn-sm btn-outline-primary" asp-action="Notes"><i class="fas fa-notes-medical me-1"></i>Klinik Notlar</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="app-card">
+                <h3 class="h6">Son Bildirimler</h3>
+                @if (recentNotifications == null || recentNotifications.Count == 0)
+                {
+                    <div class="text-muted small">Bildirim yok.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                            <tr>
+                                <th>Tarih</th>
+                                <th>Tur</th>
+                                <th>Kullanıcı</th>
+                                <th>Mesaj</th>
+                                <th>Okundu</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var n in recentNotifications)
+                            {
+                                <tr>
+                                    <td class="small">@(((DateTime)n.CreatedAtUtc).ToLocalTime().ToString("dd.MM.yyyy HH:mm"))</td>
+                                    <td class="small">@n.Type</td>
+                                    <td class="small">@n.UserName</td>
+                                    <td class="small">@n.Title - @n.Message</td>
+                                    <td class="small">@(((bool)n.IsRead) ? "Evet" : "Hayir")</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

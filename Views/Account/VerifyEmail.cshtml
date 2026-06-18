@@ -1,0 +1,49 @@
+@model PsikologProje_Void.ViewModels.VerifyEmailViewModel
+@{
+    ViewData["Title"] = "E-Posta Doğrulama";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-sm border-0 rounded-lg">
+                <div class="card-body p-5">
+                    <h3 class="text-center mb-4 text-primary">Hesabinizi Dogrulayin</h3>
+                    <p class="text-center text-muted mb-4">
+                        <b>@Model.Email</b> adresinize gönderilen 6 haneli doğrulama kodunu aşağıya giriniz.
+                    </p>
+
+                    <form asp-action="VerifyEmail" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <input type="hidden" asp-for="Email" />
+
+                        <div class="form-floating mb-4">
+                            <input asp-for="Code" class="form-control text-center" style="letter-spacing: 5px; font-size: 24px; font-weight: bold;" placeholder="123456" maxlength="6" autocomplete="off" />
+                            <label asp-for="Code">6 Haneli Kod</label>
+                            <span asp-validation-for="Code" class="text-danger d-block mt-1"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Dogrula</button>
+                        </div>
+                    </form>
+
+                    <div class="mt-4 text-center">
+                        <p class="text-muted mb-2">Kodu almadiniz mi?</p>
+                        <form asp-action="ResendEmailConfirmation" method="post" class="d-inline">
+                            <input type="hidden" name="email" value="@Model.Email" />
+                            <button type="submit" class="btn btn-link text-decoration-none p-0">Tekrar Gönder</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="card-footer text-center py-3 bg-light">
+                    <div class="small"><a asp-action="Login">Giriş ekranına dön</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

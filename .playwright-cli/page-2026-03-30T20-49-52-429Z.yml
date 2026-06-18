@@ -1,0 +1,188 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "Mentora Logo Mentora" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Mentora Logo" [ref=e5]
+        - generic [ref=e6]: Mentora
+      - generic [ref=e7]:
+        - list [ref=e8]:
+          - listitem [ref=e9]:
+            - link " Randevularim" [ref=e10] [cursor=pointer]:
+              - /url: /DoctorDashboard
+              - generic [ref=e11]: 
+              - text: Randevularim
+          - listitem [ref=e12]:
+            - link " Haftalik Cizelge" [ref=e13] [cursor=pointer]:
+              - /url: /DoctorDashboard/Scheduler
+              - generic [ref=e14]: 
+              - text: Haftalik Cizelge
+          - listitem [ref=e15]:
+            - link " Oto Rutin" [ref=e16] [cursor=pointer]:
+              - /url: /Automation
+              - generic [ref=e17]: 
+              - text: Oto Rutin
+          - listitem [ref=e18]:
+            - link " Klinik Notlar" [ref=e19] [cursor=pointer]:
+              - /url: /ClinicalNotes
+              - generic [ref=e20]: 
+              - text: Klinik Notlar
+          - listitem [ref=e21]:
+            - link " Gelen Talepler" [ref=e22] [cursor=pointer]:
+              - /url: /Request
+              - generic [ref=e23]: 
+              - text: Gelen Talepler
+          - listitem [ref=e24]:
+            - link " Kisilerim" [ref=e25] [cursor=pointer]:
+              - /url: /People
+              - generic [ref=e26]: 
+              - text: Kisilerim
+        - list [ref=e27]:
+          - listitem [ref=e28]:
+            - button " Profil konumu tanimsiz" [ref=e29] [cursor=pointer]:
+              - generic [ref=e30]: 
+              - generic [ref=e31]: Profil konumu tanimsiz
+          - listitem [ref=e32]:
+            - button "" [ref=e33] [cursor=pointer]:
+              - generic [ref=e34]: 
+          - listitem [ref=e35]:
+            - button "Profil Test Doctor" [ref=e36] [cursor=pointer]:
+              - img "Profil" [ref=e37]
+              - generic [ref=e38]: Test Doctor
+            - text:   
+  - main [ref=e39]:
+    - generic [ref=e40]:
+      - generic [ref=e41]:
+        - heading "Auto Routine Manager" [level=1] [ref=e42]
+        - paragraph [ref=e43]: Rutinlerinizi olusturun, hizli presetlerle durdurun ve takvim akisina kontrollu sekilde devam edin.
+      - generic [ref=e44]:
+        - generic [ref=e46]:
+          - heading "Yeni Rutin" [level=2] [ref=e47]
+          - generic [ref=e48]:
+            - generic:
+              - list
+            - generic [ref=e49]:
+              - generic [ref=e50]: Rutin adi
+              - textbox "Rutin adi" [ref=e51]
+            - generic [ref=e52]:
+              - generic [ref=e53]:
+                - generic [ref=e54]: Baslangic saati
+                - textbox "Baslangic saati" [ref=e55]: 09:00
+              - generic [ref=e56]:
+                - generic [ref=e57]: Sure (dk)
+                - spinbutton "Sure (dk)" [ref=e58]: "50"
+            - generic [ref=e59]:
+              - generic [ref=e60]: Kac gun once olusturulsun?
+              - spinbutton "Kac gun once olusturulsun?" [ref=e61]: "7"
+              - generic [ref=e62]: "Orn: 7 secerseniz sistem sadece sonraki 7 gunluk slotlari olusturur."
+            - generic [ref=e63]:
+              - generic [ref=e64]:
+                - generic [ref=e65]: Aktif baslangic
+                - textbox "Aktif baslangic" [ref=e66]: 2026-03-30
+              - generic [ref=e67]:
+                - generic [ref=e68]: Aktif bitis
+                - textbox "Aktif bitis" [ref=e69]
+            - generic [ref=e70]:
+              - generic [ref=e71]: Gun secimi
+              - generic [ref=e72]:
+                - generic [ref=e73] [cursor=pointer]:
+                  - checkbox "Pzt" [ref=e74]
+                  - text: Pzt
+                - generic [ref=e75] [cursor=pointer]:
+                  - checkbox "Sal" [ref=e76]
+                  - text: Sal
+                - generic [ref=e77] [cursor=pointer]:
+                  - checkbox "Car" [ref=e78]
+                  - text: Car
+                - generic [ref=e79] [cursor=pointer]:
+                  - checkbox "Per" [ref=e80]
+                  - text: Per
+                - generic [ref=e81] [cursor=pointer]:
+                  - checkbox "Cum" [ref=e82]
+                  - text: Cum
+                - generic [ref=e83] [cursor=pointer]:
+                  - checkbox "Cmt" [ref=e84]
+                  - text: Cmt
+                - generic [ref=e85] [cursor=pointer]:
+                  - checkbox "Paz" [ref=e86]
+                  - text: Paz
+            - generic [ref=e87]:
+              - generic [ref=e88]: Randevu tipi
+              - generic [ref=e89]:
+                - checkbox "Online" [checked] [ref=e90]
+                - generic [ref=e91]: Online
+              - generic [ref=e92]:
+                - checkbox "Yuz yuze" [ref=e93]
+                - generic [ref=e94]: Yuz yuze
+            - generic [ref=e95]:
+              - generic [ref=e96]: Yuz yuze konum kaynagi
+              - combobox [ref=e97]:
+                - option "Profil konumu" [selected]
+                - option "Mevcut cihaz konumu"
+                - option "Manuel konum girisi"
+            - generic [ref=e98]:
+              - generic [ref=e99]: Acik adres notu
+              - textbox "Acik adres notu" [ref=e100]:
+                - /placeholder: "Orn: Klinik girisi B blok, 3. kat."
+            - generic [ref=e101]:
+              - generic [ref=e102]:
+                - generic [ref=e103]: Min fiyat
+                - textbox "Min fiyat" [ref=e104]
+              - generic [ref=e105]:
+                - generic [ref=e106]: Max fiyat
+                - textbox "Max fiyat" [ref=e107]
+            - generic [ref=e108]:
+              - generic [ref=e109]: Uzmanliklar
+              - generic [ref=e110]:
+                - generic [ref=e112]:
+                  - checkbox "Aile Terapisi" [ref=e113]
+                  - generic [ref=e114]: Aile Terapisi
+                - generic [ref=e116]:
+                  - checkbox "Anksiyete Bozukluklari" [ref=e117]
+                  - generic [ref=e118]: Anksiyete Bozukluklari
+                - generic [ref=e120]:
+                  - checkbox "Bagimlilik Tedavisi" [ref=e121]
+                  - generic [ref=e122]: Bagimlilik Tedavisi
+                - generic [ref=e124]:
+                  - checkbox "Cift Terapisi" [ref=e125]
+                  - generic [ref=e126]: Cift Terapisi
+                - generic [ref=e128]:
+                  - checkbox "Cocuk Psikolojisi" [ref=e129]
+                  - generic [ref=e130]: Cocuk Psikolojisi
+                - generic [ref=e132]:
+                  - checkbox "Depresyon Tedavisi" [ref=e133]
+                  - generic [ref=e134]: Depresyon Tedavisi
+                - generic [ref=e136]:
+                  - checkbox "Ergen Psikolojisi" [ref=e137]
+                  - generic [ref=e138]: Ergen Psikolojisi
+                - generic [ref=e140]:
+                  - checkbox "Kariyer Danismanligi" [ref=e141]
+                  - generic [ref=e142]: Kariyer Danismanligi
+                - generic [ref=e144]:
+                  - checkbox "Kisilik Bozukluklari" [ref=e145]
+                  - generic [ref=e146]: Kisilik Bozukluklari
+                - generic [ref=e148]:
+                  - checkbox "Ofke Yonetimi" [ref=e149]
+                  - generic [ref=e150]: Ofke Yonetimi
+                - generic [ref=e152]:
+                  - checkbox "Sosyal Fobi" [ref=e153]
+                  - generic [ref=e154]: Sosyal Fobi
+                - generic [ref=e156]:
+                  - checkbox "Stres Yonetimi" [ref=e157]
+                  - generic [ref=e158]: Stres Yonetimi
+                - generic [ref=e160]:
+                  - checkbox "Travma Terapisi" [ref=e161]
+                  - generic [ref=e162]: Travma Terapisi
+                - generic [ref=e164]:
+                  - checkbox "Yasli Psikolojisi" [ref=e165]
+                  - generic [ref=e166]: Yasli Psikolojisi
+                - generic [ref=e168]:
+                  - checkbox "Yeme Bozukluklari" [ref=e169]
+                  - generic [ref=e170]: Yeme Bozukluklari
+            - generic [ref=e171]:
+              - generic [ref=e172]: Not
+              - textbox "Not" [ref=e173]
+            - button "Rutini Olustur" [ref=e174] [cursor=pointer]
+        - generic [ref=e176]:
+          - heading "Mevcut Rutinler" [level=2] [ref=e177]
+          - generic [ref=e178]: Henuz otomatik rutin tanimi yok.

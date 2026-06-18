@@ -1,0 +1,79 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "Mentora Logo Mentora" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Mentora Logo" [ref=e5]
+        - generic [ref=e6]: Mentora
+      - generic [ref=e7]:
+        - list [ref=e8]:
+          - listitem [ref=e9]:
+            - link " Randevu Ara" [ref=e10] [cursor=pointer]:
+              - /url: /PatientDashboard
+              - generic [ref=e11]: 
+              - text: Randevu Ara
+          - listitem [ref=e12]:
+            - link " Taleplerim" [ref=e13] [cursor=pointer]:
+              - /url: /Request/MyRequests
+              - generic [ref=e14]: 
+              - text: Taleplerim
+          - listitem [ref=e15]:
+            - link " Ozel Randevular" [ref=e16] [cursor=pointer]:
+              - /url: /PrivateAppointments
+              - generic [ref=e17]: 
+              - text: Ozel Randevular
+          - listitem [ref=e18]:
+            - link " Notlarim" [ref=e19] [cursor=pointer]:
+              - /url: /ClinicalNotes/MyNotes
+              - generic [ref=e20]: 
+              - text: Notlarim
+          - listitem [ref=e21]:
+            - link " Doktorlarim" [ref=e22] [cursor=pointer]:
+              - /url: /People
+              - generic [ref=e23]: 
+              - text: Doktorlarim
+        - list [ref=e24]:
+          - listitem [ref=e25]:
+            - button " Profil konumu tanimsiz" [ref=e26] [cursor=pointer]:
+              - generic [ref=e27]: 
+              - generic [ref=e28]: Profil konumu tanimsiz
+          - listitem [ref=e29]:
+            - button "" [ref=e30] [cursor=pointer]:
+              - generic [ref=e31]: 
+          - listitem [ref=e32]:
+            - button "Profil Test Patient" [ref=e33] [cursor=pointer]:
+              - img "Profil" [ref=e34]
+              - generic [ref=e35]: Test Patient
+            - text:   
+  - main [ref=e36]:
+    - generic [ref=e38]:
+      - generic [ref=e39]: E-posta adresiniz henuz dogrulanmamis. Profil menusu uzerinden tekrar dogrulama maili gonderebilirsiniz.
+      - generic [ref=e40]:
+        - generic [ref=e41]: 
+        - heading "Giriş Yap" [level=2] [ref=e42]
+        - paragraph [ref=e43]: Hesabınıza giriş yapın.
+      - generic [ref=e44]:
+        - generic [ref=e45]:
+          - textbox " E-posta veya Kullanici Adi" [ref=e46]:
+            - /placeholder: E-posta veya Kullanici Adi
+          - generic [ref=e47]:
+            - generic [ref=e48]: 
+            - text: E-posta veya Kullanici Adi
+        - generic [ref=e49]:
+          - textbox " Şifre" [ref=e50]:
+            - /placeholder: Şifre
+          - generic [ref=e51]:
+            - generic [ref=e52]: 
+            - text: Şifre
+        - generic [ref=e53]:
+          - checkbox "Beni Hatırla" [ref=e54]
+          - generic [ref=e55]: Beni Hatırla
+        - button "Giriş Yap" [ref=e56] [cursor=pointer]
+        - generic [ref=e57]:
+          - paragraph [ref=e58]:
+            - link "Sifremi unuttum" [ref=e59] [cursor=pointer]:
+              - /url: /Account/ForgotPassword
+          - paragraph [ref=e60]:
+            - text: Hesabınız yok mu?
+            - link "Kayıt Ol" [ref=e61] [cursor=pointer]:
+              - /url: /Account/Register

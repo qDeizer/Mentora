@@ -1,0 +1,353 @@
+@using Microsoft.AspNetCore.Identity
+@using PsikologProje_Void.Models
+@using PsikologProje_Void.Services
+@using PsikologProje_Void.ViewModels
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+@inject IGlobalLocationContextService GlobalLocationContextService
+@inject INotificationService NotificationService
+@inject IAppointmentService AppointmentService
+@inject IConfiguration Configuration
+
+@{
+    User? currentUser = null;
+    GlobalLocationContextViewModel? globalLocationContext = null;
+    var unreadNotificationCount = 0;
+    if (SignInManager.IsSignedIn(User))
+    {
+        currentUser = await UserManager.GetUserAsync(User);
+        globalLocationContext = await GlobalLocationContextService.GetContextAsync(User);
+        unreadNotificationCount = await NotificationService.CountUnreadAsync(currentUser?.Id ?? string.Empty);
+    }
+
+    var pendingPrivateOfferCount = 0;
+    if (currentUser != null && User.IsInRole("Patient"))
+    {
+        pendingPrivateOfferCount = await AppointmentService.CountPendingPrivateOffersAsync(currentUser.Id);
+    }
+
+    string ActiveClass(string controller, string? action = null)
+    {
+        var currentController = (ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty);
+        var currentAction = (ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty);
+
+        var controllerMatch = string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase);
+        var actionMatch = action == null || string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase);
+        return controllerMatch && actionMatch ? "active" : string.Empty;
+    }
+
+    var mapsApiKey = Configuration["GoogleMaps:ApiKey"];
+    if (string.IsNullOrWhiteSpace(mapsApiKey))
+    {
+        mapsApiKey = Configuration["GoogleMaps__ApiKey"];
+    }
+    if (string.IsNullOrWhiteSpace(mapsApiKey))
+    {
+        mapsApiKey = Configuration["GOOGLE_MAPS_API_KEY"];
+    }
+    if (string.IsNullOrWhiteSpace(mapsApiKey))
+    {
+        mapsApiKey = Configuration["GoogleMapsApiKey"];
+    }
+    var hasMapsApiKey = !string.IsNullOrWhiteSpace(mapsApiKey);
+    var themePreference = currentUser?.ThemePreference ?? "system";
+    var layoutDensity = currentUser?.LayoutDensity ?? "comfortable";
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Mentora</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <script>
+        (function () {
+            const serverTheme = "@themePreference";
+            const serverDensity = "@layoutDensity";
+            const theme = localStorage.getItem("mentora:theme") || serverTheme || "system";
+            const density = localStorage.getItem("mentora:density") || serverDensity || "comfortable";
+            const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+            document.documentElement.dataset.themePreference = theme;
+            document.documentElement.dataset.theme = theme === "system" ? (prefersDark ? "dark" : "light") : theme;
+            document.documentElement.dataset.density = density;
+        })();
+    </script>
+
+    @RenderSection("Styles", required: false)
+</head>
+<body data-appearance-save-url="@Url.Action("Appearance", "Settings")" data-signed-in="@(currentUser != null ? "true" : "false")">
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top app-navbar">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                <img src="~/images/logo.png" alt="Mentora Logo" class="brand-logo me-2" />
+                <span class="brand-text">Mentora</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    @if (currentUser != null)
+                    {
+                        if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @ActiveClass("Admin", "Index")" asp-controller="Admin" asp-action="Index"><i class="fas fa-shield-halved me-1"></i>Admin Paneli</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @ActiveClass("Admin", "Users")" asp-controller="Admin" asp-action="Users"><i class="fas fa-users me-1"></i>Kullanıcılar</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @ActiveClass("Admin", "Appointments")" asp-controller="Admin" asp-action="Appointments"><i class="fas fa-calendar me-1"></i>Randevular</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @ActiveClass("Admin", "Notes")" asp-controller="Admin" asp-action="Notes"><i class="fas fa-notes-medical me-1"></i>Klinik Notlar</a>
+                            </li>
+                        }
+                        else if (User.IsInRole("Doctor"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @ActiveClass("DoctorDashboard", "Index")" asp-controller="DoctorDashboard" asp-action="Index"><i class="fas fa-calendar-plus me-1"></i>Randevularım</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @ActiveClass("DoctorDashboard", "Scheduler")" asp-controller="DoctorDashboard" asp-action="Scheduler"><i class="fas fa-chart-column me-1"></i>Haftalık Çizelge</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @ActiveClass("Automation", "Index")" asp-controller="Automation" asp-action="Index"><i class="fas fa-robot me-1"></i>Oto Rutin</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @ActiveClass("ClinicalNotes", "Index")" asp-controller="ClinicalNotes" asp-action="Index"><i class="fas fa-notes-medical me-1"></i>Klinik Notlar</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @ActiveClass("Request", "Index")" asp-controller="Request" asp-action="Index"><i class="fas fa-inbox me-1"></i>Gelen Talepler</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @ActiveClass("People", "Index")" asp-controller="People" asp-action="Index"><i class="fas fa-users me-1"></i>Kişilerim</a>
+                            </li>
+                        }
+                        else if (User.IsInRole("Patient"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @ActiveClass("PatientDashboard", "Index")" asp-controller="PatientDashboard" asp-action="Index"><i class="fas fa-search-location me-1"></i>Randevu Ara</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @ActiveClass("Request", "MyRequests")" asp-controller="Request" asp-action="MyRequests"><i class="fas fa-tasks me-1"></i>Taleplerim</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @ActiveClass("PatientDashboard", "Appointments")" asp-controller="PatientDashboard" asp-action="Appointments"><i class="fas fa-calendar-check me-1"></i>Randevularım</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @ActiveClass("PrivateAppointments", "Index")" asp-controller="PrivateAppointments" asp-action="Index">
+                                    <i class="fas fa-gem me-1"></i>Özel Randevular
+                                    @if (pendingPrivateOfferCount > 0)
+                                    {
+                                        <span class="badge text-bg-danger ms-1">@pendingPrivateOfferCount</span>
+                                    }
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @ActiveClass("ClinicalNotes", "MyNotes")" asp-controller="ClinicalNotes" asp-action="MyNotes"><i class="fas fa-file-medical me-1"></i>Notlarım</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @ActiveClass("People", "Index")" asp-controller="People" asp-action="Index"><i class="fas fa-users me-1"></i>Doktorlarım</a>
+                            </li>
+                        }
+                    }
+                </ul>
+
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown me-1">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center"
+                           href="#"
+                           id="appearanceDropdown"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            <i class="fas fa-palette me-1"></i>Tema
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end p-3 appearance-dropdown" aria-labelledby="appearanceDropdown">
+                            <label class="form-label small mb-1" for="themePreferenceSelect">Tema</label>
+                            <select class="form-select form-select-sm mb-2" id="themePreferenceSelect">
+                                <option value="system">Sistem</option>
+                                <option value="light">Açık</option>
+                                <option value="dark">Koyu</option>
+                            </select>
+
+                            <label class="form-label small mb-1" for="layoutDensitySelect">Görünüm</label>
+                            <select class="form-select form-select-sm" id="layoutDensitySelect">
+                                <option value="comfortable">Rahat</option>
+                                <option value="compact">Kompakt</option>
+                            </select>
+
+                            <form id="appearancePreferenceForm" asp-controller="Settings" asp-action="Appearance" method="post" class="d-none">
+                                @Html.AntiForgeryToken()
+                            </form>
+                        </div>
+                    </li>
+
+                    @if (currentUser != null)
+                    {
+                        <li class="nav-item dropdown me-1">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center global-location-trigger"
+                               href="#"
+                               id="globalLocationDropdown"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false"
+                               data-has-maps="@hasMapsApiKey.ToString().ToLowerInvariant()"
+                               data-maps-key="@mapsApiKey">
+                                <i class="fas fa-location-crosshairs me-1"></i>
+                                <span id="globalLocationBadgeText">@(globalLocationContext?.Label ?? "Konum seç")</span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end p-3 global-location-dropdown" aria-labelledby="globalLocationDropdown">
+                                <div class="small fw-semibold mb-2">Genel Konum</div>
+                                <select class="form-select form-select-sm mb-2" id="globalLocationSourceSelect">
+                                    <option value="Profile">Profil konumu</option>
+                                    <option value="DeviceGps">Cihaz konumu</option>
+                                    <option value="ManualMap">Manuel harita seçimi</option>
+                                </select>
+                                <div id="globalLocationMeta" class="small text-muted mb-2">Konum yükleniyor...</div>
+                                <div class="d-flex gap-2 mb-2">
+                                    <button class="btn btn-sm btn-outline-secondary w-100" type="button" id="globalLocationUseDeviceBtn">Cihazdan al</button>
+                                    <button class="btn btn-sm btn-outline-secondary w-100" type="button" id="globalLocationOpenMapBtn">Haritadan seç</button>
+                                </div>
+                                <button class="btn btn-sm btn-primary w-100" type="button" id="globalLocationSaveProfileBtn">Profilime kaydet</button>
+                                @Html.AntiForgeryToken()
+                            </div>
+                        </li>
+
+                        <li class="nav-item dropdown me-1">
+                            <a class="nav-link d-flex align-items-center position-relative"
+                               href="#"
+                               id="notificationDropdown"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
+                                <i class="fas fa-bell"></i>
+                                @if (unreadNotificationCount > 0)
+                                {
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="navbarUnreadNotificationCount">
+                                        @unreadNotificationCount
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" id="navbarUnreadNotificationCount">0</span>
+                                }
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end notification-dropdown p-0" aria-labelledby="notificationDropdown">
+                                <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                                    <strong>Bildirimler</strong>
+                                    <button type="button" class="btn btn-link btn-sm p-0" id="markAllNotificationsReadBtn">Tümünü oku</button>
+                                </div>
+                                <div id="notificationListContainer" class="notification-list-container">
+                                    <div class="px-3 py-2 small text-muted">Yükleniyor...</div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="@(string.IsNullOrEmpty(currentUser.ProfilePhotoPath) ? "/images/default-avatar.png" : currentUser.ProfilePhotoPath)" class="navbar-profile-img" alt="Profil">
+                                <span class="navbar-user-name">@currentUser.FirstName @currentUser.LastName</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end custom-dropdown" aria-labelledby="navbarDropdownUser">
+                                <li><h6 class="dropdown-header">@currentUser.Email</h6></li>
+                                <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile"><i class="fas fa-user-cog me-2"></i>Profil Ayarları</a></li>
+                                <li><a class="dropdown-item" asp-controller="Settings" asp-action="Notifications"><i class="fas fa-cog me-2"></i>Bildirim Ayarları</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="Login">
+                                <i class="fas fa-sign-in-alt me-1"></i>Giriş Yap
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-primary nav-btn" asp-controller="Account" asp-action="Register">
+                                <i class="fas fa-user-plus me-1"></i>Kayıt Ol
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main role="main" class="app-main">
+        @RenderBody()
+    </main>
+
+    @if (currentUser != null)
+    {
+        <div class="modal fade" id="globalLocationMapModal" tabindex="-1" aria-labelledby="globalLocationMapModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content app-card">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="globalLocationMapModalLabel">Genel Konum Seçimi</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                    </div>
+                    <div class="modal-body">
+                        @if (hasMapsApiKey)
+                        {
+                            <input id="globalLocationMapSearch" class="form-control mb-2" type="text" placeholder="Adres ara..." />
+                            <div id="globalLocationMapCanvas" class="modal-map"></div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning mb-0">Harita seçimi için `GoogleMaps:ApiKey` gereklidir.</div>
+                        }
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">İptal</button>
+                        @if (hasMapsApiKey)
+                        {
+                            <button type="button" class="btn btn-primary" id="globalLocationApplyMapBtn" data-bs-dismiss="modal">Konumu Uygula</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @if (currentUser != null)
+    {
+        <script>
+            window.mentoraNavbarConfig = @Html.Raw(Json.Serialize(new
+            {
+                hasMapsApiKey,
+                mapsApiKey,
+                initialGlobalLocation = globalLocationContext,
+                notificationRecentEndpoint = Url.Action("Recent", "Notifications"),
+                notificationMarkReadEndpointBase = Url.Action("MarkRead", "Notifications", new { id = "__id__" }),
+                notificationMarkAllReadEndpoint = Url.Action("MarkAllRead", "Notifications")
+            }));
+        </script>
+        <script src="~/js/navbar-extras.js" asp-append-version="true"></script>
+    }
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

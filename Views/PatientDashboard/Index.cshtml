@@ -1,0 +1,241 @@
+@model PsikologProje_Void.ViewModels.PatientDashboardViewModel
+@inject IConfiguration Configuration
+@{
+    ViewData["Title"] = "Randevu Ara";
+    var mapsApiKey = Configuration["GoogleMaps:ApiKey"];
+    if (string.IsNullOrWhiteSpace(mapsApiKey))
+    {
+        mapsApiKey = Configuration["GoogleMaps__ApiKey"];
+    }
+    if (string.IsNullOrWhiteSpace(mapsApiKey))
+    {
+        mapsApiKey = Configuration["GOOGLE_MAPS_API_KEY"];
+    }
+    if (string.IsNullOrWhiteSpace(mapsApiKey))
+    {
+        mapsApiKey = Configuration["GoogleMapsApiKey"];
+    }
+
+    var hasMapsApiKey = !string.IsNullOrWhiteSpace(mapsApiKey);
+    var selectedDays = Model.Filter.SelectedDays?.ToHashSet() ?? new HashSet<int>();
+    var selectedDoctorIds = Model.Filter.SelectedDoctorIds?.Distinct().ToHashSet() ?? new HashSet<string>();
+    var selectedSpecialtyIds = Model.Filter.SelectedSpecialtyIds?.Distinct().ToHashSet() ?? new HashSet<int>();
+    var sortDirectionLabel = Model.Filter.SortDirection == "asc" ? "Artan" : "Azalan";
+}
+
+<div class="container app-page">
+    <div class="page-header">
+        <h1 class="page-title">Randevu Arama</h1>
+        <p class="page-subtitle">Doktor, uzmanlık, tarih, gün, ücret ve mesafeye göre filtreleyin. Konum seçimi üst bardaki genel konumdan alınır.</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="row g-3">
+        <aside class="col-lg-3">
+            <div class="app-card filter-sidebar">
+                <h2 class="h6 mb-3">Filtreler</h2>
+                <form id="filterForm" asp-action="Index" method="get">
+                    <input type="hidden" asp-for="Filter.SortBy" id="sortBy" />
+                    <input type="hidden" asp-for="Filter.SortDirection" id="sortDirection" />
+                    <input type="hidden" asp-for="Filter.Latitude" id="userLat" />
+                    <input type="hidden" asp-for="Filter.Longitude" id="userLon" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Doktorlar (çoklu)</label>
+                        <div class="dropdown multi-avatar-dropdown">
+                            <button class="form-select form-select-sm text-start d-flex align-items-center" type="button" id="patientDashboardDoctorsDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                <span class="multi-avatar-summary" id="patientDashboardDoctorsSummary">Doktor seçimi (@selectedDoctorIds.Count)</span>
+                            </button>
+                            <div class="dropdown-menu p-2 multi-avatar-menu" aria-labelledby="patientDashboardDoctorsDropdown">
+                                @foreach (var doctor in Model.Doctors)
+                                {
+                                    var photo = string.IsNullOrWhiteSpace(doctor.ProfilePhotoPath) ? "/images/default-avatar.png" : doctor.ProfilePhotoPath;
+                                    <label class="multi-avatar-item w-100">
+                                        <input type="checkbox"
+                                               class="form-check-input"
+                                               name="Filter.SelectedDoctorIds"
+                                               value="@doctor.Id"
+                                               @(selectedDoctorIds.Contains(doctor.Id) ? "checked" : null) />
+                                        <img src="@photo" alt="@doctor.FullName" class="inline-profile-avatar" style="width:26px;height:26px;" />
+                                        <span>@doctor.FullName</span>
+                                    </label>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Uzmanlıklar (çoklu)</label>
+                        <details class="multi-select-panel">
+                            <summary class="multi-select-summary">Uzmanlık seçimi (@selectedSpecialtyIds.Count)</summary>
+                            <div class="multi-select-options">
+                                @foreach (var specialty in Model.Specialties)
+                                {
+                                    <label class="multi-select-option">
+                                        <input type="checkbox" name="Filter.SelectedSpecialtyIds" value="@specialty.Id" checked="@selectedSpecialtyIds.Contains(specialty.Id)" />
+                                        <span>@specialty.Name</span>
+                                    </label>
+                                }
+                            </div>
+                        </details>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label d-block">Günler</label>
+                        <div class="d-flex flex-wrap gap-1">
+                            <label class="btn btn-sm btn-outline-primary"><input type="checkbox" name="Filter.SelectedDays" value="1" class="me-1" @(selectedDays.Contains(1) ? "checked" : null) />Pzt</label>
+                            <label class="btn btn-sm btn-outline-primary"><input type="checkbox" name="Filter.SelectedDays" value="2" class="me-1" @(selectedDays.Contains(2) ? "checked" : null) />Sal</label>
+                            <label class="btn btn-sm btn-outline-primary"><input type="checkbox" name="Filter.SelectedDays" value="3" class="me-1" @(selectedDays.Contains(3) ? "checked" : null) />Çar</label>
+                            <label class="btn btn-sm btn-outline-primary"><input type="checkbox" name="Filter.SelectedDays" value="4" class="me-1" @(selectedDays.Contains(4) ? "checked" : null) />Per</label>
+                            <label class="btn btn-sm btn-outline-primary"><input type="checkbox" name="Filter.SelectedDays" value="5" class="me-1" @(selectedDays.Contains(5) ? "checked" : null) />Cum</label>
+                            <label class="btn btn-sm btn-outline-primary"><input type="checkbox" name="Filter.SelectedDays" value="6" class="me-1" @(selectedDays.Contains(6) ? "checked" : null) />Cmt</label>
+                            <label class="btn btn-sm btn-outline-primary"><input type="checkbox" name="Filter.SelectedDays" value="0" class="me-1" @(selectedDays.Contains(0) ? "checked" : null) />Paz</label>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label asp-for="Filter.StartDate" class="form-label">Başlangıç</label>
+                            <input asp-for="Filter.StartDate" type="date" class="form-control" />
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="Filter.EndDate" class="form-label">Bitiş</label>
+                            <input asp-for="Filter.EndDate" type="date" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label asp-for="Filter.MinPrice" class="form-label">Min fiyat</label>
+                            <div class="input-group">
+                                <span class="input-group-text">TL</span>
+                                <input asp-for="Filter.MinPrice" type="number" class="form-control" placeholder="100" />
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="Filter.MaxPrice" class="form-label">Max fiyat</label>
+                            <div class="input-group">
+                                <span class="input-group-text">TL</span>
+                                <input asp-for="Filter.MaxPrice" type="number" class="form-control" placeholder="900" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Filter.DistanceKm" class="form-label">Mesafe (km)</label>
+                        <input asp-for="Filter.DistanceKm" type="number" class="form-control" placeholder="Örn: 25" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label d-block">Randevu tipi</label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input" type="checkbox" asp-for="Filter.IsOnline" value="true" />
+                                <label class="form-check-label" asp-for="Filter.IsOnline">Çevrim içi</label>
+                            </div>
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input" type="checkbox" asp-for="Filter.IsInPerson" value="true" />
+                                <label class="form-check-label" asp-for="Filter.IsInPerson">Yüz yüze</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </aside>
+
+        <section class="col-lg-9">
+            <div class="top-controls">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <button type="button"
+                            class="btn btn-outline-primary"
+                            id="viewOnMapBtn"
+                            data-bs-toggle="modal"
+                            data-bs-target="#appointmentsMapModal"
+                            disabled="@(!hasMapsApiKey)"
+                            title="@(hasMapsApiKey ? "Haritada gör" : "Harita anahtarı tanımlı değil")">
+                        <i class="fas fa-map-marked-alt me-2"></i>Haritada gör
+                    </button>
+                    <span class="status-chip status-neutral" id="activeLocationBadge">Konum: @Model.GlobalLocationLabel</span>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <select class="form-select form-select-sm" id="sortSelector">
+                        <option value="date" selected="@(Model.Filter.SortBy == "date" || string.IsNullOrWhiteSpace(Model.Filter.SortBy))">Tarih</option>
+                        <option value="doctor" selected="@(Model.Filter.SortBy == "doctor")">Doktor</option>
+                        <option value="price" selected="@(Model.Filter.SortBy == "price")">Fiyat</option>
+                        <option value="rating" selected="@(Model.Filter.SortBy == "rating")">Puan</option>
+                        <option value="distance" selected="@(Model.Filter.SortBy == "distance")">Mesafe</option>
+                    </select>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="sortDirectionToggle">@sortDirectionLabel</button>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                @if (Model.Appointments.Any())
+                {
+                    @foreach (var item in Model.Appointments)
+                    {
+                        <div class="col-md-6">
+                            @await Html.PartialAsync("_AppointmentCardPartial", item)
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12">
+                        <div class="app-card text-center py-5">
+                            <i class="far fa-calendar-times fa-3x mb-3"></i>
+                            <h4 class="mb-1">Uygun randevu bulunamadı</h4>
+                            <p class="text-muted mb-0">Filtre kriterlerinizi değiştirip tekrar deneyin.</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+    </div>
+</div>
+
+@await Html.PartialAsync("_PatientDashboardModals", hasMapsApiKey)
+
+@section Scripts {
+    @if (hasMapsApiKey)
+    {
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=@mapsApiKey&libraries=places&loading=async"></script>
+    }
+    <script>
+        window.patientDashboardConfig = @Html.Raw(Json.Serialize(new
+        {
+            mapsEnabled = hasMapsApiKey,
+            profileLat = Model.ProfileLatitude,
+            profileLng = Model.ProfileLongitude,
+            globalLat = Model.GlobalLatitude,
+            globalLng = Model.GlobalLongitude,
+            globalLocationLabel = Model.GlobalLocationLabel,
+            globalLocationSource = Model.GlobalLocationSource,
+            appointments = Model.Appointments
+                .Where(a => a.Location != null)
+                .Select(a => new
+                {
+                    id = a.Id,
+                    doctor = a.DoctorName,
+                    doctorId = a.DoctorId,
+                    doctorPhoto = string.IsNullOrWhiteSpace(a.DoctorProfilePhotoPath) ? "/images/default-avatar.png" : a.DoctorProfilePhotoPath,
+                    lat = a.Location!.Y,
+                    lng = a.Location!.X,
+                    price = a.PriceRange,
+                    time = a.StartTime.ToString("dd.MM.yyyy HH:mm"),
+                    timeValue = a.StartTime.ToString("O"),
+                    relative = a.RelativeDayLabel
+                })
+        }));
+    </script>
+    <script src="~/js/patient-dashboard.js" asp-append-version="true"></script>
+}

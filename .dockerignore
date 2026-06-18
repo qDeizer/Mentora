@@ -1,0 +1,10 @@
+**/bin/
+**/obj/
+.git/
+.vs/
+.idea/
+screenshoots/
+*.md
+appsettings.Development.json
+appsettings.Production.json
+*.user

@@ -1,0 +1,63 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "Mentora Logo Mentora" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Mentora Logo" [ref=e5]
+        - generic [ref=e6]: Mentora
+      - generic [ref=e7]:
+        - list [ref=e8]:
+          - listitem [ref=e9]:
+            - link " Randevularim" [ref=e10] [cursor=pointer]:
+              - /url: /DoctorDashboard
+              - generic [ref=e11]: 
+              - text: Randevularim
+          - listitem [ref=e12]:
+            - link " Haftalik Cizelge" [ref=e13] [cursor=pointer]:
+              - /url: /DoctorDashboard/Scheduler
+              - generic [ref=e14]: 
+              - text: Haftalik Cizelge
+          - listitem [ref=e15]:
+            - link " Oto Rutin" [ref=e16] [cursor=pointer]:
+              - /url: /Automation
+              - generic [ref=e17]: 
+              - text: Oto Rutin
+          - listitem [ref=e18]:
+            - link " Klinik Notlar" [ref=e19] [cursor=pointer]:
+              - /url: /ClinicalNotes
+              - generic [ref=e20]: 
+              - text: Klinik Notlar
+          - listitem [ref=e21]:
+            - link " Gelen Talepler" [ref=e22] [cursor=pointer]:
+              - /url: /Request
+              - generic [ref=e23]: 
+              - text: Gelen Talepler
+          - listitem [ref=e24]:
+            - link " Kisilerim" [ref=e25] [cursor=pointer]:
+              - /url: /People
+              - generic [ref=e26]: 
+              - text: Kisilerim
+        - list [ref=e27]:
+          - listitem [ref=e28]:
+            - button " Profil konumu tanimsiz" [ref=e29] [cursor=pointer]:
+              - generic [ref=e30]: 
+              - generic [ref=e31]: Profil konumu tanimsiz
+          - listitem [ref=e32]:
+            - button " 1" [ref=e33] [cursor=pointer]:
+              - generic [ref=e34]: 
+              - generic [ref=e35]: "1"
+          - listitem [ref=e36]:
+            - button "Profil Test Doctor" [ref=e37] [cursor=pointer]:
+              - img "Profil" [ref=e38]
+              - generic [ref=e39]: Test Doctor
+            - text:   
+  - main [ref=e40]:
+    - generic [ref=e41]:
+      - img "Mentora Logo" [ref=e42]
+      - heading "Mentora" [level=1] [ref=e43]
+      - paragraph [ref=e44]: Zihinsel sağlığınız ve kişisel gelişiminiz için doğru uzmanla, doğru zamanda buluşun. Mentora, size en uygun psikologu bulma yolculuğunuzda yanınızda.
+      - generic [ref=e45]:
+        - link "Randevularım" [ref=e46] [cursor=pointer]:
+          - /url: /DoctorDashboard
+        - link "Taleplerim" [ref=e47] [cursor=pointer]:
+          - /url: /Request

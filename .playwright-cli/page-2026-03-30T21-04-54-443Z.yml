@@ -1,0 +1,193 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "Mentora Logo Mentora" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Mentora Logo" [ref=e5]
+        - generic [ref=e6]: Mentora
+      - generic [ref=e7]:
+        - list [ref=e8]:
+          - listitem [ref=e9]:
+            - link " Randevularim" [ref=e10] [cursor=pointer]:
+              - /url: /DoctorDashboard
+              - generic [ref=e11]: 
+              - text: Randevularim
+          - listitem [ref=e12]:
+            - link " Haftalik Cizelge" [ref=e13] [cursor=pointer]:
+              - /url: /DoctorDashboard/Scheduler
+              - generic [ref=e14]: 
+              - text: Haftalik Cizelge
+          - listitem [ref=e15]:
+            - link " Oto Rutin" [ref=e16] [cursor=pointer]:
+              - /url: /Automation
+              - generic [ref=e17]: 
+              - text: Oto Rutin
+          - listitem [ref=e18]:
+            - link " Klinik Notlar" [ref=e19] [cursor=pointer]:
+              - /url: /ClinicalNotes
+              - generic [ref=e20]: 
+              - text: Klinik Notlar
+          - listitem [ref=e21]:
+            - link " Gelen Talepler" [ref=e22] [cursor=pointer]:
+              - /url: /Request
+              - generic [ref=e23]: 
+              - text: Gelen Talepler
+          - listitem [ref=e24]:
+            - link " Kisilerim" [ref=e25] [cursor=pointer]:
+              - /url: /People
+              - generic [ref=e26]: 
+              - text: Kisilerim
+        - list [ref=e27]:
+          - listitem [ref=e28]:
+            - button " Profil konumu tanimsiz" [ref=e29] [cursor=pointer]:
+              - generic [ref=e30]: 
+              - generic [ref=e31]: Profil konumu tanimsiz
+          - listitem [ref=e32]:
+            - button "" [ref=e33] [cursor=pointer]:
+              - generic [ref=e34]: 
+          - listitem [ref=e35]:
+            - button "Profil Test Doctor" [ref=e36] [cursor=pointer]:
+              - img "Profil" [ref=e37]
+              - generic [ref=e38]: Test Doctor
+            - text:   
+  - main [ref=e39]:
+    - generic [ref=e40]:
+      - generic [ref=e41]:
+        - heading "Doctor Dashboard" [level=1] [ref=e42]
+        - paragraph [ref=e43]: Randevularinizi, talep akislarini ve cakisma durumlarini tek yerden yonetin.
+        - link " Haftalik Cizelgeyi Ac" [ref=e44] [cursor=pointer]:
+          - /url: /DoctorDashboard/Scheduler
+          - generic [ref=e45]: 
+          - text: Haftalik Cizelgeyi Ac
+      - generic [ref=e46]: Randevu basariyla olusturuldu.
+      - generic [ref=e47]:
+        - generic [ref=e48]:
+          - generic [ref=e49]: Bugun slot
+          - generic [ref=e50]: "1"
+        - generic [ref=e51]:
+          - generic [ref=e52]: Musait/Pending
+          - generic [ref=e53]: "1"
+        - generic [ref=e54]:
+          - generic [ref=e55]: Yaklasan rezerve
+          - generic [ref=e56]: "0"
+        - generic [ref=e57]:
+          - generic [ref=e58]: Tamamlanma
+          - generic [ref=e59]: 0%
+      - generic [ref=e60]:
+        - generic [ref=e62]:
+          - generic [ref=e63]:
+            - heading "Randevu Akisi" [level=2] [ref=e64]
+            - generic [ref=e65]: Toplam 1
+          - article [ref=e66]:
+            - generic [ref=e67]:
+              - generic [ref=e68]:
+                - 'heading "Slot #12" [level=3] [ref=e69]'
+                - generic [ref=e70]: 31 Mart 2026, 14:00 - 14:50
+              - generic [ref=e71]: Musait
+            - generic [ref=e72]:
+              - generic [ref=e73]: "Sure: 50 dk"
+              - generic [ref=e74]: "Tur: Online"
+              - generic [ref=e75]: "Ucret: ₺500,00 - ₺900,00"
+            - generic [ref=e76]: "Not: Smoke test slot"
+            - generic [ref=e77]:
+              - link " Talepler" [ref=e78] [cursor=pointer]:
+                - /url: /Request?AppointmentId=12
+                - generic [ref=e79]: 
+                - text: Talepler
+              - button " Sil" [ref=e81] [cursor=pointer]:
+                - generic [ref=e82]: 
+                - text: Sil
+        - generic [ref=e84]:
+          - generic [ref=e85]:
+            - generic [ref=e86]: 
+            - heading "Yeni Randevu Olustur" [level=2] [ref=e87]
+            - paragraph [ref=e88]: Musaitlik durumunuzu belirterek yeni bir randevu araligi olusturun.
+          - generic [ref=e89]:
+            - generic:
+              - list
+            - generic [ref=e90]:
+              - generic [ref=e91]:
+                - textbox [ref=e92]
+                - generic [ref=e93]: Randevu Başlangıcı
+              - generic [ref=e94]:
+                - spinbutton [ref=e95]
+                - generic [ref=e96]: Randevu Süresi (Dakika)
+            - generic [ref=e97]:
+              - textbox [ref=e98]
+              - generic [ref=e99]: Randevu Bitişi
+            - paragraph [ref=e100]: Bitis saatini veya sureyi girdiginizde digeri otomatik hesaplanir.
+            - separator [ref=e101]
+            - generic [ref=e102]:
+              - generic [ref=e103]: Randevu Turu (En az birini secin)
+              - generic [ref=e104]:
+                - generic [ref=e105]:
+                  - switch "Online" [ref=e106]
+                  - generic [ref=e107]: Online
+                - generic [ref=e108]:
+                  - switch "Yuz Yuze" [ref=e109]
+                  - generic [ref=e110]: Yuz Yuze
+            - generic [ref=e111]:
+              - checkbox [ref=e112]
+              - generic [ref=e113]: Hastaya ozel randevu teklifi
+            - generic [ref=e114]:
+              - generic [ref=e115]:
+                - textbox "Minimum Fiyat" [ref=e116]:
+                  - /placeholder: Minimum Fiyat (Opsiyonel)
+                - generic [ref=e117]: Minimum Fiyat
+              - generic [ref=e118]:
+                - textbox "Maksimum Fiyat" [ref=e119]:
+                  - /placeholder: Maksimum Fiyat (Opsiyonel)
+                - generic [ref=e120]: Maksimum Fiyat
+            - generic [ref=e121]:
+              - generic [ref=e122]: Ilgili Uzmanlik Alanlari (Opsiyonel)
+              - generic [ref=e123]:
+                - generic [ref=e125]:
+                  - checkbox "Aile Terapisi" [ref=e126]
+                  - generic [ref=e127]: Aile Terapisi
+                - generic [ref=e129]:
+                  - checkbox "Anksiyete Bozukluklari" [ref=e130]
+                  - generic [ref=e131]: Anksiyete Bozukluklari
+                - generic [ref=e133]:
+                  - checkbox "Bagimlilik Tedavisi" [ref=e134]
+                  - generic [ref=e135]: Bagimlilik Tedavisi
+                - generic [ref=e137]:
+                  - checkbox "Cift Terapisi" [ref=e138]
+                  - generic [ref=e139]: Cift Terapisi
+                - generic [ref=e141]:
+                  - checkbox "Cocuk Psikolojisi" [ref=e142]
+                  - generic [ref=e143]: Cocuk Psikolojisi
+                - generic [ref=e145]:
+                  - checkbox "Depresyon Tedavisi" [ref=e146]
+                  - generic [ref=e147]: Depresyon Tedavisi
+                - generic [ref=e149]:
+                  - checkbox "Ergen Psikolojisi" [ref=e150]
+                  - generic [ref=e151]: Ergen Psikolojisi
+                - generic [ref=e153]:
+                  - checkbox "Kariyer Danismanligi" [ref=e154]
+                  - generic [ref=e155]: Kariyer Danismanligi
+                - generic [ref=e157]:
+                  - checkbox "Kisilik Bozukluklari" [ref=e158]
+                  - generic [ref=e159]: Kisilik Bozukluklari
+                - generic [ref=e161]:
+                  - checkbox "Ofke Yonetimi" [ref=e162]
+                  - generic [ref=e163]: Ofke Yonetimi
+                - generic [ref=e165]:
+                  - checkbox "Sosyal Fobi" [ref=e166]
+                  - generic [ref=e167]: Sosyal Fobi
+                - generic [ref=e169]:
+                  - checkbox "Stres Yonetimi" [ref=e170]
+                  - generic [ref=e171]: Stres Yonetimi
+                - generic [ref=e173]:
+                  - checkbox "Travma Terapisi" [ref=e174]
+                  - generic [ref=e175]: Travma Terapisi
+                - generic [ref=e177]:
+                  - checkbox "Yasli Psikolojisi" [ref=e178]
+                  - generic [ref=e179]: Yasli Psikolojisi
+                - generic [ref=e181]:
+                  - checkbox "Yeme Bozukluklari" [ref=e182]
+                  - generic [ref=e183]: Yeme Bozukluklari
+            - generic [ref=e184]:
+              - textbox "Randevu Notu" [ref=e185]:
+                - /placeholder: Randevu Notu (Opsiyonel)
+              - generic [ref=e186]: Randevu Notu
+            - button "Randevuyu Olustur" [ref=e187] [cursor=pointer]

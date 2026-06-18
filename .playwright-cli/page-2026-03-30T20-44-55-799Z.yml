@@ -1,0 +1,144 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "Mentora Logo Mentora" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Mentora Logo" [ref=e5]
+        - generic [ref=e6]: Mentora
+      - generic [ref=e7]:
+        - list
+        - list [ref=e8]:
+          - listitem [ref=e9]:
+            - link " Giris Yap" [ref=e10] [cursor=pointer]:
+              - /url: /Account/Login
+              - generic [ref=e11]: 
+              - text: Giris Yap
+          - listitem [ref=e12]:
+            - link " Kayit Ol" [ref=e13] [cursor=pointer]:
+              - /url: /Account/Register
+              - generic [ref=e14]: 
+              - text: Kayit Ol
+  - main [ref=e15]:
+    - generic [ref=e17]:
+      - generic [ref=e18]:
+        - generic [ref=e19]: 
+        - heading "Hesap Oluştur" [level=2] [ref=e20]
+        - paragraph [ref=e21]: Topluluğumuza katılmak için bilgilerinizi girin.
+      - generic [ref=e22]:
+        - generic:
+          - list
+        - generic [ref=e23]:
+          - paragraph [ref=e24]: "Kayıt olmak istediğiniz hesap türünü seçin:"
+          - group [ref=e25]:
+            - button " Hasta" [ref=e26] [cursor=pointer]:
+              - generic [ref=e27]: 
+              - text: Hasta
+            - button " Doktor" [ref=e28] [cursor=pointer]:
+              - generic [ref=e29]: 
+              - text: Doktor
+        - generic [ref=e30]:
+          - generic [ref=e31]:
+            - textbox " İsim" [ref=e32]:
+              - /placeholder: İsim
+            - generic [ref=e33]:
+              - generic [ref=e34]: 
+              - text: İsim
+          - generic [ref=e35]:
+            - textbox "@ Kullanici Adi" [ref=e36]:
+              - /placeholder: Kullanici Adi
+            - generic [ref=e37]:
+              - generic [ref=e38]: "@"
+              - text: Kullanici Adi
+        - generic [ref=e39]:
+          - generic [ref=e40]:
+            - textbox " Soy İsim" [ref=e41]:
+              - /placeholder: Soy İsim
+            - generic [ref=e42]:
+              - generic [ref=e43]: 
+              - text: Soy İsim
+          - generic [ref=e44]:
+            - textbox " E-posta" [ref=e45]:
+              - /placeholder: E-posta
+            - generic [ref=e46]:
+              - generic [ref=e47]: 
+              - text: E-posta
+        - generic [ref=e48]:
+          - textbox " Telefon" [ref=e49]:
+            - /placeholder: Telefon
+          - generic [ref=e50]:
+            - generic [ref=e51]: 
+            - text: Telefon
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - textbox " Doğum Tarihi" [ref=e54]:
+              - /placeholder: Doğum Tarihi
+              - text: 0001-01-01
+            - generic [ref=e55]:
+              - generic [ref=e56]: 
+              - text: Doğum Tarihi
+          - combobox [ref=e58]:
+            - option "Cinsiyet Seçin..." [disabled]
+            - option "Male" [selected]
+            - option "Female"
+            - option "Other"
+        - generic [ref=e59]:
+          - generic [ref=e60]:
+            - textbox " Şifre" [ref=e61]:
+              - /placeholder: Şifre
+            - generic [ref=e62]:
+              - generic [ref=e63]: 
+              - text: Şifre
+          - generic [ref=e64]:
+            - textbox " Şifre Tekrar" [ref=e65]:
+              - /placeholder: Şifre Tekrar
+            - generic [ref=e66]:
+              - generic [ref=e67]: 
+              - text: Şifre Tekrar
+        - generic [ref=e68]:
+          - generic [ref=e69]: Konumunuzu Haritadan Seçin (Opsiyonel)
+          - generic [ref=e73]:
+            - generic:
+              - button "Klavye kısayolları"
+            - region "Harita" [ref=e74]
+            - generic [ref=e75]:
+              - img "Konumunuzu buraya surukleyin" [ref=e104]:
+                - generic:
+                  - generic "Konumunuzu buraya surukleyin"
+              - iframe [ref=e105]:
+                
+              - menubar [ref=e125] [cursor=pointer]:
+                - menuitemradio "Sokak haritasını göster" [checked] [ref=e127]: Harita
+                - menuitemradio "Uydu görüntülerini göster" [ref=e129]: Uydu
+              - textbox "Adres Ara..." [ref=e71]
+              - button "Tam ekran görünümü açma/kapama" [ref=e130] [cursor=pointer]
+              - generic:
+                - generic:
+                  - button "Harita kamerası kontrolleri" [ref=e132] [cursor=pointer]
+                  - button "Street View'u açmak için Pegman'i harita üzerine sürükleyin" [ref=e133] [cursor=pointer]:
+                    - generic:
+                      - img "Street View Pegman Kontrolü"
+              - link "Bu bölgeyi Google Haritalar'da açın (yeni pencerede açılır)" [ref=e135] [cursor=pointer]:
+                - /url: https://maps.google.com/maps?ll=39.925533,32.866287&z=5&t=m&hl=tr-TR&gl=US&mapclient=apiv3
+                - img "Google" [ref=e137]
+              - generic [ref=e138]:
+                - button "Klavye kısayolları" [ref=e144] [cursor=pointer]
+                - generic [ref=e149]: Harita verileri ©2026 GeoBasis-DE/BKG (©2009), Google, Inst. Geogr. Nacional, Mapa GISrael
+                - link "Şartlar (yeni sekmede açılır)" [ref=e154] [cursor=pointer]:
+                  - /url: https://www.google.com/intl/tr-TR_US/help/terms_maps.html
+                  - text: Şartlar
+        - generic [ref=e106]:
+          - textbox " Hakkımda" [ref=e107]:
+            - /placeholder: Hakkımda
+          - generic [ref=e108]:
+            - generic [ref=e109]: 
+            - text: Hakkımda
+        - generic [ref=e110]:
+          - generic [ref=e111]: Profil Fotoğrafı
+          - button "Choose File" [ref=e112] [cursor=pointer]
+          - text: Yalnizca JPG/PNG/WEBP, en fazla 2 MB. Yuz foto kare formatta optimize edilir.
+        - text:  
+        - button "Kayıt Ol" [ref=e113] [cursor=pointer]
+        - paragraph [ref=e115]:
+          - text: Zaten bir hesabınız var mı?
+          - link "Giriş Yap" [ref=e116] [cursor=pointer]:
+            - /url: /Account/Login

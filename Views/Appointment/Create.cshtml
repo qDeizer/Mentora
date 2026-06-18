@@ -1,0 +1,17 @@
+﻿@model PsikologProje_Void.ViewModels.CreateAppointmentViewModel
+@{
+    ViewData["Title"] = "Yeni Randevu Oluştur";
+    // Uzmanlık alanları, controller'dan ViewBag aracılığıyla partial view'a zaten aktarılıyor.
+}
+
+<div class="auth-container">
+    <div class="auth-card glass-effect" style="max-width: 700px;">
+        @* Formun tamamı, artık tek merkezden yönetilen partial view ile değiştirildi. *@
+        @await Html.PartialAsync("_CreateAppointmentPartial", Model)
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+@* Gerekli scriptler artık _CreateAppointmentPartial.cshtml içinde yer aldığı için burada ek bir scripte gerek yoktur. *@
+}

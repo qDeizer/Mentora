@@ -1,0 +1,337 @@
+@model PsikologProje_Void.ViewModels.AutomationRoutineInputViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+@inject IConfiguration Configuration
+@{
+    ViewData["Title"] = "Rutini Düzenle";
+    var specialtyOptions = ViewBag.SpecialtyOptions as List<SelectListItem> ?? new List<SelectListItem>();
+    var selectedSpecialties = Model.SelectedSpecialtyIds?.ToHashSet() ?? new HashSet<int>();
+    var selectedDays = Model.SelectedDays?.ToHashSet() ?? new HashSet<int>();
+    var mapsApiKey = Configuration["GoogleMaps:ApiKey"];
+    if (string.IsNullOrWhiteSpace(mapsApiKey))
+    {
+        mapsApiKey = Configuration["GoogleMaps__ApiKey"];
+    }
+    if (string.IsNullOrWhiteSpace(mapsApiKey))
+    {
+        mapsApiKey = Configuration["GOOGLE_MAPS_API_KEY"];
+    }
+    if (string.IsNullOrWhiteSpace(mapsApiKey))
+    {
+        mapsApiKey = Configuration["GoogleMapsApiKey"];
+    }
+    var hasMapsApiKey = !string.IsNullOrWhiteSpace(mapsApiKey);
+}
+
+<div class="container py-5 mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="glass-effect p-4">
+                <h3 class="mb-3">Rutini Düzenle</h3>
+                <form asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+                    <input asp-for="Id" type="hidden" />
+                    <div asp-validation-summary="All" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label">Rutin adı</label>
+                        <input asp-for="Name" class="form-control" />
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label asp-for="StartTime" class="form-label">Başlangıç saati</label>
+                            <input asp-for="StartTime" type="time" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="DurationInMinutes" class="form-label">Süre (dk)</label>
+                            <input asp-for="DurationInMinutes" type="number" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="mt-2">
+                        <label asp-for="GenerateDaysAhead" class="form-label">Kaç gün önce oluşturulsun?</label>
+                        <input asp-for="GenerateDaysAhead" type="number" min="1" max="90" class="form-control" />
+                        <div class="small text-muted">Sistem her çalıştığında sadece bu gün ufku içindeki slotları üretir.</div>
+                    </div>
+
+                    <div class="row g-2 mt-1">
+                        <div class="col-md-6">
+                            <label asp-for="ActiveFrom" class="form-label">Aktif başlangıç</label>
+                            <input asp-for="ActiveFrom" type="date" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ActiveUntil" class="form-label">Aktif bitiş</label>
+                            <input asp-for="ActiveUntil" type="date" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="form-label d-block">Günler</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <label class="badge bg-secondary"><input type="checkbox" name="SelectedDays" value="1" class="me-1" @(selectedDays.Contains(1) ? "checked" : null) />Pzt</label>
+                            <label class="badge bg-secondary"><input type="checkbox" name="SelectedDays" value="2" class="me-1" @(selectedDays.Contains(2) ? "checked" : null) />Sal</label>
+                            <label class="badge bg-secondary"><input type="checkbox" name="SelectedDays" value="3" class="me-1" @(selectedDays.Contains(3) ? "checked" : null) />Çar</label>
+                            <label class="badge bg-secondary"><input type="checkbox" name="SelectedDays" value="4" class="me-1" @(selectedDays.Contains(4) ? "checked" : null) />Per</label>
+                            <label class="badge bg-secondary"><input type="checkbox" name="SelectedDays" value="5" class="me-1" @(selectedDays.Contains(5) ? "checked" : null) />Cum</label>
+                            <label class="badge bg-secondary"><input type="checkbox" name="SelectedDays" value="6" class="me-1" @(selectedDays.Contains(6) ? "checked" : null) />Cmt</label>
+                            <label class="badge bg-secondary"><input type="checkbox" name="SelectedDays" value="0" class="me-1" @(selectedDays.Contains(0) ? "checked" : null) />Paz</label>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="form-label">Randevu tipi</label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" asp-for="IsOnline" />
+                            <label class="form-check-label" asp-for="IsOnline">Çevrim içi</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" asp-for="IsInPerson" />
+                            <label class="form-check-label" asp-for="IsInPerson">Yüz yüze</label>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <label asp-for="InPersonLocationMode" class="form-label">Yüz yüze konum kaynağı</label>
+                        <select asp-for="InPersonLocationMode" class="form-select" id="editLocationMode">
+                            <option value="profile">Profil konumu</option>
+                            <option value="device">Mevcut cihaz konumu</option>
+                            <option value="manual">Manuel konum girişi</option>
+                        </select>
+                    </div>
+
+                    <div id="editManualLocationFields" class="row g-2 mt-1">
+                        <input asp-for="InPersonLatitude" type="hidden" />
+                        <input asp-for="InPersonLongitude" type="hidden" />
+                        <div class="col-12">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="editUseDeviceLocationBtn">Cihazdan konum al</button>
+                        </div>
+                        <div class="col-12">
+                            <input id="editManualLocationDisplay" class="form-control" readonly placeholder="Seçilen konum" />
+                        </div>
+                        @if (hasMapsApiKey)
+                        {
+                            <div class="col-12">
+                                <input id="editManualLocationSearch" class="form-control mb-2" type="text" placeholder="Adres ara..." />
+                                <div id="editManualLocationMap" class="modal-map"></div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-12">
+                                <div class="alert alert-warning mb-0">Manuel seçim için GoogleMaps API anahtarı gerekli.</div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="mt-2 location-note-wrapper">
+                        <label asp-for="LocationNote" class="form-label">Açık adres notu</label>
+                        <input asp-for="LocationNote"
+                               class="form-control"
+                               placeholder="Örn: Klinik girişi B blok, 3. kat."
+                               data-location-note-history="mentora-location-note-history" />
+                    </div>
+
+                    <div class="row g-2 mt-1">
+                        <div class="col-md-6">
+                            <label asp-for="MinPrice" class="form-label">Min fiyat</label>
+                            <input asp-for="MinPrice" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="MaxPrice" class="form-label">Max fiyat</label>
+                            <input asp-for="MaxPrice" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="form-label">Uzmanlıklar</label>
+                        <div class="row g-2">
+                            @foreach (var item in specialtyOptions)
+                            {
+                                var specialtyId = int.Parse(item.Value!, System.Globalization.CultureInfo.InvariantCulture);
+                                <div class="col-sm-6">
+                                    <label class="form-check border rounded px-2 py-2 w-100 d-flex align-items-center gap-2">
+                                        <input type="checkbox"
+                                               class="form-check-input"
+                                               name="SelectedSpecialtyIds"
+                                               value="@specialtyId"
+                                               @(selectedSpecialties.Contains(specialtyId) ? "checked" : null) />
+                                        <span class="small">@item.Text</span>
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <label asp-for="Notes" class="form-label">Not</label>
+                        <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-3">
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                        <a asp-action="Index" class="btn btn-secondary">Vazgeç</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    @if (hasMapsApiKey)
+    {
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=@mapsApiKey&libraries=places&loading=async"></script>
+    }
+    <script>
+        let editManualMap;
+        let editManualMarker;
+        let editManualAutocomplete;
+
+        function whenGoogleMapsReady(callback) {
+            if (window.google && window.google.maps) {
+                callback();
+                return;
+            }
+
+            const startedAt = Date.now();
+            const timer = window.setInterval(function() {
+                if (window.google && window.google.maps) {
+                    window.clearInterval(timer);
+                    callback();
+                    return;
+                }
+                if (Date.now() - startedAt > 10000) {
+                    window.clearInterval(timer);
+                }
+            }, 100);
+        }
+
+        function updateEditLocation(lat, lon) {
+            const latInput = document.getElementById("InPersonLatitude");
+            const lonInput = document.getElementById("InPersonLongitude");
+            const displayInput = document.getElementById("editManualLocationDisplay");
+            if (latInput) latInput.value = Number(lat).toFixed(6);
+            if (lonInput) lonInput.value = Number(lon).toFixed(6);
+            if (displayInput) displayInput.value = `${Number(lat).toFixed(6)}, ${Number(lon).toFixed(6)}`;
+        }
+
+        function initEditManualMap() {
+            const mapElement = document.getElementById("editManualLocationMap");
+            if (!mapElement) {
+                return;
+            }
+
+            whenGoogleMapsReady(function() {
+                const latInput = document.getElementById("InPersonLatitude");
+                const lonInput = document.getElementById("InPersonLongitude");
+                const lat = parseFloat(latInput?.value || "");
+                const lon = parseFloat(lonInput?.value || "");
+                const hasCoordinates = Number.isFinite(lat) && Number.isFinite(lon);
+                const initial = hasCoordinates ? { lat: lat, lng: lon } : { lat: 39.925533, lng: 32.866287 };
+
+                if (!editManualMap) {
+                    editManualMap = new google.maps.Map(mapElement, {
+                        center: initial,
+                        zoom: hasCoordinates ? 12 : 6
+                    });
+
+                    editManualMarker = new google.maps.Marker({
+                        position: initial,
+                        map: editManualMap,
+                        draggable: true
+                    });
+
+                    editManualMarker.addListener("dragend", function(event) {
+                        updateEditLocation(event.latLng.lat(), event.latLng.lng());
+                    });
+
+                    editManualMap.addListener("click", function(event) {
+                        editManualMarker.setPosition(event.latLng);
+                        updateEditLocation(event.latLng.lat(), event.latLng.lng());
+                    });
+
+                    const searchInput = document.getElementById("editManualLocationSearch");
+                    if (searchInput) {
+                        editManualAutocomplete = new google.maps.places.Autocomplete(searchInput, {
+                            fields: ["geometry", "name"]
+                        });
+                        editManualAutocomplete.addListener("place_changed", function() {
+                            const place = editManualAutocomplete.getPlace();
+                            if (!place || !place.geometry || !place.geometry.location) {
+                                return;
+                            }
+
+                            editManualMarker.setPosition(place.geometry.location);
+                            updateEditLocation(place.geometry.location.lat(), place.geometry.location.lng());
+                            if (place.geometry.viewport) {
+                                editManualMap.fitBounds(place.geometry.viewport);
+                            } else {
+                                editManualMap.panTo(place.geometry.location);
+                                editManualMap.setZoom(14);
+                            }
+                        });
+                    }
+                } else {
+                    editManualMap.panTo(initial);
+                    editManualMarker.setPosition(initial);
+                }
+
+                window.setTimeout(function() {
+                    google.maps.event.trigger(editManualMap, "resize");
+                    editManualMap.panTo(initial);
+                }, 120);
+            });
+        }
+
+        function toggleEditManualLocationFields() {
+            const mode = document.getElementById("editLocationMode")?.value || "profile";
+            const isInPerson = document.getElementById("IsInPerson")?.checked;
+            const panel = document.getElementById("editManualLocationFields");
+            if (!panel) {
+                return;
+            }
+            if (!isInPerson) {
+                panel.style.display = "none";
+                return;
+            }
+            panel.style.display = mode === "profile" ? "none" : "";
+            if (mode === "manual") {
+                initEditManualMap();
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const modeSelect = document.getElementById("editLocationMode");
+            const inPersonSwitch = document.getElementById("IsInPerson");
+            const deviceBtn = document.getElementById("editUseDeviceLocationBtn");
+            const latInput = document.getElementById("InPersonLatitude");
+            const lonInput = document.getElementById("InPersonLongitude");
+
+            toggleEditManualLocationFields();
+            modeSelect?.addEventListener("change", toggleEditManualLocationFields);
+            inPersonSwitch?.addEventListener("change", toggleEditManualLocationFields);
+
+            deviceBtn?.addEventListener("click", function() {
+                if (!navigator.geolocation) {
+                    if (window.showMentoraToast) {
+                        window.showMentoraToast("Tarayici konum servisini desteklemiyor.", "warning");
+                    }
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(function(pos) {
+                    updateEditLocation(pos.coords.latitude, pos.coords.longitude);
+                    if (modeSelect) {
+                        modeSelect.value = "device";
+                    }
+                    toggleEditManualLocationFields();
+                }, function() {
+                    if (window.showMentoraToast) {
+                        window.showMentoraToast("Cihaz konumu alınamadı.", "warning");
+                    }
+                });
+            });
+        });
+    </script>
+}

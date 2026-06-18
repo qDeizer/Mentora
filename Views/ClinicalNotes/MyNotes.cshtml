@@ -1,0 +1,551 @@
+@model PsikologProje_Void.ViewModels.ClinicalNotesPatientDashboardViewModel
+@using PsikologProje_Void.Models
+
+@{
+    ViewData["Title"] = "Notlarım";
+    var selectedVisibilities = Model.Filter.SelectedVisibilities?.Distinct().ToHashSet() ?? new HashSet<ClinicalNoteVisibility>();
+    if (selectedVisibilities.Count == 0)
+    {
+        selectedVisibilities = Enum.GetValues<ClinicalNoteVisibility>().ToHashSet();
+    }
+    var selectedDoctors = Model.Filter.SelectedDoctorIds?.Distinct().ToHashSet() ?? new HashSet<string>();
+    var sortDirectionAscending = Model.Filter.SortDirection == "asc";
+    var currentUrl = Context?.Request?.Path + Context?.Request?.QueryString;
+}
+
+<div class="container app-page">
+    <div class="page-header page-header-compact">
+        <h1 class="page-title">Notlarım</h1>
+        <p class="page-subtitle">Notlarınızı filtreleyin, yetki ayarları yapın ve çoklu işlemle toplu güncelleyin.</p>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    <div class="app-card mb-3">
+        <div class="d-flex flex-wrap gap-2 align-items-start justify-content-between">
+            <div class="d-flex align-items-center gap-2">
+                <span id="selectedNoteCountBadge" class="status-chip status-info">0</span>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="toggleBulkModeBtn">Çoklu İşlem</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary d-none" id="toggleSelectAllBtn">Tümünü seç</button>
+                <button type="button" class="btn btn-sm btn-primary d-none" id="openBulkActionModalBtn" disabled>İşlem yap</button>
+            </div>
+
+            <form id="myNotesFilterForm" asp-action="MyNotes" method="get" class="d-flex flex-wrap gap-2 flex-grow-1 justify-content-end">
+                <input type="hidden" name="SortDirection" id="notesSortDirectionInput" value="@Model.Filter.SortDirection" />
+
+                <details class="multi-select-panel" style="min-width:270px;">
+                    <summary class="multi-select-summary">Doktorlar (@selectedDoctors.Count)</summary>
+                    <div class="multi-select-options">
+                        @foreach (var doctor in Model.FilterDoctorProfiles)
+                        {
+                            var doctorPhoto = string.IsNullOrWhiteSpace(doctor.ProfilePhotoPath) ? "/images/default-avatar.png" : doctor.ProfilePhotoPath;
+                            <label class="multi-select-option">
+                                <input type="checkbox" name="SelectedDoctorIds" value="@doctor.Id" checked="@selectedDoctors.Contains(doctor.Id)" />
+                                <img src="@doctorPhoto" alt="@doctor.Name" class="inline-profile-avatar" onerror="this.src='/images/default-avatar.png';" />
+                                <span>@doctor.Name</span>
+                            </label>
+                        }
+                    </div>
+                </details>
+
+                <div class="d-flex flex-wrap gap-1 align-items-center">
+                    <label class="btn btn-sm btn-outline-secondary">
+                        <input type="checkbox" class="me-1" name="SelectedVisibilities" value="@ClinicalNoteVisibility.Private" checked="@selectedVisibilities.Contains(ClinicalNoteVisibility.Private)" />
+                        Gizli
+                    </label>
+                    <label class="btn btn-sm btn-outline-success">
+                        <input type="checkbox" class="me-1" name="SelectedVisibilities" value="@ClinicalNoteVisibility.Public" checked="@selectedVisibilities.Contains(ClinicalNoteVisibility.Public)" />
+                        Açık
+                    </label>
+                    <label class="btn btn-sm btn-outline-warning">
+                        <input type="checkbox" class="me-1" name="SelectedVisibilities" value="@ClinicalNoteVisibility.Shared" checked="@selectedVisibilities.Contains(ClinicalNoteVisibility.Shared)" />
+                        Paylaşılan
+                    </label>
+                </div>
+
+                <input type="text" name="SearchTerm" value="@Model.Filter.SearchTerm" class="form-control form-control-sm" style="min-width:220px;" placeholder="Not veya doktor ara" />
+
+                <select name="SortBy" class="form-select form-select-sm" id="notesSortBySelect" style="max-width:170px;">
+                    <option value="createdAt" selected="@(Model.Filter.SortBy == "createdAt")">Oluşturma tarihi</option>
+                    <option value="updatedAt" selected="@(Model.Filter.SortBy == "updatedAt")">Güncelleme tarihi</option>
+                    <option value="doctor" selected="@(Model.Filter.SortBy == "doctor")">Doktor adı</option>
+                </select>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="notesSortDirectionToggle" title="Artan/Azalan">
+                    <i class="fas @(sortDirectionAscending ? "fa-arrow-up-wide-short" : "fa-arrow-down-wide-short")"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        @if (!Model.Notes.Any())
+        {
+            <div class="col-12">
+                <div class="app-card text-muted">Gösterilecek not bulunmuyor.</div>
+            </div>
+        }
+        else
+        {
+            @foreach (var note in Model.Notes)
+            {
+                var authorPhoto = string.IsNullOrWhiteSpace(note.AuthorDoctorProfilePhotoPath) ? "/images/default-avatar.png" : note.AuthorDoctorProfilePhotoPath;
+                var visibilityClass = note.Visibility switch
+                {
+                    ClinicalNoteVisibility.Public => "status-active",
+                    ClinicalNoteVisibility.Shared => "status-pending",
+                    _ => "status-neutral"
+                };
+                <div class="col-lg-6">
+                    <article class="content-card h-100 note-item-card" data-note-id="@note.Id">
+                        <div class="d-flex justify-content-between align-items-start gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="@authorPhoto" alt="@note.AuthorDoctorName" class="inline-profile-avatar" onerror="this.src='/images/default-avatar.png';" />
+                                <div>
+                                    <h3 class="h6 mb-0">@note.AuthorDoctorName</h3>
+                                    <div class="small text-muted">@note.CreatedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="status-chip @visibilityClass">@note.VisibilityLabel</span>
+                                @if (note.IsLockedForPatient)
+                                {
+                                    <span class="status-chip status-danger">Kilitli</span>
+                                }
+                                <input type="checkbox" class="note-selector-checkbox d-none" value="@note.Id" />
+                            </div>
+                        </div>
+
+                        <p class="small mt-2 mb-2">@note.PreviewContent</p>
+                        <div class="small text-muted mb-2">Güncelleme: @note.UpdatedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#noteDetailModal_@note.Id">
+                                <i class="fas fa-expand me-1"></i>Detay
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#noteSettingsModal_@note.Id">
+                                <i class="fas fa-sliders me-1"></i>Not Ayarları
+                            </button>
+                        </div>
+                    </article>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@foreach (var note in Model.Notes)
+{
+    <div class="modal fade" id="noteDetailModal_@note.Id" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content app-card">
+                <div class="modal-header">
+                    <h5 class="modal-title">Not #@note.Id</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="small text-muted mb-2">
+                        <div>Yazan: @note.AuthorDoctorName</div>
+                        <div>Oluşturma: @note.CreatedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+                    </div>
+
+                    @if (!note.CanReadContent)
+                    {
+                        <div class="alert alert-warning">Bu not doktor tarafından kilitlendi. İçerik ve yorumlar gizli.</div>
+                    }
+                    else
+                    {
+                        <div class="p-3 border rounded mb-3" style="white-space:pre-wrap;">@note.Content</div>
+                    }
+
+                    <h6 class="mb-2">Yorumlar</h6>
+                    @if (!note.Comments.Any())
+                    {
+                        <div class="small text-muted mb-2">Yorum yok.</div>
+                    }
+                    else
+                    {
+                        <div class="d-flex flex-column gap-2 mb-3">
+                            @foreach (var comment in note.Comments)
+                            {
+                                var cPhoto = string.IsNullOrWhiteSpace(comment.AuthorProfilePhotoPath) ? "/images/default-avatar.png" : comment.AuthorProfilePhotoPath;
+                                var roleIconClass = comment.IsDoctorComment ? "mentora-confirm-role-icon--doctor" : "mentora-confirm-role-icon--patient";
+                                var roleIcon = comment.IsDoctorComment ? "fa-user-doctor" : "fa-user";
+                                var roleTitle = comment.IsDoctorComment ? "Doktor" : "Hasta";
+                                <div class="border rounded p-2">
+                                    <div class="d-flex justify-content-between align-items-start gap-2">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="position-relative">
+                                                <img src="@cPhoto" class="inline-profile-avatar" alt="@comment.AuthorName" onerror="this.src='/images/default-avatar.png';" />
+                                                <span class="mentora-confirm-role-icon @roleIconClass position-absolute" style="bottom:-2px;right:-2px;" title="@roleTitle"><i class="fas @roleIcon"></i></span>
+                                            </span>
+                                            <div>
+                                                <div class="fw-semibold small d-flex align-items-center gap-1">
+                                                    <span>@comment.AuthorName</span>
+                                                    <span class="badge bg-secondary" style="font-size:0.65rem;">@roleTitle</span>
+                                                </div>
+                                                <div class="small text-muted">@comment.CreatedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+                                            </div>
+                                        </div>
+                                        @if (comment.CanDelete)
+                                        {
+                                            <form action="/ClinicalNoteComments/Delete" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="commentId" value="@comment.Id" />
+                                                <input type="hidden" name="returnUrl" value="@currentUrl" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Sil</button>
+                                            </form>
+                                        }
+                                    </div>
+                                    @if (comment.CanEdit)
+                                    {
+                                        <form action="/ClinicalNoteComments/Update" method="post" class="mt-2">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="commentId" value="@comment.Id" />
+                                            <input type="hidden" name="returnUrl" value="@currentUrl" />
+                                            <textarea name="content" rows="2" class="form-control mb-2">@comment.Content</textarea>
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">Yorumu Güncelle</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <div class="small mt-2">@comment.Content</div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    @if (note.CanComment)
+                    {
+                        <form action="/ClinicalNoteComments/Create" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="noteId" value="@note.Id" />
+                            <input type="hidden" name="returnUrl" value="@currentUrl" />
+                            <label class="form-label">Yeni yorum</label>
+                            <textarea name="content" rows="3" class="form-control mb-2"></textarea>
+                            <button type="submit" class="btn btn-sm btn-primary">Yorum Ekle</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@foreach (var note in Model.Notes)
+{
+    <div class="modal fade" id="noteSettingsModal_@note.Id" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content app-card">
+                <div class="modal-header">
+                    <h5 class="modal-title">Not Ayarları - #@note.Id</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <form asp-action="UpdateVisibility" method="post" class="mb-3">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="noteId" value="@note.Id" />
+                        <label class="form-label">Gorunurluk</label>
+                        <div class="d-flex gap-2">
+                            <select class="form-select form-select-sm" name="visibility">
+                                <option value="@ClinicalNoteVisibility.Private" selected="@note.IsPrivate">Gizli</option>
+                                <option value="@ClinicalNoteVisibility.Public" selected="@note.IsPublic">Açık</option>
+                                <option value="@ClinicalNoteVisibility.Shared" selected="@note.IsShared">Paylaşılan</option>
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-outline-primary">Güncelle</button>
+                        </div>
+                    </form>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Paylasilan Doktorlar</h6>
+                            </div>
+                            @if (!note.SharedDoctors.Any())
+                            {
+                                <div class="small text-muted mb-2">Kayit yok.</div>
+                            }
+                            else
+                            {
+                                @foreach (var doctor in note.SharedDoctors)
+                                {
+                                    var doctorPhoto = string.IsNullOrWhiteSpace(doctor.ProfilePhotoPath) ? "/images/default-avatar.png" : doctor.ProfilePhotoPath;
+                                    <form asp-action="UpdateAccessRule" method="post" class="d-flex align-items-center justify-content-between border rounded p-2 mb-2">
+                                        @Html.AntiForgeryToken()
+                                        <div class="d-flex align-items-center gap-2">
+                                            <img src="@doctorPhoto" class="inline-profile-avatar" alt="@doctor.Name" onerror="this.src='/images/default-avatar.png';" />
+                                            <span>@doctor.Name</span>
+                                        </div>
+                                        <input type="hidden" name="NoteId" value="@note.Id" />
+                                        <input type="hidden" name="DoctorId" value="@doctor.Id" />
+                                        <input type="hidden" name="RuleType" value="@ClinicalNoteAccessRuleType.Share" />
+                                        <input type="hidden" name="Enabled" value="false" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">-</button>
+                                    </form>
+                                }
+                            }
+
+                            <form asp-action="UpdateAccessRule" method="post" class="mt-2">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="NoteId" value="@note.Id" />
+                                <input type="hidden" name="RuleType" value="@ClinicalNoteAccessRuleType.Share" />
+                                <input type="hidden" name="Enabled" value="true" />
+                                <label class="form-label">Paylasima doktor ekle</label>
+                                <select name="DoctorId" class="form-select form-select-sm">
+                                    @foreach (var doctor in Model.AllDoctorProfiles)
+                                    {
+                                        <option value="@doctor.Id">@doctor.Name</option>
+                                    }
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-outline-primary mt-2">+</button>
+                            </form>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Bloklanan Doktorlar</h6>
+                            </div>
+                            @if (!note.BlockedDoctors.Any())
+                            {
+                                <div class="small text-muted mb-2">Kayit yok.</div>
+                            }
+                            else
+                            {
+                                @foreach (var doctor in note.BlockedDoctors)
+                                {
+                                    var doctorPhoto = string.IsNullOrWhiteSpace(doctor.ProfilePhotoPath) ? "/images/default-avatar.png" : doctor.ProfilePhotoPath;
+                                    <form asp-action="UpdateAccessRule" method="post" class="d-flex align-items-center justify-content-between border rounded p-2 mb-2">
+                                        @Html.AntiForgeryToken()
+                                        <div class="d-flex align-items-center gap-2">
+                                            <img src="@doctorPhoto" class="inline-profile-avatar" alt="@doctor.Name" onerror="this.src='/images/default-avatar.png';" />
+                                            <span>@doctor.Name</span>
+                                        </div>
+                                        <input type="hidden" name="NoteId" value="@note.Id" />
+                                        <input type="hidden" name="DoctorId" value="@doctor.Id" />
+                                        <input type="hidden" name="RuleType" value="@ClinicalNoteAccessRuleType.Block" />
+                                        <input type="hidden" name="Enabled" value="false" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">-</button>
+                                    </form>
+                                }
+                            }
+
+                            <form asp-action="UpdateAccessRule" method="post" class="mt-2">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="NoteId" value="@note.Id" />
+                                <input type="hidden" name="RuleType" value="@ClinicalNoteAccessRuleType.Block" />
+                                <input type="hidden" name="Enabled" value="true" />
+                                <label class="form-label">Blok listesine doktor ekle</label>
+                                <select name="DoctorId" class="form-select form-select-sm">
+                                    @foreach (var doctor in Model.AllDoctorProfiles)
+                                    {
+                                        <option value="@doctor.Id">@doctor.Name</option>
+                                    }
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-outline-primary mt-2">+</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="modal fade" id="bulkActionsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content app-card">
+            <form action="/ClinicalNoteBulkActions/Apply" method="post" id="bulkActionsForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">Çoklu Not İşlemi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="bulkActionNoteIds"></div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Gorunurluk (opsiyonel)</label>
+                        <select class="form-select" name="Visibility">
+                            <option value="">Degistirme</option>
+                            <option value="@ClinicalNoteVisibility.Private">Gizli</option>
+                            <option value="@ClinicalNoteVisibility.Public">Açık</option>
+                            <option value="@ClinicalNoteVisibility.Shared">Paylaşılan</option>
+                        </select>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Paylasima ekle</label>
+                            <select class="form-select" name="AddShareDoctorIds" multiple size="7">
+                                @foreach (var doctor in Model.AllDoctorProfiles)
+                                {
+                                    <option value="@doctor.Id">@doctor.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Paylasimdan kaldir</label>
+                            <select class="form-select" name="RemoveShareDoctorIds" multiple size="7">
+                                @foreach (var doctor in Model.AllDoctorProfiles)
+                                {
+                                    <option value="@doctor.Id">@doctor.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Bloka ekle</label>
+                            <select class="form-select" name="AddBlockDoctorIds" multiple size="7">
+                                @foreach (var doctor in Model.AllDoctorProfiles)
+                                {
+                                    <option value="@doctor.Id">@doctor.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Bloktan kaldir</label>
+                            <select class="form-select" name="RemoveBlockDoctorIds" multiple size="7">
+                                @foreach (var doctor in Model.AllDoctorProfiles)
+                                {
+                                    <option value="@doctor.Id">@doctor.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Uygula</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    (function () {
+        const filterForm = document.getElementById("myNotesFilterForm");
+        const selectedCountBadge = document.getElementById("selectedNoteCountBadge");
+        const checkboxes = Array.from(document.querySelectorAll(".note-selector-checkbox"));
+        const toggleBulkModeBtn = document.getElementById("toggleBulkModeBtn");
+        const toggleSelectAllBtn = document.getElementById("toggleSelectAllBtn");
+        const openBulkActionModalBtn = document.getElementById("openBulkActionModalBtn");
+        const bulkActionsForm = document.getElementById("bulkActionsForm");
+        const bulkActionNoteIds = document.getElementById("bulkActionNoteIds");
+        const sortDirectionInput = document.getElementById("notesSortDirectionInput");
+        const sortDirectionToggle = document.getElementById("notesSortDirectionToggle");
+
+        let bulkMode = false;
+
+        function getSelectedIds() {
+            return checkboxes.filter((x) => x.checked).map((x) => Number(x.value));
+        }
+
+        function refreshSelectionState() {
+            const selected = getSelectedIds();
+            selectedCountBadge.textContent = String(selected.length);
+            if (openBulkActionModalBtn) {
+                openBulkActionModalBtn.disabled = selected.length === 0;
+            }
+            if (toggleSelectAllBtn) {
+                const allSelected = checkboxes.length > 0 && selected.length === checkboxes.length;
+                toggleSelectAllBtn.textContent = allSelected ? "Tüm seçimi kaldır" : "Tümünü seç";
+            }
+        }
+
+        function applyBulkMode() {
+            checkboxes.forEach((box) => box.classList.toggle("d-none", !bulkMode));
+            toggleBulkModeBtn.textContent = bulkMode ? "Seçimi Kapat" : "Çoklu İşlem";
+            toggleSelectAllBtn?.classList.toggle("d-none", !bulkMode);
+            openBulkActionModalBtn?.classList.toggle("d-none", !bulkMode);
+            if (!bulkMode) {
+                checkboxes.forEach((box) => box.checked = false);
+            }
+            refreshSelectionState();
+        }
+
+        function submitFilterKeepingScroll() {
+            if (!filterForm) {
+                return;
+            }
+            sessionStorage.setItem("mentora:myNotes:scrollY", String(window.scrollY || 0));
+            filterForm.requestSubmit();
+        }
+
+        function restoreScroll() {
+            const value = sessionStorage.getItem("mentora:myNotes:scrollY");
+            if (!value) {
+                return;
+            }
+            sessionStorage.removeItem("mentora:myNotes:scrollY");
+            const y = Number(value);
+            if (Number.isFinite(y) && y > 0) {
+                window.scrollTo({ top: y, behavior: "auto" });
+            }
+        }
+
+        filterForm?.querySelectorAll("input[type='checkbox'], input[type='text'], select").forEach((el) => {
+            el.addEventListener("change", submitFilterKeepingScroll);
+        });
+
+        sortDirectionToggle?.addEventListener("click", () => {
+            if (!sortDirectionInput) {
+                return;
+            }
+            sortDirectionInput.value = sortDirectionInput.value === "asc" ? "desc" : "asc";
+            sortDirectionToggle.innerHTML = sortDirectionInput.value === "asc"
+                ? "<i class='fas fa-arrow-up-wide-short'></i>"
+                : "<i class='fas fa-arrow-down-wide-short'></i>";
+            submitFilterKeepingScroll();
+        });
+
+        toggleBulkModeBtn?.addEventListener("click", () => {
+            bulkMode = !bulkMode;
+            applyBulkMode();
+        });
+
+        toggleSelectAllBtn?.addEventListener("click", () => {
+            const selected = getSelectedIds();
+            const shouldSelectAll = selected.length !== checkboxes.length;
+            checkboxes.forEach((box) => box.checked = shouldSelectAll);
+            refreshSelectionState();
+        });
+
+        checkboxes.forEach((box) => box.addEventListener("change", refreshSelectionState));
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && bulkMode) {
+                bulkMode = false;
+                applyBulkMode();
+            }
+        });
+
+        openBulkActionModalBtn?.addEventListener("click", () => {
+            const selected = getSelectedIds();
+            bulkActionNoteIds.innerHTML = "";
+            selected.forEach((id) => {
+                const hidden = document.createElement("input");
+                hidden.type = "hidden";
+                hidden.name = "NoteIds";
+                hidden.value = String(id);
+                bulkActionNoteIds.appendChild(hidden);
+            });
+            bootstrap.Modal.getOrCreateInstance(document.getElementById("bulkActionsModal")).show();
+        });
+
+        bulkActionsForm?.addEventListener("submit", () => {
+            bulkMode = false;
+        });
+
+        restoreScroll();
+        applyBulkMode();
+    })();
+</script>
+}

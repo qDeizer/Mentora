@@ -1,0 +1,54 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - link "Mentora Logo Mentora" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img "Mentora Logo" [ref=e5]
+        - generic [ref=e6]: Mentora
+      - generic [ref=e7]:
+        - list
+        - list [ref=e8]:
+          - listitem [ref=e9]:
+            - link " Giris Yap" [ref=e10] [cursor=pointer]:
+              - /url: /Account/Login
+              - generic [ref=e11]: 
+              - text: Giris Yap
+          - listitem [ref=e12]:
+            - link " Kayit Ol" [ref=e13] [cursor=pointer]:
+              - /url: /Account/Register
+              - generic [ref=e14]: 
+              - text: Kayit Ol
+  - main [ref=e15]:
+    - generic [ref=e17]:
+      - generic [ref=e18]:
+        - generic [ref=e19]: 
+        - heading "Giriş Yap" [level=2] [ref=e20]
+        - paragraph [ref=e21]: Hesabınıza giriş yapın.
+      - generic [ref=e22]:
+        - list [ref=e24]:
+          - listitem [ref=e25]: Gecersiz giris denemesi.
+        - generic [ref=e26]:
+          - textbox " E-posta veya Kullanici Adi" [ref=e27]:
+            - /placeholder: E-posta veya Kullanici Adi
+            - text: demo.doctor@mentora.local
+          - generic [ref=e28]:
+            - generic [ref=e29]: 
+            - text: E-posta veya Kullanici Adi
+        - generic [ref=e30]:
+          - textbox " Şifre" [ref=e31]:
+            - /placeholder: Şifre
+          - generic [ref=e32]:
+            - generic [ref=e33]: 
+            - text: Şifre
+        - generic [ref=e34]:
+          - checkbox "Beni Hatırla" [ref=e35]
+          - generic [ref=e36]: Beni Hatırla
+        - button "Giriş Yap" [ref=e37] [cursor=pointer]
+        - generic [ref=e38]:
+          - paragraph [ref=e39]:
+            - link "Sifremi unuttum" [ref=e40] [cursor=pointer]:
+              - /url: /Account/ForgotPassword
+          - paragraph [ref=e41]:
+            - text: Hesabınız yok mu?
+            - link "Kayıt Ol" [ref=e42] [cursor=pointer]:
+              - /url: /Account/Register

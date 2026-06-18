@@ -1,0 +1,56 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mentora-app
+    network_mode: "host"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: "https://+:8443;http://+:8080"
+      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/certs/mentora.pfx"
+      ASPNETCORE_Kestrel__Certificates__Default__Password: "mentora"
+      ConnectionStrings__DefaultConnection: "Server=localhost,14333;Database=${DB_NAME:-MentoraDb};User Id=sa;Password=${SA_PASSWORD:-Strong_Password123!};TrustServerCertificate=True;MultipleActiveResultSets=true"
+      Seed__DemoData: "true"
+      Seed__DemoDoctorEmail: "demo.doktor1@mentora.local"
+      Smtp__Host: "smtp.gmail.com"
+      Smtp__Port: "587"
+      Smtp__UseSsl: "false"
+      Smtp__UserName: "gnar4540@gmail.com"
+      Smtp__Password: "gszkaovhyymohnqx"
+      Smtp__FromEmail: "gnar4540@gmail.com"
+      Smtp__FromName: "Mentora"
+      Smtp__UseHttpApi: "false"
+      GoogleMaps__ApiKey: "AIzaSyDckoAD59bPFzUfo_cezdr1xJa1Krq-Zl4"
+    volumes:
+      - mentora_uploads:/app/wwwroot/images
+      - mentora_keys:/app/keys
+      - /opt/mentora-cert:/app/certs:ro
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mentora-db
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${SA_PASSWORD:-Strong_Password123!}"
+      MSSQL_PID: "Developer"
+    ports:
+      - "14333:1433"
+    volumes:
+      - mentora_sql_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q \"SELECT 1\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+volumes:
+  mentora_sql_data:
+  mentora_uploads:
+  mentora_keys:

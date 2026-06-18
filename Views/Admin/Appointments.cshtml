@@ -1,0 +1,71 @@
+@model List<PsikologProje_Void.Models.Appointment>
+
+@{
+    ViewData["Title"] = "Admin - Randevular";
+    var query = ViewBag.Query as string ?? string.Empty;
+
+    string StatusText(PsikologProje_Void.Models.AppointmentStatus status) => status switch
+    {
+        PsikologProje_Void.Models.AppointmentStatus.Available => "Müsait",
+        PsikologProje_Void.Models.AppointmentStatus.Reserved => "Rezerve edildi",
+        PsikologProje_Void.Models.AppointmentStatus.Completed => "Tamamlandı",
+        PsikologProje_Void.Models.AppointmentStatus.NotCompleted => "Gerçekleşmedi",
+        PsikologProje_Void.Models.AppointmentStatus.CancelledByConflict => "Çakışma nedeniyle kapatıldı",
+        _ => status.ToString()
+    };
+
+    string OfferStatusText(PsikologProje_Void.Models.AppointmentOfferStatus status) => status switch
+    {
+        PsikologProje_Void.Models.AppointmentOfferStatus.None => "-",
+        PsikologProje_Void.Models.AppointmentOfferStatus.Pending => "Beklemede",
+        PsikologProje_Void.Models.AppointmentOfferStatus.Accepted => "Kabul edildi",
+        PsikologProje_Void.Models.AppointmentOfferStatus.Rejected => "Reddedildi",
+        PsikologProje_Void.Models.AppointmentOfferStatus.Expired => "Süresi doldu",
+        _ => status.ToString()
+    };
+}
+
+<div class="container app-page">
+    <div class="page-header">
+        <h1 class="page-title">Tüm Randevular</h1>
+        <p class="page-subtitle">Sistemdeki son 200 randevu.</p>
+        <a class="btn btn-sm btn-outline-secondary mt-2" asp-action="Index">Admin Paneline Dön</a>
+    </div>
+
+    <form method="get" asp-action="Appointments" class="d-flex gap-2 mb-3">
+        <input type="text" name="q" class="form-control" placeholder="Doktor veya hasta ara" value="@query" />
+        <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
+    </form>
+
+    <div class="app-card">
+        <div class="table-responsive">
+            <table class="table table-sm align-middle">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Doktor</th>
+                    <th>Hasta</th>
+                    <th>Hedef Hasta (Özel)</th>
+                    <th>Zaman</th>
+                    <th>Durum</th>
+                    <th>Özel Teklif</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var a in Model)
+                {
+                    <tr>
+                        <td>@a.Id</td>
+                        <td>@(a.Doctor != null ? a.Doctor.FirstName + " " + a.Doctor.LastName : "-")</td>
+                        <td>@(a.Patient != null ? a.Patient.FirstName + " " + a.Patient.LastName : "-")</td>
+                        <td>@(a.TargetPatient != null ? a.TargetPatient.FirstName + " " + a.TargetPatient.LastName : "-")</td>
+                        <td class="small">@a.StartTime.ToString("dd.MM.yyyy HH:mm") - @a.EndTime.ToString("HH:mm")</td>
+                        <td>@StatusText(a.Status)</td>
+                        <td>@(a.IsPrivateOffer ? OfferStatusText(a.OfferStatus) : "-")</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

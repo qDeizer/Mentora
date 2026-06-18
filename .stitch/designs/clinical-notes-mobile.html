@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mentora - Clinical Notes</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface": "#f7f9fd",
+              "on-tertiary-container": "#ffd5c5",
+              "on-surface": "#181c1f",
+              "on-primary-container": "#d5dcff",
+              "inverse-primary": "#b5c4ff",
+              "background": "#f7f9fd",
+              "on-primary-fixed-variant": "#003cad",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-high": "#e6e8ec",
+              "secondary": "#4d5c8f",
+              "on-tertiary-fixed-variant": "#7e2c00",
+              "surface-bright": "#f7f9fd",
+              "on-secondary-fixed": "#051847",
+              "on-tertiary": "#ffffff",
+              "on-surface-variant": "#434654",
+              "on-error": "#ffffff",
+              "surface-variant": "#e0e3e6",
+              "on-primary-fixed": "#00164d",
+              "primary-fixed-dim": "#b5c4ff",
+              "primary-fixed": "#dce1ff",
+              "tertiary": "#832f00",
+              "error-container": "#ffdad6",
+              "surface-tint": "#1f54d3",
+              "on-primary": "#ffffff",
+              "inverse-surface": "#2d3134",
+              "outline-variant": "#c3c5d7",
+              "on-secondary-container": "#415082",
+              "on-error-container": "#93000a",
+              "primary-container": "#2457d6",
+              "primary": "#003fb3",
+              "on-secondary-fixed-variant": "#354475",
+              "tertiary-container": "#aa3f00",
+              "on-tertiary-fixed": "#360f00",
+              "on-secondary": "#ffffff",
+              "on-background": "#181c1f",
+              "inverse-on-surface": "#eff1f5",
+              "outline": "#747686",
+              "surface-dim": "#d8dade",
+              "secondary-fixed-dim": "#b6c4fe",
+              "tertiary-fixed": "#ffdbcd",
+              "secondary-container": "#b6c4fe",
+              "surface-container": "#eceef2",
+              "surface-container-low": "#f2f4f8",
+              "secondary-fixed": "#dce1ff",
+              "tertiary-fixed-dim": "#ffb597",
+              "surface-container-highest": "#e0e3e6",
+              "error": "#ba1a1a"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface antialiased">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#f7f9fd] dark:bg-slate-900">
+<div class="flex items-center justify-between px-6 h-16 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#2457D6] dark:text-blue-400 text-2xl" data-icon="clinical_notes">clinical_notes</span>
+<h1 class="font-['Manrope'] font-extrabold text-2xl tracking-tighter text-[#2457D6] dark:text-blue-400">Mentora</h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high border border-outline-variant/20">
+<img alt="Dr. Sarah Mitchell" data-alt="professional headshot of a female doctor in a clinical setting with soft natural lighting and blurred background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCS6xZUVZUQ31yF3RxmB5rWM4ohPQMjfzqpdiIRxWvrDXx6rXSzAKYZvwl0z4YoGabKu0rK-600IMO1fNQ2QCE4VIRn-Hw7Htho1-o08_DQ--A51W7MCOXZKCeCf-AEvmc3VokqA2q2K3n4bBnUL5YfnKwe5oWhCtG2wa_C3tiRNEHnaDf6PKUHKG5NCzAp-0FWO3BcUJYmlKOe9Wnc7m5H-06bIrgxy2spEUvHVWg2WKfpWGyLuP9qS9B5DNqstu6Bi4lnOt4FHVs"/>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-16 pb-24 min-h-screen max-w-md mx-auto px-4 md:max-w-2xl lg:max-w-7xl">
+<!-- Privacy Disclaimer -->
+<div class="mt-6 p-4 rounded-xl bg-primary-container/5 border-l-4 border-primary-container flex items-start gap-3">
+<span class="material-symbols-outlined text-primary-container shrink-0" data-icon="lock" style="font-variation-settings: 'FILL' 1;">lock</span>
+<p class="text-sm font-medium text-on-surface-variant leading-relaxed">
+                Notes are private and only visible to authorized providers. All data is encrypted according to healthcare standards.
+            </p>
+</div>
+<!-- Success Toast (Interaction State Example) -->
+<div class="mt-4 flex items-center justify-between p-3 bg-on-background text-white rounded-xl shadow-lg transition-all duration-300 opacity-90">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-emerald-400" data-icon="check_circle">check_circle</span>
+<span class="text-sm font-medium">Save Successful</span>
+</div>
+<span class="material-symbols-outlined text-white/60 text-sm" data-icon="close">close</span>
+</div>
+<!-- Custom Tabbed View -->
+<div class="mt-8 flex bg-surface-container-low rounded-xl p-1.5 gap-1 mb-8">
+<button class="flex-1 py-2.5 rounded-lg text-sm font-bold font-headline bg-white text-primary shadow-sm">
+                Create Note
+            </button>
+<button class="flex-1 py-2.5 rounded-lg text-sm font-bold font-headline text-on-surface-variant hover:bg-white/50 transition-colors">
+                Note Timeline
+            </button>
+</div>
+<!-- Tab Content 1: Create Note -->
+<section class="space-y-6" id="create-note-form">
+<div class="grid gap-6">
+<!-- Patient Selector -->
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-1">Patient Search</label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline" data-icon="search">search</span>
+<input class="w-full pl-12 pr-4 py-4 bg-surface-container-highest border-b border-outline-variant/30 rounded-t-xl focus:border-primary focus:ring-0 transition-all font-medium text-on-surface" placeholder="Select or search patient..." type="text"/>
+</div>
+</div>
+<!-- Note Title -->
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-1">Session Title (Optional)</label>
+<input class="w-full px-4 py-4 bg-surface-container-highest border-b border-outline-variant/30 rounded-t-xl focus:border-primary focus:ring-0 transition-all font-medium text-on-surface" placeholder="e.g., Weekly Therapy - Session 12" type="text"/>
+</div>
+<!-- Rich Text Area -->
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-1">Note Content</label>
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/10 shadow-sm">
+<!-- Simple Editor Toolbar -->
+<div class="flex items-center gap-1 p-2 bg-surface-container-low border-b border-outline-variant/10">
+<button class="p-2 hover:bg-white rounded transition-colors"><span class="material-symbols-outlined text-on-surface-variant" data-icon="format_bold">format_bold</span></button>
+<button class="p-2 hover:bg-white rounded transition-colors"><span class="material-symbols-outlined text-on-surface-variant" data-icon="format_italic">format_italic</span></button>
+<button class="p-2 hover:bg-white rounded transition-colors"><span class="material-symbols-outlined text-on-surface-variant" data-icon="format_list_bulleted">format_list_bulleted</span></button>
+<div class="w-px h-6 bg-outline-variant/30 mx-1"></div>
+<button class="p-2 hover:bg-white rounded transition-colors"><span class="material-symbols-outlined text-on-surface-variant" data-icon="history">history</span></button>
+</div>
+<textarea class="w-full p-4 border-none focus:ring-0 text-on-surface leading-relaxed resize-none" placeholder="Type clinical observations, progress notes, or intervention strategies here..." rows="10"></textarea>
+</div>
+</div>
+<!-- Save Action -->
+<div class="pt-4">
+<button class="w-full bg-gradient-to-br from-[#003fb3] to-[#2457d6] text-white py-4 rounded-xl font-headline font-bold text-lg shadow-xl shadow-primary/20 active:scale-[0.98] transition-all">
+                        Save Note
+                    </button>
+</div>
+</div>
+</section>
+<!-- Hidden Section Placeholder (Timeline) -->
+<section class="hidden mt-10 space-y-6" id="note-timeline">
+<div class="flex flex-col gap-4">
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline" data-icon="filter_list">filter_list</span>
+<input class="w-full pl-12 pr-4 py-3 bg-white rounded-xl border-none shadow-sm focus:ring-2 focus:ring-primary/20" placeholder="Search and filter notes..." type="text"/>
+</div>
+</div>
+<!-- Timeline Item 1 -->
+<div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-primary">
+<div class="flex justify-between items-start mb-3">
+<div>
+<h3 class="font-headline font-bold text-lg text-on-surface">Ethan Caldwell</h3>
+<p class="text-sm text-on-surface-variant font-medium">Progress Note - Session 08</p>
+</div>
+<span class="px-3 py-1 bg-surface-container-low text-primary-container text-[10px] font-bold uppercase rounded-full tracking-wider">Own</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-on-surface-variant mb-4">
+<span class="material-symbols-outlined text-sm" data-icon="calendar_today">calendar_today</span>
+<span>Oct 24, 2023 · 10:30 AM</span>
+</div>
+<div class="text-sm text-on-surface-variant line-clamp-2 leading-relaxed italic border-l-2 border-surface-container-low pl-3">
+                    "Patient reports significant improvement in anxiety management techniques discussed last week. Focused on CBT exercises..."
+                </div>
+</div>
+<!-- Timeline Item 2 (Shared) -->
+<div class="bg-white p-5 rounded-xl shadow-sm">
+<div class="flex justify-between items-start mb-3">
+<div>
+<h3 class="font-headline font-bold text-lg text-on-surface">Maya Rodriguez</h3>
+<p class="text-sm text-on-surface-variant font-medium">Initial Assessment</p>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold uppercase rounded-full tracking-wider">Shared-by-Patient</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-x-4 gap-y-2 text-xs text-on-surface-variant mb-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="calendar_today">calendar_today</span>
+<span>Oct 22, 2023</span>
+</div>
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-sm" data-icon="share" style="font-variation-settings: 'FILL' 1;">share</span>
+<span>Shared: Oct 23, 2023</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full h-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md flex justify-around items-center px-4 pb-safe z-50 rounded-t-xl border-t border-[#f2f4f8] dark:border-slate-800 shadow-[0px_-4px_12px_rgba(24,28,31,0.04)]">
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#2457D6] transition-all active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="dashboard">dashboard</span>
+<span class="font-['Inter'] font-medium text-[11px] uppercase tracking-wider">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#2457D6] transition-all active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="calendar_today">calendar_today</span>
+<span class="font-['Inter'] font-medium text-[11px] uppercase tracking-wider">Appointments</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#2457D6] dark:text-blue-300 bg-[#f2f4f8] dark:bg-blue-900/30 rounded-xl px-4 py-1 active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="description" style="font-variation-settings: 'FILL' 1;">description</span>
+<span class="font-['Inter'] font-medium text-[11px] uppercase tracking-wider">Notes</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#2457D6] transition-all active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="settings">settings</span>
+<span class="font-['Inter'] font-medium text-[11px] uppercase tracking-wider">Settings</span>
+</a>
+</nav>
+<!-- Floating Action Button (FAB) - Suppression Logic applied (not needed on active focused task screens, but could be "Add Note" shortcuts if elsewhere) -->
+</body></html>

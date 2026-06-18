@@ -1,0 +1,112 @@
+@model PsikologProje_Void.ViewModels.AppointmentViewModel
+@inject IConfiguration Configuration
+@{
+    var mapsApiKey = Configuration["GoogleMaps:ApiKey"];
+    if (string.IsNullOrWhiteSpace(mapsApiKey))
+    {
+        mapsApiKey = Configuration["GoogleMaps__ApiKey"];
+    }
+    if (string.IsNullOrWhiteSpace(mapsApiKey))
+    {
+        mapsApiKey = Configuration["GOOGLE_MAPS_API_KEY"];
+    }
+    if (string.IsNullOrWhiteSpace(mapsApiKey))
+    {
+        mapsApiKey = Configuration["GoogleMapsApiKey"];
+    }
+    var hasMapsApiKey = !string.IsNullOrWhiteSpace(mapsApiKey);
+}
+
+<article class="appointment-card h-100">
+    @{
+        var doctorPhoto = string.IsNullOrEmpty(Model.DoctorProfilePhotoPath) ? "/images/default-avatar.png" : Model.DoctorProfilePhotoPath;
+    }
+    <div class="d-flex align-items-center mb-2">
+        <img src="@doctorPhoto" alt="@Model.DoctorName" class="doctor-photo" />
+        <div class="ms-3">
+            <h3 class="h6 mb-0">@Model.DoctorName</h3>
+            <div class="doctor-rating">
+                <i class="fas fa-star"></i>
+                <span>@Model.DoctorAverageRating.ToString("0.0")</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="small text-muted">@string.Join(", ", Model.Specialties)</div>
+
+    <div class="card-info-grid small">
+        <div>
+            <i class="fas fa-calendar-alt fa-fw me-2"></i>@Model.StartTime.ToString("dd MMMM, dddd")
+            @if (!string.IsNullOrWhiteSpace(Model.RelativeDayLabel))
+            {
+                <span class="status-chip status-neutral ms-1">@Model.RelativeDayLabel</span>
+            }
+        </div>
+        <div><i class="fas fa-clock fa-fw me-2"></i>@Model.StartTime.ToString("HH:mm") - @Model.EndTime.ToString("HH:mm") (@Model.DurationInMinutes dk)</div>
+        <div><i class="fas fa-tags fa-fw me-2"></i>@Model.PriceRange</div>
+        @if (Model.DistanceKm.HasValue)
+        {
+            <div><i class="fas fa-route fa-fw me-2"></i>Yaklasik @Model.DistanceKm.Value.ToString("0.0") km</div>
+        }
+    </div>
+
+    <div class="my-1">
+        @foreach (var type in Model.AppointmentTypes)
+        {
+            <span class="status-chip status-info me-1">@type</span>
+        }
+    </div>
+
+    <div class="action-row mt-auto">
+        @if (Model.Location != null)
+        {
+            var lat = Model.Location.Y.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            var lon = Model.Location.X.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            if (hasMapsApiKey)
+            {
+                <button class="btn btn-sm btn-outline-primary location-btn"
+                        data-bs-toggle="modal"
+                        data-bs-target="#locationModal"
+                        data-lat="@lat"
+                        data-lon="@lon"
+                        data-doctor="@Model.DoctorName"
+                        data-doctor-photo="@doctorPhoto"
+                        data-price="@Model.PriceRange"
+                        data-time="@Model.StartTime.ToString("dd.MM.yyyy HH:mm")">
+                    <i class="fas fa-map-marker-alt me-1"></i>Konum
+                </button>
+            }
+
+            <a class="btn btn-sm btn-outline-secondary route-link"
+               data-destination="@lat,@lon"
+               target="_blank"
+               rel="noopener noreferrer"
+               href="https://www.google.com/maps/dir/?api=1&destination=@lat,@lon&travelmode=driving">
+                <i class="fas fa-directions me-1"></i>Yol Tarifi Al
+            </a>
+        }
+
+        @if (Model.IsRequestedByCurrentUser)
+        {
+            <button class="btn btn-sm btn-secondary" disabled><i class="fas fa-check me-1"></i>Talep Edildi</button>
+        }
+        else
+        {
+            <button class="btn btn-sm btn-primary request-btn"
+                    data-bs-toggle="modal" data-bs-target="#requestModal"
+                    data-appointment-id="@Model.Id"
+                    data-doctor-id="@Model.DoctorId"
+                    data-doctor-name="@Model.DoctorName"
+                    data-appointment-time="@Model.StartTime.ToString("dd.MM.yyyy HH:mm") - @Model.EndTime.ToString("HH:mm")"
+                    data-appointment-type="@string.Join(", ", Model.AppointmentTypes)"
+                    data-appointment-price="@Model.PriceRange">
+                <i class="fas fa-paper-plane me-1"></i>Talep Et
+            </button>
+        }
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.LocationNote))
+    {
+        <div class="small mt-2"><b>Konum notu:</b> @Model.LocationNote</div>
+    }
+</article>

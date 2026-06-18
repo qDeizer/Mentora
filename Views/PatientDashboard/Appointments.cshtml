@@ -1,0 +1,171 @@
+@model PsikologProje_Void.ViewModels.PatientAppointmentsViewModel
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Randevularım";
+    var culture = new CultureInfo("tr-TR");
+}
+
+<div class="container app-page">
+    <div class="page-header">
+        <h1 class="page-title">Randevularım</h1>
+        <p class="page-subtitle">Onaylanmış yaklaşan randevularınızı ve geçmiş randevu kayıtlarınızı buradan takip edebilirsiniz.</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <section class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h2 class="h5 mb-0">Yaklaşan randevularım</h2>
+            <span class="status-chip status-info">@Model.UpcomingAppointments.Count kayıt</span>
+        </div>
+
+        @if (!Model.UpcomingAppointments.Any())
+        {
+            <div class="app-card text-center py-4 text-muted">Yaklaşan onaylı randevunuz yok.</div>
+        }
+        else
+        {
+            <div class="row g-3">
+                @foreach (var item in Model.UpcomingAppointments)
+                {
+                    <div class="col-md-6">
+                        <article class="content-card h-100">
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="@(string.IsNullOrWhiteSpace(item.DoctorProfilePhotoPath) ? "/images/default-avatar.png" : item.DoctorProfilePhotoPath)"
+                                     alt="@item.DoctorName"
+                                     class="inline-profile-avatar" />
+                                <div>
+                                    <h3 class="h6 mb-1"><a asp-controller="People" asp-action="Profile" asp-route-id="@item.DoctorId">@item.DoctorName</a></h3>
+                                    <div class="small text-muted">@item.StartTime.ToString("d MMMM yyyy, HH:mm", culture) - @item.EndTime.ToString("HH:mm", culture)</div>
+                                </div>
+                            </div>
+
+                            <div class="entity-meta">
+                                <div><b>Durum:</b> @item.StatusText</div>
+                                <div><b>Tür:</b> @item.TypeText</div>
+                                <div><b>Ücret:</b> @item.PriceRange</div>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(item.MeetingLink))
+                            {
+                                <a href="@item.MeetingLink" class="btn btn-sm btn-primary" target="_blank" rel="noopener noreferrer">
+                                    <i class="fas fa-video me-1"></i>Çevrim İçi Görüşmeye Katıl
+                                </a>
+                            }
+
+                            @if (item.Latitude.HasValue && item.Longitude.HasValue)
+                            {
+                                var destination = $"{item.Latitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)},{item.Longitude.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+                                <a class="btn btn-sm btn-outline-secondary route-link"
+                                   data-destination="@destination"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   href="https://www.google.com/maps/dir/?api=1&destination=@destination&travelmode=driving">
+                                    <i class="fas fa-directions me-1"></i>Yol Tarifi Al
+                                </a>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(item.LocationNote))
+                            {
+                                <div class="small"><b>Konum notu:</b> @item.LocationNote</div>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(item.Notes))
+                            {
+                                <div class="small"><b>Randevu notu:</b> @item.Notes</div>
+                            }
+
+                            <div class="action-row mt-auto">
+                                <a asp-action="Calendar" asp-route-id="@item.AppointmentId" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-calendar-plus me-1"></i>Takvime Ekle
+                                </a>
+                            </div>
+                        </article>
+                    </div>
+                }
+            </div>
+        }
+    </section>
+
+    <section>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h2 class="h5 mb-0">Geçmiş randevularım</h2>
+            <span class="status-chip status-neutral">@Model.PastAppointments.Count kayıt</span>
+        </div>
+
+        @if (!Model.PastAppointments.Any())
+        {
+            <div class="app-card text-center py-4 text-muted">Geçmiş randevu kaydı bulunmuyor.</div>
+        }
+        else
+        {
+            <div class="row g-3">
+                @foreach (var item in Model.PastAppointments)
+                {
+                    var statusClass = item.StatusText switch
+                    {
+                        "Tamamlandı" => "status-active",
+                        "Gerçekleşmedi" => "status-danger",
+                        "Çakışma nedeniyle kapatıldı" => "status-danger",
+                        _ => "status-neutral"
+                    };
+
+                    <div class="col-md-6 col-xl-4">
+                        <article class="content-card h-100">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <div>
+                                    <h3 class="h6 mb-1"><a asp-controller="People" asp-action="Profile" asp-route-id="@item.DoctorId">@item.DoctorName</a></h3>
+                                    <div class="small text-muted">@item.StartTime.ToString("d MMMM yyyy, HH:mm", culture)</div>
+                                </div>
+                                <span class="status-chip @statusClass">@item.StatusText</span>
+                            </div>
+
+                            <div class="small"><b>Tür:</b> @item.TypeText</div>
+                            <div class="small"><b>Ücret:</b> @item.PriceRange</div>
+
+                            @if (item.Rating.HasValue)
+                            {
+                                <div class="doctor-rating"><i class="fas fa-star"></i> @item.Rating / 5</div>
+                                @if (!string.IsNullOrWhiteSpace(item.Review))
+                                {
+                                    <div class="small"><b>Yorumunuz:</b> @item.Review</div>
+                                }
+                            }
+                            else if (item.CanRate)
+                            {
+                                <form asp-action="RateAppointment" method="post" class="mt-auto">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="appointmentId" value="@item.AppointmentId" />
+                                    <div class="row g-2">
+                                        <div class="col-4">
+                                            <label class="form-label small">Puan</label>
+                                            <select name="rating" class="form-select form-select-sm" required>
+                                                <option value="5">5</option>
+                                                <option value="4">4</option>
+                                                <option value="3">3</option>
+                                                <option value="2">2</option>
+                                                <option value="1">1</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-8">
+                                            <label class="form-label small">Yorum</label>
+                                            <input name="review" class="form-control form-control-sm" maxlength="500" placeholder="İsteğe bağlı" />
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary mt-2 w-100">Değerlendir</button>
+                                </form>
+                            }
+                        </article>
+                    </div>
+                }
+            </div>
+        }
+    </section>
+</div>

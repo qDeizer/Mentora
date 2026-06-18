@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mentora Auto Routine Manager</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-bright": "#f7f9fd",
+              "primary-fixed": "#dce1ff",
+              "primary-container": "#2457d6",
+              "outline-variant": "#c3c5d7",
+              "primary-fixed-dim": "#b5c4ff",
+              "on-secondary-container": "#415082",
+              "on-background": "#181c1f",
+              "on-primary": "#ffffff",
+              "outline": "#747686",
+              "on-tertiary-fixed": "#360f00",
+              "on-error": "#ffffff",
+              "inverse-surface": "#2d3134",
+              "surface-dim": "#d8dade",
+              "secondary-container": "#b6c4fe",
+              "primary": "#003fb3",
+              "error-container": "#ffdad6",
+              "tertiary": "#832f00",
+              "on-surface-variant": "#434654",
+              "on-error-container": "#93000a",
+              "surface": "#f7f9fd",
+              "inverse-on-surface": "#eff1f5",
+              "error": "#ba1a1a",
+              "on-primary-container": "#d5dcff",
+              "background": "#f7f9fd",
+              "tertiary-fixed": "#ffdbcd",
+              "secondary-fixed-dim": "#b6c4fe",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-high": "#e6e8ec",
+              "secondary-fixed": "#dce1ff",
+              "on-secondary-fixed-variant": "#354475",
+              "secondary": "#4d5c8f",
+              "on-primary-fixed": "#00164d",
+              "inverse-primary": "#b5c4ff",
+              "tertiary-fixed-dim": "#ffb597",
+              "surface-variant": "#e0e3e6",
+              "on-secondary-fixed": "#051847",
+              "on-tertiary": "#ffffff",
+              "on-tertiary-container": "#ffd5c5",
+              "on-tertiary-fixed-variant": "#7e2c00",
+              "tertiary-container": "#aa3f00",
+              "surface-tint": "#1f54d3",
+              "on-surface": "#181c1f",
+              "surface-container-highest": "#e0e3e6",
+              "on-secondary": "#ffffff",
+              "on-primary-fixed-variant": "#003cad",
+              "surface-container": "#eceef2",
+              "surface-container-low": "#f2f4f8"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .pulse-chip-active {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            background-color: rgba(36, 87, 214, 0.1);
+            color: #003fb3;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        .pulse-chip-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #003fb3;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .cta-gradient {
+            background: linear-gradient(135deg, #003fb3 0%, #2457d6 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body text-on-background antialiased pb-32">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-50 bg-[#f7f9fd] dark:bg-slate-950 flex justify-between items-center w-full px-6 h-16">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#2457D6] dark:text-blue-400">menu</span>
+<h1 class="font-['Manrope'] font-bold text-2xl tracking-tight text-[#2457D6] dark:text-blue-400">Ether Clinical</h1>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed">
+<img class="w-full h-full object-cover" data-alt="professional portrait of a healthcare professional in a clinical setting with soft natural lighting and medical background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKZ7yYhtGYFgJeXC7SfkpV81XiKVgW3vxdLewT-vjZfePNY8RCM_M3ikMUEzWo229jYZa4mgiXcH0UBlPoxp-grWgeCsidmgWdxqC4xH3x5ALhk145n-gjTF6bQ8FU3HqIlYy8d0j11jn_1OFpkVQGgoJ0hz87dZm7ubWHRIZ1iIPMuzF9NNd0IKTqsQOCdjbgChu40sMauFQRKRYqfKdymL2uSI9hMPW-oPdXthFwM1iohDUpfcG1FCEQyTUEj0wQ6bEspsazW0w"/>
+</div>
+</header>
+<main class="px-6 pt-4">
+<!-- Editorial Header -->
+<section class="mb-8">
+<h2 class="font-headline font-extrabold text-4xl text-on-background tracking-tight leading-tight">Routines</h2>
+<p class="text-on-surface-variant font-medium mt-1">Manage your automated clinical workflows.</p>
+</section>
+<!-- Quick Pause Section (Glassmorphism Bento Card) -->
+<section class="mb-10">
+<div class="glass-panel p-6 rounded-xl border border-outline-variant/15 shadow-[0px_8px_24px_rgba(24,28,31,0.06)]">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary">timer_pause</span>
+<h3 class="font-headline font-bold text-lg">Quick Pause</h3>
+</div>
+<div class="grid grid-cols-2 gap-3 mb-6">
+<button class="bg-surface-container-low hover:bg-surface-container-high transition-colors py-3 rounded-lg text-sm font-semibold flex flex-col items-center justify-center gap-1">
+<span class="text-on-surface">1 Day</span>
+<span class="text-[10px] text-outline uppercase tracking-widest">Preset</span>
+</button>
+<button class="bg-surface-container-low hover:bg-surface-container-high transition-colors py-3 rounded-lg text-sm font-semibold flex flex-col items-center justify-center gap-1">
+<span class="text-on-surface">3 Days</span>
+<span class="text-[10px] text-outline uppercase tracking-widest">Preset</span>
+</button>
+<button class="bg-surface-container-low hover:bg-surface-container-high transition-colors py-3 rounded-lg text-sm font-semibold flex flex-col items-center justify-center gap-1">
+<span class="text-on-surface">7 Days</span>
+<span class="text-[10px] text-outline uppercase tracking-widest">Preset</span>
+</button>
+<button class="bg-surface-container-low hover:bg-surface-container-high transition-colors py-3 rounded-lg text-sm font-semibold flex flex-col items-center justify-center gap-1">
+<span class="text-on-surface">30 Days</span>
+<span class="text-[10px] text-outline uppercase tracking-widest">Preset</span>
+</button>
+</div>
+<div class="space-y-2">
+<label class="block text-xs font-bold text-outline uppercase tracking-wider px-1">Pause Until</label>
+<div class="relative">
+<input class="w-full bg-surface-container-highest border-b border-outline-variant/30 focus:border-primary focus:ring-0 rounded-t-lg px-4 py-3 font-medium text-on-surface" type="datetime-local"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Routines List (Stacked Cards) -->
+<section class="space-y-4">
+<div class="flex items-center justify-between px-1 mb-2">
+<h3 class="font-headline font-bold text-sm text-outline uppercase tracking-widest">Active Routines</h3>
+<span class="text-xs font-medium text-primary">View All</span>
+</div>
+<!-- Routine Card 1 -->
+<div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/10 shadow-[0px_4px_12px_rgba(24,28,31,0.03)] group">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h4 class="font-headline font-bold text-lg text-on-surface">Morning Psychotherapy</h4>
+<p class="text-sm text-on-surface-variant">Daily at 08:30 AM • 45m sessions</p>
+</div>
+<div class="pulse-chip-active">
+<div class="pulse-chip-dot"></div>
+<span>Active</span>
+</div>
+</div>
+<div class="flex gap-2 pt-4 border-t border-outline-variant/10">
+<button class="flex-1 bg-surface-container-low hover:bg-surface-container-high py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all">
+<span class="material-symbols-outlined text-sm">edit</span>
+<span class="text-xs font-bold uppercase tracking-wider">Edit</span>
+</button>
+<button class="flex-1 bg-surface-container-low hover:bg-surface-container-high py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all">
+<span class="material-symbols-outlined text-sm">pause</span>
+<span class="text-xs font-bold uppercase tracking-wider">Pause</span>
+</button>
+<button class="w-12 bg-error-container/20 hover:bg-error-container/40 text-error py-2.5 rounded-lg flex items-center justify-center transition-all group-hover:scale-105">
+<span class="material-symbols-outlined text-sm">delete</span>
+</button>
+</div>
+</div>
+<!-- Routine Card 2 (Paused) -->
+<div class="bg-surface-container-low/50 p-5 rounded-xl border border-outline-variant/10">
+<div class="flex justify-between items-start mb-4 opacity-70">
+<div>
+<h4 class="font-headline font-bold text-lg text-on-surface">Afternoon Consults</h4>
+<p class="text-sm text-on-surface-variant">Mon, Wed, Fri • 02:00 PM</p>
+</div>
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-semibold text-[10px] uppercase tracking-wider">
+<span class="material-symbols-outlined text-[14px]">pause_circle</span>
+<span>Paused</span>
+</div>
+</div>
+<div class="flex gap-2 pt-4 border-t border-outline-variant/10">
+<button class="flex-1 bg-surface-container-low hover:bg-surface-container-high py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all">
+<span class="material-symbols-outlined text-sm">edit</span>
+<span class="text-xs font-bold uppercase tracking-wider">Edit</span>
+</button>
+<button class="flex-1 bg-primary text-on-primary py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all shadow-sm">
+<span class="material-symbols-outlined text-sm">play_arrow</span>
+<span class="text-xs font-bold uppercase tracking-wider">Resume</span>
+</button>
+<button class="w-12 bg-error-container/20 hover:bg-error-container/40 text-error py-2.5 rounded-lg flex items-center justify-center transition-all">
+<span class="material-symbols-outlined text-sm">delete</span>
+</button>
+</div>
+</div>
+<!-- Routine Card 3 -->
+<div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/10 shadow-[0px_4px_12px_rgba(24,28,31,0.03)] group">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h4 class="font-headline font-bold text-lg text-on-surface">Weekly Case Review</h4>
+<p class="text-sm text-on-surface-variant">Sundays • 06:00 PM</p>
+</div>
+<div class="pulse-chip-active">
+<div class="pulse-chip-dot"></div>
+<span>Active</span>
+</div>
+</div>
+<div class="flex gap-2 pt-4 border-t border-outline-variant/10">
+<button class="flex-1 bg-surface-container-low hover:bg-surface-container-high py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all">
+<span class="material-symbols-outlined text-sm">edit</span>
+<span class="text-xs font-bold uppercase tracking-wider">Edit</span>
+</button>
+<button class="flex-1 bg-surface-container-low hover:bg-surface-container-high py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all">
+<span class="material-symbols-outlined text-sm">pause</span>
+<span class="text-xs font-bold uppercase tracking-wider">Pause</span>
+</button>
+<button class="w-12 bg-error-container/20 hover:bg-error-container/40 text-error py-2.5 rounded-lg flex items-center justify-center transition-all">
+<span class="material-symbols-outlined text-sm">delete</span>
+</button>
+</div>
+<div class="mt-3 px-1">
+<p class="text-[10px] text-error flex items-center gap-1 font-semibold uppercase tracking-wider">
+<span class="material-symbols-outlined text-[12px]">info</span>
+                        Delete action cannot be undone
+                    </p>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB: Add New Routine -->
+<div class="fixed bottom-28 right-6 z-40">
+<button class="cta-gradient w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-xl active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined font-bold text-3xl">add</span>
+</button>
+</div>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-[#f2f4f8]/50 dark:border-slate-800/50 shadow-[0px_-8px_24px_rgba(24,28,31,0.06)]">
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-4 py-1.5 hover:text-[#2457D6] dark:hover:text-blue-300" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="dashboard">dashboard</span>
+<span class="font-['Inter'] font-medium text-[10px] uppercase tracking-wider">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-4 py-1.5 hover:text-[#2457D6] dark:hover:text-blue-300" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="calendar_today">calendar_today</span>
+<span class="font-['Inter'] font-medium text-[10px] uppercase tracking-wider">Appointments</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-[#2457D6]/10 dark:bg-blue-500/20 text-[#2457D6] dark:text-blue-300 rounded-2xl px-4 py-1.5" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="event_repeat" style="font-variation-settings: 'FILL' 1;">event_repeat</span>
+<span class="font-['Inter'] font-medium text-[10px] uppercase tracking-wider">Routines</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-4 py-1.5 hover:text-[#2457D6] dark:hover:text-blue-300" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="settings">settings</span>
+<span class="font-['Inter'] font-medium text-[10px] uppercase tracking-wider">Settings</span>
+</a>
+</nav>
+</body></html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>My Notes | Mentora Patient Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-high": "#e6e8ec",
+                        "surface-container-low": "#f2f4f8",
+                        "surface-tint": "#1f54d3",
+                        "primary": "#003fb3",
+                        "on-tertiary-fixed-variant": "#7e2c00",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2d3134",
+                        "background": "#f7f9fd",
+                        "on-surface": "#181c1f",
+                        "on-secondary-fixed": "#051847",
+                        "tertiary-fixed-dim": "#ffb597",
+                        "primary-fixed-dim": "#b5c4ff",
+                        "error-container": "#ffdad6",
+                        "outline-variant": "#c3c5d7",
+                        "secondary-container": "#b6c4fe",
+                        "inverse-primary": "#b5c4ff",
+                        "surface-container-highest": "#e0e3e6",
+                        "on-tertiary-container": "#ffd5c5",
+                        "surface-container": "#eceef2",
+                        "on-background": "#181c1f",
+                        "inverse-on-surface": "#eff1f5",
+                        "on-primary-container": "#d5dcff",
+                        "surface": "#f7f9fd",
+                        "on-primary-fixed-variant": "#003cad",
+                        "on-secondary-fixed-variant": "#354475",
+                        "on-secondary-container": "#415082",
+                        "secondary-fixed": "#dce1ff",
+                        "error": "#ba1a1a",
+                        "primary-container": "#2457d6",
+                        "on-surface-variant": "#434654",
+                        "on-primary-fixed": "#00164d",
+                        "primary-fixed": "#dce1ff",
+                        "surface-bright": "#f7f9fd",
+                        "on-secondary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "tertiary": "#832f00",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed": "#360f00",
+                        "tertiary-fixed": "#ffdbcd",
+                        "tertiary-container": "#aa3f00",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#e0e3e6",
+                        "secondary-fixed-dim": "#b6c4fe",
+                        "secondary": "#4d5c8f",
+                        "surface-dim": "#d8dade",
+                        "outline": "#747686",
+                        "on-tertiary": "#ffffff"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="w-full sticky top-0 z-50 bg-[#f7f9fd] dark:bg-slate-900">
+<div class="flex items-center justify-between px-6 h-16 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-xl hover:bg-[#f2f4f8] transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-[#2457D6]">menu</span>
+</button>
+<h1 class="font-['Manrope'] font-bold text-2xl tracking-tight text-[#2457D6]">My Notes</h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex items-center gap-6 mr-6">
+<a class="text-[#2457D6] font-bold transition-colors" href="#">Notes</a>
+<a class="text-slate-500 hover:text-[#2457D6] transition-colors" href="#">Dashboard</a>
+<a class="text-slate-500 hover:text-[#2457D6] transition-colors" href="#">Doctors</a>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden border-2 border-primary-container/20">
+<img alt="Doctor Profile" class="w-full h-full object-cover" data-alt="Professional portrait of a healthcare provider in a clean clinical setting with soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCo8Vv1-yKSYkeRNWemPVm6EDeF2pQUZhWQTs3vuYrU594rYZ5qwaJNqjEJfc31LfHnZduiJnu03eQS0qgKrgA6Dmz2LVWGSX_2MeufVzzMfNuAVhjmOl2un__plnqg6kmeWfVtn061NyOZ0ZL2141B7163tY_T8tryJqhRUqCv4ZnVptHvM1IUpT2NZMvINdaQOToQyR-Q3kDq9i21cCjEZ4WiFI3BZyditQEJvaaxkj24U1csiRqcNTUv9j1HvTPAsuwpFaTokHs"/>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-4xl mx-auto px-4 pt-8">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+<div>
+<p class="text-sm font-semibold uppercase tracking-widest text-primary mb-2">Clinical Journal</p>
+<h2 class="text-4xl font-extrabold text-on-surface tracking-tight">Personal Records</h2>
+<p class="text-on-surface-variant mt-2 max-w-md">Manage your clinical observations and control which healthcare providers can access your data.</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="relative">
+<button class="flex items-center gap-2 px-5 py-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl font-semibold text-on-surface shadow-sm hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined text-xl">filter_list</span>
+<span>Filter</span>
+</button>
+</div>
+<button class="flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-primary to-primary-container text-white rounded-xl font-bold shadow-lg shadow-primary/20 active:scale-95 transition-all">
+<span class="material-symbols-outlined">add</span>
+<span>New Note</span>
+</button>
+</div>
+</div>
+<!-- Bulk Action Bar (Contextual) -->
+<div class="mb-6 p-4 bg-primary-container/5 rounded-2xl border border-primary/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center w-6 h-6 border-2 border-primary rounded-md bg-white">
+<span class="material-symbols-outlined text-primary text-sm font-bold">check</span>
+</div>
+<span class="font-semibold text-primary">2 notes selected</span>
+</div>
+<div class="flex flex-wrap items-center gap-3">
+<div class="relative group">
+<select class="appearance-none pl-4 pr-10 py-2 bg-white border border-outline-variant rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary focus:border-primary outline-none cursor-pointer">
+<option>Choose Doctor...</option>
+<option>Dr. Aris Thorne</option>
+<option>Dr. Elena Vance</option>
+<option>Dr. Marcus Holloway</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+<button class="px-4 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-primary-container transition-colors">
+                    Share
+                </button>
+<button class="px-4 py-2 bg-error-container text-on-error-container text-sm font-bold rounded-lg hover:bg-error/10 transition-colors">
+                    Revoke Access
+                </button>
+</div>
+</div>
+<!-- Notes Stack -->
+<div class="space-y-4">
+<!-- Note Card 1: Shared Active -->
+<div class="group bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-transparent hover:border-primary/20 transition-all">
+<div class="flex items-start gap-4">
+<div class="mt-1">
+<input checked="" class="w-6 h-6 rounded-lg border-outline-variant text-primary focus:ring-primary/20 transition-all cursor-pointer" type="checkbox"/>
+</div>
+<div class="flex-1">
+<div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+<div class="flex items-center gap-3">
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                                    Shared - Active
+                                </span>
+<span class="text-on-surface-variant text-sm font-medium">Oct 24, 2023</span>
+</div>
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<h3 class="text-xl font-bold text-on-surface mb-2">Morning Blood Glucose Levels</h3>
+<p class="text-on-surface-variant leading-relaxed mb-6">Observed consistent readings between 95-105 mg/dL over the last 7 days. Feeling significantly less fatigued after breakfast adjustments.</p>
+<!-- Audit Section (Expanded State) -->
+<div class="bg-surface-container-low/50 rounded-xl p-4">
+<div class="flex items-center justify-between mb-3">
+<h4 class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Access History</h4>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">history</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div>
+<p class="text-[10px] uppercase font-bold text-outline mb-1">Doctor</p>
+<p class="text-sm font-semibold text-on-surface">Dr. Aris Thorne</p>
+</div>
+<div>
+<p class="text-[10px] uppercase font-bold text-outline mb-1">Shared On</p>
+<p class="text-sm font-semibold text-on-surface">Oct 25, 2023 • 09:12 AM</p>
+</div>
+<div>
+<p class="text-[10px] uppercase font-bold text-outline mb-1">Status</p>
+<p class="text-sm font-semibold text-primary">Currently Viewing</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Note Card 2: Private -->
+<div class="group bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-transparent hover:border-primary/20 transition-all">
+<div class="flex items-start gap-4">
+<div class="mt-1">
+<input class="w-6 h-6 rounded-lg border-outline-variant text-primary focus:ring-primary/20 transition-all cursor-pointer" type="checkbox"/>
+</div>
+<div class="flex-1">
+<div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+<div class="flex items-center gap-3">
+<span class="bg-surface-container-high text-on-surface-variant px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm">lock</span>
+                                    Private
+                                </span>
+<span class="text-on-surface-variant text-sm font-medium">Oct 22, 2023</span>
+</div>
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<h3 class="text-xl font-bold text-on-surface mb-2">Medication Side Effects Journal</h3>
+<p class="text-on-surface-variant leading-relaxed">Personal thoughts on the new prescription. Slight dizziness noted in the evenings, but overall manageable. To be discussed at next check-in.</p>
+</div>
+</div>
+</div>
+<!-- Note Card 3: Shared Revoked -->
+<div class="group bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-transparent hover:border-primary/20 transition-all opacity-80">
+<div class="flex items-start gap-4">
+<div class="mt-1">
+<input class="w-6 h-6 rounded-lg border-outline-variant text-primary focus:ring-primary/20 transition-all cursor-pointer" type="checkbox"/>
+</div>
+<div class="flex-1">
+<div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+<div class="flex items-center gap-3">
+<span class="bg-error-container/40 text-error px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm">block</span>
+                                    Shared - Revoked
+                                </span>
+<span class="text-on-surface-variant text-sm font-medium">Sep 15, 2023</span>
+</div>
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<h3 class="text-xl font-bold text-on-surface mb-2">Initial Symptom Tracking</h3>
+<p class="text-on-surface-variant leading-relaxed mb-6">Archive of symptoms from early September. This data is no longer relevant for current treatment plan.</p>
+<div class="bg-surface-container-low/50 rounded-xl p-4">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div>
+<p class="text-[10px] uppercase font-bold text-outline mb-1">Doctor</p>
+<p class="text-sm font-semibold text-on-surface">Dr. Elena Vance</p>
+</div>
+<div>
+<p class="text-[10px] uppercase font-bold text-outline mb-1">Revoked On</p>
+<p class="text-sm font-semibold text-error">Oct 01, 2023 • 04:45 PM</p>
+</div>
+<div>
+<p class="text-[10px] uppercase font-bold text-outline mb-1">Visibility</p>
+<p class="text-sm font-semibold text-on-surface">No longer accessible</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Confirmation Modal (Overlaid) -->
+<div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-on-surface/40 backdrop-blur-sm">
+<div class="bg-surface-container-lowest w-full max-w-md rounded-2xl shadow-2xl p-8 border border-outline-variant/20">
+<div class="w-16 h-16 bg-error-container rounded-full flex items-center justify-center mb-6 mx-auto">
+<span class="material-symbols-outlined text-error text-3xl">warning</span>
+</div>
+<h3 class="text-2xl font-bold text-center text-on-surface mb-2">Revoke Access?</h3>
+<p class="text-center text-on-surface-variant mb-8 leading-relaxed">
+                This action will immediately remove Dr. Aris Thorne's ability to view these notes. You can always share them again later.
+            </p>
+<div class="flex flex-col gap-3">
+<button class="w-full py-3.5 bg-error text-white font-bold rounded-xl hover:bg-error/90 transition-all active:scale-95">
+                    Yes, Revoke Access
+                </button>
+<button class="w-full py-3.5 bg-surface-container-low text-on-surface font-bold rounded-xl hover:bg-surface-container-high transition-all">
+                    Cancel
+                </button>
+</div>
+</div>
+</div>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-[#f2f4f8]/50 dark:border-slate-800/50 shadow-[0px_-4px_12px_rgba(24,28,31,0.04)] px-4 pb-4 pt-2 flex justify-around items-center">
+<a class="flex flex-col items-center justify-center text-slate-400 hover:text-[#2457D6] transition-transform active:scale-90" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-['Manrope'] text-[11px] font-semibold uppercase tracking-wider">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#2457D6] bg-[#2457D6]/5 rounded-xl px-4 py-1 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-['Manrope'] text-[11px] font-semibold uppercase tracking-wider">Notes</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 hover:text-[#2457D6] transition-transform active:scale-90" href="#">
+<span class="material-symbols-outlined">medical_services</span>
+<span class="font-['Manrope'] text-[11px] font-semibold uppercase tracking-wider">Doctors</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 hover:text-[#2457D6] transition-transform active:scale-90" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-['Manrope'] text-[11px] font-semibold uppercase tracking-wider">Profile</span>
+</a>
+</nav>
+<!-- FAB (Contextual) -->
+<button class="fixed bottom-24 right-6 md:bottom-8 md:right-8 w-16 h-16 bg-gradient-to-br from-primary to-primary-container text-white rounded-2xl shadow-xl shadow-primary/30 flex items-center justify-center active:scale-90 transition-all group">
+<span class="material-symbols-outlined text-3xl">add</span>
+<span class="absolute right-full mr-4 bg-on-surface text-white px-3 py-1.5 rounded-lg text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Create Note</span>
+</button>
+</body></html>

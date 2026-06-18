@@ -1,0 +1,494 @@
+@model PsikologProje_Void.ViewModels.CreateAppointmentViewModel
+@using PsikologProje_Void.Models
+@inject IConfiguration Configuration
+@{
+    var specialties = ViewBag.Specialties as List<Specialty> ?? new List<Specialty>();
+    var linkedPatients = ViewBag.TargetPatients as List<PsikologProje_Void.ViewModels.ClinicalNotePatientOptionViewModel> ?? new List<PsikologProje_Void.ViewModels.ClinicalNotePatientOptionViewModel>();
+    var mapsApiKey = Configuration["GoogleMaps:ApiKey"];
+    if (string.IsNullOrWhiteSpace(mapsApiKey))
+    {
+        mapsApiKey = Configuration["GoogleMaps__ApiKey"];
+    }
+    if (string.IsNullOrWhiteSpace(mapsApiKey))
+    {
+        mapsApiKey = Configuration["GOOGLE_MAPS_API_KEY"];
+    }
+    if (string.IsNullOrWhiteSpace(mapsApiKey))
+    {
+        mapsApiKey = Configuration["GoogleMapsApiKey"];
+    }
+    var hasMapsApiKey = !string.IsNullOrWhiteSpace(mapsApiKey);
+}
+
+<div class="auth-header">
+    <i class="fas fa-calendar-plus auth-icon"></i>
+    <h2>Yeni Randevu Oluştur</h2>
+    <p>Müsaitlik durumunuzu belirterek yeni bir randevu aralığı oluşturun.</p>
+</div>
+
+<form asp-controller="Appointment" asp-action="Create" method="post" class="auth-form">
+    <div asp-validation-summary="All" class="text-danger validation-summary"></div>
+
+    <div class="row">
+        <div class="col-md-6 form-floating-group">
+            <input asp-for="StartTime" class="form-control" id="startTime" type="datetime-local" />
+            <label asp-for="StartTime"></label>
+            <span asp-validation-for="StartTime" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 form-floating-group">
+            <input asp-for="DurationInMinutes" type="number" class="form-control" id="duration" placeholder="Süre (dk)" />
+            <label asp-for="DurationInMinutes"></label>
+            <span asp-validation-for="DurationInMinutes" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="form-floating-group">
+        <input asp-for="EndTime" class="form-control" id="endTime" type="datetime-local" />
+        <label asp-for="EndTime"></label>
+        <span asp-validation-for="EndTime" class="text-danger"></span>
+    </div>
+
+    <p class="text-center text-muted small">Bitiş saatini veya süreyi girdiğinizde diğeri otomatik hesaplanır.</p>
+
+    <hr style="border-color: var(--border-color); margin: 1.5rem 0;" />
+
+    <div class="form-group mb-3">
+        <label class="form-label">Randevu Türü (en az birini seçin)</label>
+        <div class="d-flex gap-4">
+            <div class="form-check form-switch">
+                <input asp-for="IsOnline" class="form-check-input" type="checkbox" role="switch">
+                <label class="form-check-label" asp-for="IsOnline">Çevrim içi</label>
+            </div>
+            <div class="form-check form-switch">
+                <input asp-for="IsInPerson" class="form-check-input" type="checkbox" role="switch">
+                <label class="form-check-label" asp-for="IsInPerson">Yüz Yüze</label>
+            </div>
+        </div>
+        <span asp-validation-for="IsOnline" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating-group" id="onlineMeetingLinkGroup">
+        <input asp-for="MeetingLink" class="form-control" placeholder="https://meet.google.com/..." />
+        <label asp-for="MeetingLink"></label>
+        <span asp-validation-for="MeetingLink" class="text-danger"></span>
+        <div class="small text-muted mt-1">Bu link sadece randevusu onaylanan hastaya gösterilir.</div>
+    </div>
+
+    <div class="form-check form-switch mb-3">
+        <input asp-for="IsPrivateOffer" class="form-check-input" type="checkbox" id="isPrivateOfferSwitch" />
+        <label asp-for="IsPrivateOffer" class="form-check-label">Hastaya özel randevu teklifi</label>
+    </div>
+
+    <div id="privateOfferFields" style="display:none;">
+        <div class="form-group mb-3">
+            <label asp-for="TargetPatientId" class="form-label">Hedef hasta</label>
+            <select asp-for="TargetPatientId" class="form-control" id="targetPatientSelect">
+                <option value="">Hasta seçin</option>
+                @foreach (var patient in linkedPatients)
+                {
+                    <option value="@patient.Id">@patient.Name</option>
+                }
+            </select>
+            <span asp-validation-for="TargetPatientId" class="text-danger"></span>
+
+            @if (linkedPatients.Any())
+            {
+                <div class="mt-2 d-flex flex-wrap gap-2">
+                    @foreach (var patient in linkedPatients)
+                    {
+                        var photo = string.IsNullOrWhiteSpace(patient.ProfilePhotoPath) ? "/images/default-avatar.png" : patient.ProfilePhotoPath;
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary select-target-patient-btn d-inline-flex align-items-center gap-2"
+                                data-target-id="@patient.Id">
+                            <img src="@photo" alt="@patient.Name" class="inline-profile-avatar" style="width:24px;height:24px;" />
+                            <span>@patient.Name</span>
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="form-floating-group">
+            <textarea asp-for="OfferNoteFromDoctor" class="form-control" placeholder="Hastaya iletilecek not" style="height:80px"></textarea>
+            <label asp-for="OfferNoteFromDoctor"></label>
+            <span asp-validation-for="OfferNoteFromDoctor" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div id="inPersonLocationSection">
+        <div class="form-group mb-3">
+            <label asp-for="InPersonLocationMode" class="form-label">Yüz yüze konum kaynağı</label>
+            <select asp-for="InPersonLocationMode" class="form-control" id="appointmentLocationMode">
+                <option value="profile">Profil konumu</option>
+                <option value="device">Mevcut cihaz konumu</option>
+                <option value="manual">Manuel konum girişi</option>
+            </select>
+        </div>
+
+        <div id="appointmentManualLocationFields" class="row">
+            <input asp-for="InPersonLatitude" type="hidden" id="appointmentLocationLatitude" />
+            <input asp-for="InPersonLongitude" type="hidden" id="appointmentLocationLongitude" />
+
+            <div class="col-12 mb-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="appointmentUseDeviceLocationBtn">
+                    Cihazdan konum al
+                </button>
+            </div>
+
+            <div class="col-12 mb-2">
+                <input id="appointmentManualLocationDisplay" class="form-control" readonly placeholder="Manuel seçilen konum" />
+            </div>
+
+            @if (hasMapsApiKey)
+            {
+                <div class="col-12 mb-2">
+                    <input id="appointmentManualLocationSearch" class="form-control mb-2" type="text" placeholder="Adres ara..." />
+                    <div id="appointmentManualLocationMap" class="modal-map"></div>
+                </div>
+            }
+            else
+            {
+                <div class="col-12">
+                    <div class="alert alert-warning mb-2">Manuel konum seçimi için Google Maps API anahtarı gerekli.</div>
+                </div>
+            }
+
+            <div class="col-12">
+                <span asp-validation-for="InPersonLatitude" class="text-danger"></span>
+                <span asp-validation-for="InPersonLongitude" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-floating-group location-note-wrapper">
+            <input asp-for="LocationNote"
+                   class="form-control"
+                   placeholder="Açık adres / konum notu"
+                   data-location-note-history="mentora-location-note-history" />
+            <label asp-for="LocationNote"></label>
+            <span asp-validation-for="LocationNote" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 form-floating-group">
+            <input asp-for="MinPrice" class="form-control" placeholder="Minimum Fiyat (Opsiyonel)" />
+            <label asp-for="MinPrice"></label>
+            <span asp-validation-for="MinPrice" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 form-floating-group">
+            <input asp-for="MaxPrice" class="form-control" placeholder="Maksimum Fiyat (Opsiyonel)" />
+            <label asp-for="MaxPrice"></label>
+            <span asp-validation-for="MaxPrice" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="SelectedSpecialtyIds" class="form-label">İlgili Uzmanlık Alanları (isteğe bağlı)</label>
+        <div class="row g-2">
+            @foreach (var specialty in specialties)
+            {
+                var isSelected = Model.SelectedSpecialtyIds?.Contains(specialty.Id) == true;
+                <div class="col-md-6">
+                    <label class="form-check border rounded px-2 py-2 w-100 d-flex align-items-center gap-2">
+                        <input type="checkbox"
+                               class="form-check-input"
+                               name="SelectedSpecialtyIds"
+                               value="@specialty.Id"
+                               @(isSelected ? "checked" : null) />
+                        <span>@specialty.Name</span>
+                    </label>
+                </div>
+            }
+        </div>
+        <span asp-validation-for="SelectedSpecialtyIds" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating-group">
+        <textarea asp-for="Notes" class="form-control" placeholder="Randevu Notu (Opsiyonel)" style="height: 100px"></textarea>
+        <label asp-for="Notes"></label>
+        <span asp-validation-for="Notes" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-auth">Randevuyu Oluştur</button>
+</form>
+
+@if (hasMapsApiKey)
+{
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=@mapsApiKey&libraries=places&loading=async"></script>
+}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const startTimeInput = document.getElementById('startTime');
+        const endTimeInput = document.getElementById('endTime');
+        const durationInput = document.getElementById('duration');
+        const onlineSwitch = document.getElementById('IsOnline');
+        const onlineMeetingLinkGroup = document.getElementById('onlineMeetingLinkGroup');
+        const inPersonSwitch = document.getElementById('IsInPerson');
+        const isPrivateOfferSwitch = document.getElementById('isPrivateOfferSwitch');
+        const privateOfferFields = document.getElementById('privateOfferFields');
+        const targetPatientSelect = document.getElementById('targetPatientSelect');
+        const locationModeSelect = document.getElementById('appointmentLocationMode');
+        const inPersonLocationSection = document.getElementById('inPersonLocationSection');
+        const manualLocationPanel = document.getElementById('appointmentManualLocationFields');
+        const deviceLocationBtn = document.getElementById('appointmentUseDeviceLocationBtn');
+        const latitudeInput = document.getElementById('appointmentLocationLatitude');
+        const longitudeInput = document.getElementById('appointmentLocationLongitude');
+        const manualDisplayInput = document.getElementById('appointmentManualLocationDisplay');
+        const manualMapElement = document.getElementById('appointmentManualLocationMap');
+        const manualSearchInput = document.getElementById('appointmentManualLocationSearch');
+
+        let manualMap = null;
+        let manualMarker = null;
+        let manualAutocomplete = null;
+
+        if (!startTimeInput || !endTimeInput || !durationInput) {
+            return;
+        }
+
+        function toLocalISOString(date) {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+
+        function calculateEndTime() {
+            if (startTimeInput.value && durationInput.value) {
+                const startDate = new Date(startTimeInput.value);
+                const duration = parseInt(durationInput.value, 10);
+                if (!isNaN(duration) && duration > 0) {
+                    startDate.setMinutes(startDate.getMinutes() + duration);
+                    endTimeInput.value = toLocalISOString(startDate);
+                }
+            }
+        }
+
+        function calculateDuration() {
+            if (startTimeInput.value && endTimeInput.value) {
+                const startDate = new Date(startTimeInput.value);
+                const endDate = new Date(endTimeInput.value);
+                if (endDate > startDate) {
+                    const diffMs = endDate - startDate;
+                    const diffMins = Math.round(diffMs / 60000);
+                    durationInput.value = diffMins;
+                } else {
+                    durationInput.value = '';
+                }
+            }
+        }
+
+        function updateManualLocation(lat, lon) {
+            if (latitudeInput && longitudeInput) {
+                latitudeInput.value = Number(lat).toFixed(6);
+                longitudeInput.value = Number(lon).toFixed(6);
+            }
+
+            if (manualDisplayInput) {
+                manualDisplayInput.value = `${Number(lat).toFixed(6)}, ${Number(lon).toFixed(6)}`;
+            }
+        }
+
+        function whenGoogleMapsReady(callback) {
+            if (window.google && window.google.maps) {
+                callback();
+                return;
+            }
+
+            const startedAt = Date.now();
+            const timer = window.setInterval(function() {
+                if (window.google && window.google.maps) {
+                    window.clearInterval(timer);
+                    callback();
+                    return;
+                }
+
+                if (Date.now() - startedAt > 10000) {
+                    window.clearInterval(timer);
+                }
+            }, 100);
+        }
+
+        function ensureManualMap() {
+            if (!manualMapElement) {
+                return;
+            }
+
+            whenGoogleMapsReady(function() {
+                const initialLat = parseFloat(latitudeInput?.value || '');
+                const initialLon = parseFloat(longitudeInput?.value || '');
+                const hasCoordinates = Number.isFinite(initialLat) && Number.isFinite(initialLon);
+                const initial = hasCoordinates ? { lat: initialLat, lng: initialLon } : { lat: 39.925533, lng: 32.866287 };
+
+                if (!manualMap) {
+                    manualMap = new google.maps.Map(manualMapElement, {
+                        center: initial,
+                        zoom: hasCoordinates ? 12 : 6
+                    });
+
+                    manualMarker = new google.maps.Marker({
+                        position: initial,
+                        map: manualMap,
+                        draggable: true
+                    });
+
+                    manualMarker.addListener('dragend', function(event) {
+                        updateManualLocation(event.latLng.lat(), event.latLng.lng());
+                    });
+
+                    manualMap.addListener('click', function(event) {
+                        manualMarker.setPosition(event.latLng);
+                        updateManualLocation(event.latLng.lat(), event.latLng.lng());
+                    });
+
+                    if (manualSearchInput) {
+                        manualAutocomplete = new google.maps.places.Autocomplete(manualSearchInput, {
+                            fields: ['geometry', 'name']
+                        });
+                        manualAutocomplete.addListener('place_changed', function() {
+                            const place = manualAutocomplete.getPlace();
+                            if (!place || !place.geometry || !place.geometry.location) {
+                                return;
+                            }
+
+                            manualMarker.setPosition(place.geometry.location);
+                            updateManualLocation(place.geometry.location.lat(), place.geometry.location.lng());
+
+                            if (place.geometry.viewport) {
+                                manualMap.fitBounds(place.geometry.viewport);
+                            } else {
+                                manualMap.panTo(place.geometry.location);
+                                manualMap.setZoom(14);
+                            }
+                        });
+                    }
+                } else {
+                    manualMap.panTo(initial);
+                    if (manualMarker) {
+                        manualMarker.setPosition(initial);
+                    }
+                }
+
+                window.setTimeout(function() {
+                    if (manualMap) {
+                        google.maps.event.trigger(manualMap, 'resize');
+                        manualMap.panTo(initial);
+                    }
+                }, 120);
+            });
+        }
+
+        function toggleInPersonLocationFields() {
+            if (!manualLocationPanel || !locationModeSelect || !inPersonSwitch || !inPersonLocationSection) {
+                return;
+            }
+
+            if (!inPersonSwitch.checked) {
+                inPersonLocationSection.style.display = 'none';
+                return;
+            }
+
+            inPersonLocationSection.style.display = '';
+            const mode = locationModeSelect.value || 'profile';
+            manualLocationPanel.style.display = mode === 'profile' ? 'none' : '';
+
+            if (mode === 'manual') {
+                ensureManualMap();
+            }
+        }
+
+        function toggleOnlineMeetingLink() {
+            if (!onlineSwitch || !onlineMeetingLinkGroup) {
+                return;
+            }
+
+            onlineMeetingLinkGroup.style.display = onlineSwitch.checked ? '' : 'none';
+        }
+
+        function togglePrivateOfferFields() {
+            if (!privateOfferFields || !isPrivateOfferSwitch) {
+                return;
+            }
+
+            privateOfferFields.style.display = isPrivateOfferSwitch.checked ? '' : 'none';
+            if (!isPrivateOfferSwitch.checked && targetPatientSelect) {
+                targetPatientSelect.value = '';
+            }
+        }
+
+        durationInput.addEventListener('input', function() {
+            if (this.value) {
+                endTimeInput.value = '';
+            }
+            calculateEndTime();
+        });
+
+        endTimeInput.addEventListener('input', function() {
+            if (this.value) {
+                durationInput.value = '';
+            }
+            calculateDuration();
+        });
+
+        startTimeInput.addEventListener('input', function() {
+            if (durationInput.value) {
+                calculateEndTime();
+            } else if (endTimeInput.value) {
+                calculateDuration();
+            }
+        });
+
+        inPersonSwitch?.addEventListener('change', toggleInPersonLocationFields);
+        onlineSwitch?.addEventListener('change', toggleOnlineMeetingLink);
+        locationModeSelect?.addEventListener('change', toggleInPersonLocationFields);
+        toggleInPersonLocationFields();
+        toggleOnlineMeetingLink();
+        isPrivateOfferSwitch?.addEventListener('change', togglePrivateOfferFields);
+        togglePrivateOfferFields();
+
+        deviceLocationBtn?.addEventListener('click', function() {
+            if (!navigator.geolocation) {
+                if (window.showMentoraToast) {
+                    window.showMentoraToast('Tarayıcı konum servisini desteklemiyor.', 'warning');
+                }
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(function(position) {
+                updateManualLocation(position.coords.latitude, position.coords.longitude);
+
+                if (locationModeSelect) {
+                    locationModeSelect.value = 'device';
+                }
+
+                toggleInPersonLocationFields();
+            }, function() {
+                if (window.showMentoraToast) {
+                    window.showMentoraToast('Cihaz konumu alınamadı.', 'warning');
+                }
+            });
+        });
+
+        const existingLat = parseFloat(latitudeInput?.value || '');
+        const existingLon = parseFloat(longitudeInput?.value || '');
+        if (Number.isFinite(existingLat) && Number.isFinite(existingLon) && manualDisplayInput) {
+            manualDisplayInput.value = `${existingLat.toFixed(6)}, ${existingLon.toFixed(6)}`;
+        }
+
+        document.querySelectorAll('.select-target-patient-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                if (!targetPatientSelect) {
+                    return;
+                }
+                const id = btn.getAttribute('data-target-id');
+                if (!id) {
+                    return;
+                }
+                targetPatientSelect.value = id;
+                targetPatientSelect.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+        });
+    });
+</script>

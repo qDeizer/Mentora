@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mentora Auto Routine Manager</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-bright": "#f7f9fd",
+              "primary-fixed": "#dce1ff",
+              "primary-container": "#2457d6",
+              "outline-variant": "#c3c5d7",
+              "primary-fixed-dim": "#b5c4ff",
+              "on-secondary-container": "#415082",
+              "on-background": "#181c1f",
+              "on-primary": "#ffffff",
+              "outline": "#747686",
+              "on-tertiary-fixed": "#360f00",
+              "on-error": "#ffffff",
+              "inverse-surface": "#2d3134",
+              "surface-dim": "#d8dade",
+              "secondary-container": "#b6c4fe",
+              "primary": "#003fb3",
+              "error-container": "#ffdad6",
+              "tertiary": "#832f00",
+              "on-surface-variant": "#434654",
+              "on-error-container": "#93000a",
+              "surface": "#f7f9fd",
+              "inverse-on-surface": "#eff1f5",
+              "error": "#ba1a1a",
+              "on-primary-container": "#d5dcff",
+              "background": "#f7f9fd",
+              "tertiary-fixed": "#ffdbcd",
+              "secondary-fixed-dim": "#b6c4fe",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-high": "#e6e8ec",
+              "secondary-fixed": "#dce1ff",
+              "on-secondary-fixed-variant": "#354475",
+              "secondary": "#4d5c8f",
+              "on-primary-fixed": "#00164d",
+              "inverse-primary": "#b5c4ff",
+              "tertiary-fixed-dim": "#ffb597",
+              "surface-variant": "#e0e3e6",
+              "on-secondary-fixed": "#051847",
+              "on-tertiary": "#ffffff",
+              "on-tertiary-container": "#ffd5c5",
+              "on-tertiary-fixed-variant": "#7e2c00",
+              "tertiary-container": "#aa3f00",
+              "surface-tint": "#1f54d3",
+              "on-surface": "#181c1f",
+              "surface-container-highest": "#e0e3e6",
+              "on-secondary": "#ffffff",
+              "on-primary-fixed-variant": "#003cad",
+              "surface-container": "#eceef2",
+              "surface-container-low": "#f2f4f8"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+      .primary-gradient {
+        background: linear-gradient(135deg, #003fb3 0%, #2457d6 100%);
+      }
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: #e0e3e6; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body min-h-screen selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Top Navigation Shell -->
+<header class="bg-[#f7f9fd] dark:bg-slate-950 flex justify-between items-center w-full px-6 h-16 sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#2457D6] cursor-pointer hover:bg-[#f2f4f8] p-2 rounded-full transition-colors" data-icon="menu">menu</span>
+<h1 class="font-['Manrope'] font-bold text-2xl tracking-tight text-[#2457D6]">Ether Clinical</h1>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-[#2457D6] dark:text-blue-300 font-bold font-['Inter'] text-sm tracking-wide transition-all" href="#">Dashboard</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium font-['Inter'] text-sm tracking-wide hover:text-[#2457D6] transition-colors" href="#">Appointments</a>
+<a class="text-[#2457D6] dark:text-blue-300 font-bold font-['Inter'] text-sm tracking-wide transition-all" href="#">Routines</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium font-['Inter'] text-sm tracking-wide hover:text-[#2457D6] transition-colors" href="#">Settings</a>
+</nav>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-xs font-bold text-on-surface">Dr. Julian Vance</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-tighter">Clinical Lead</p>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container/20">
+<img alt="physician profile picture" data-alt="professional portrait of a male physician with short hair and glasses wearing a white clinical coat in high-key studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7nwGFb9u_eGOFmKQDxnhx-21LFd981qz0Mb-el4mseMApyjQxo2ZVIVFZrXFlZdE7cY24_dH2AKL616SjOtK6GiT0zOhUOkaLjzm07FtJSVOAFAsJfT-sXg3FzF3kljT8yS-TpMll-ubRCLSgfT9PKYWIE4kG7XKWjlbwFeZ_71DMaKR7Wj5hxTPyCfU4fWbSOrifWo7MWm35bZ57BnZE7gI9ki_u3LUHtpn62m4d9vfcTSE2CJe74rihY921ACTaXhLEXW4Ey4A"/>
+</div>
+</div>
+</header>
+<main class="max-w-[1600px] mx-auto p-6 lg:p-10 flex flex-col lg:flex-row gap-8">
+<!-- Left Column: Routine List (2/3) -->
+<section class="lg:w-2/3 space-y-8">
+<header>
+<h2 class="font-headline text-3xl font-extrabold tracking-tight text-on-background mb-2">Automated Routines</h2>
+<p class="text-on-surface-variant font-medium">Manage recurring clinical schedules and auto-admission protocols.</p>
+</header>
+<!-- Quick Pause Panel (Specialty Component) -->
+<div class="bg-surface-container-low p-6 rounded-xl flex flex-wrap items-center gap-6">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-container" data-icon="timer_pause">timer_pause</span>
+<div>
+<p class="text-sm font-bold leading-none">Global Pause Presets</p>
+<p class="text-xs text-on-surface-variant">Temporarily disable all active automations</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-2 rounded-lg bg-surface-container-lowest text-sm font-semibold text-primary hover:bg-primary hover:text-white transition-all border border-outline-variant/30">1 Hour</button>
+<button class="px-4 py-2 rounded-lg bg-surface-container-lowest text-sm font-semibold text-primary hover:bg-primary hover:text-white transition-all border border-outline-variant/30">Until Tomorrow</button>
+<button class="px-4 py-2 rounded-lg bg-primary-container text-white text-sm font-semibold shadow-md flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="calendar_month">calendar_month</span>
+                        Pause Until...
+                    </button>
+</div>
+</div>
+<!-- Routine Table Surface -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/50">
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Routine Name</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-center">Status</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Schedule</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container">
+<!-- Table Row 1 -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-6 py-5">
+<div class="font-bold text-on-surface">Post-Op Cardiology Follow-up</div>
+<div class="text-xs text-on-surface-variant">In-Person • Cardiology Specialization</div>
+</td>
+<td class="px-6 py-5 text-center">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container/20 text-primary text-xs font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span> Active
+                                </span>
+</td>
+<td class="px-6 py-5">
+<div class="text-sm font-medium">M, W, F</div>
+<div class="text-xs text-on-surface-variant">09:00 AM - 45 Min</div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
+<button class="p-2 text-slate-400 hover:text-error transition-colors"><span class="material-symbols-outlined" data-icon="delete">delete</span></button>
+</td>
+</tr>
+<!-- Table Row 2 -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-6 py-5">
+<div class="font-bold text-on-surface">Weekly Wellness Check</div>
+<div class="text-xs text-on-surface-variant">Online • General Practice</div>
+</td>
+<td class="px-6 py-5 text-center">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high text-slate-500 text-xs font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Paused
+                                </span>
+</td>
+<td class="px-6 py-5">
+<div class="text-sm font-medium">Tuesday</div>
+<div class="text-xs text-on-surface-variant">02:00 PM - 30 Min</div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
+<button class="p-2 text-slate-400 hover:text-error transition-colors"><span class="material-symbols-outlined" data-icon="delete">delete</span></button>
+</td>
+</tr>
+<!-- Table Row 3 -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-6 py-5">
+<div class="font-bold text-on-surface">Diagnostic Review A</div>
+<div class="text-xs text-on-surface-variant">Online • Laboratory Sciences</div>
+</td>
+<td class="px-6 py-5 text-center">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container/20 text-primary text-xs font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span> Active
+                                </span>
+</td>
+<td class="px-6 py-5">
+<div class="text-sm font-medium">Daily (M-F)</div>
+<div class="text-xs text-on-surface-variant">08:00 AM - 15 Min</div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
+<button class="p-2 text-slate-400 hover:text-error transition-colors"><span class="material-symbols-outlined" data-icon="delete">delete</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="p-4 bg-surface-container-low/20 text-center">
+<button class="text-sm font-bold text-primary hover:underline transition-all">View all 12 routines</button>
+</div>
+</div>
+</section>
+<!-- Right Column: Form (1/3) -->
+<aside class="lg:w-1/3">
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0px_8px_24px_rgba(24,28,31,0.06)] sticky top-24">
+<div class="flex items-center justify-between mb-8">
+<h3 class="font-headline text-xl font-bold text-on-surface">Configure Routine</h3>
+<span class="text-[10px] font-bold bg-primary-fixed text-on-primary-fixed px-2 py-0.5 rounded uppercase tracking-tighter">New Entry</span>
+</div>
+<form class="space-y-6">
+<!-- Routine Name -->
+<div class="space-y-1">
+<label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Routine Name</label>
+<input class="w-full bg-surface-container-highest/50 border-0 border-b-2 border-outline-variant/30 focus:border-primary focus:ring-0 rounded-t-lg px-4 py-3 transition-all placeholder:text-slate-400" placeholder="e.g. Chronic Pain Management" type="text"/>
+<p class="text-[10px] text-slate-400">A clear, descriptive title for clinical logs.</p>
+</div>
+<!-- Weekdays -->
+<div class="space-y-1">
+<label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Recurring Days</label>
+<div class="flex justify-between mt-2">
+<label class="flex items-center justify-center w-8 h-8 rounded-full border border-outline-variant/50 text-xs font-bold cursor-pointer hover:bg-surface-container transition-colors has-[:checked]:bg-primary-container has-[:checked]:text-white has-[:checked]:border-primary-container">
+<input class="hidden" type="checkbox"/> M
+                            </label>
+<label class="flex items-center justify-center w-8 h-8 rounded-full border border-outline-variant/50 text-xs font-bold cursor-pointer hover:bg-surface-container transition-colors has-[:checked]:bg-primary-container has-[:checked]:text-white has-[:checked]:border-primary-container">
+<input checked="" class="hidden" type="checkbox"/> T
+                            </label>
+<label class="flex items-center justify-center w-8 h-8 rounded-full border border-outline-variant/50 text-xs font-bold cursor-pointer hover:bg-surface-container transition-colors has-[:checked]:bg-primary-container has-[:checked]:text-white has-[:checked]:border-primary-container">
+<input checked="" class="hidden" type="checkbox"/> W
+                            </label>
+<label class="flex items-center justify-center w-8 h-8 rounded-full border border-outline-variant/50 text-xs font-bold cursor-pointer hover:bg-surface-container transition-colors has-[:checked]:bg-primary-container has-[:checked]:text-white has-[:checked]:border-primary-container">
+<input class="hidden" type="checkbox"/> T
+                            </label>
+<label class="flex items-center justify-center w-8 h-8 rounded-full border border-outline-variant/50 text-xs font-bold cursor-pointer hover:bg-surface-container transition-colors has-[:checked]:bg-primary-container has-[:checked]:text-white has-[:checked]:border-primary-container">
+<input checked="" class="hidden" type="checkbox"/> F
+                            </label>
+<label class="flex items-center justify-center w-8 h-8 rounded-full border border-outline-variant/50 text-xs font-bold cursor-pointer hover:bg-surface-container transition-colors has-[:checked]:bg-primary-container has-[:checked]:text-white has-[:checked]:border-primary-container">
+<input class="hidden" type="checkbox"/> S
+                            </label>
+<label class="flex items-center justify-center w-8 h-8 rounded-full border border-outline-variant/50 text-xs font-bold cursor-pointer hover:bg-surface-container transition-colors has-[:checked]:bg-primary-container has-[:checked]:text-white has-[:checked]:border-primary-container">
+<input class="hidden" type="checkbox"/> S
+                            </label>
+</div>
+</div>
+<!-- Time & Duration -->
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-1">
+<label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Start Time</label>
+<input class="w-full bg-surface-container-highest/50 border-0 border-b-2 border-outline-variant/30 focus:border-primary focus:ring-0 rounded-t-lg px-4 py-3 transition-all" type="time" value="09:00"/>
+</div>
+<div class="space-y-1">
+<label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Duration</label>
+<select class="w-full bg-surface-container-highest/50 border-0 border-b-2 border-outline-variant/30 focus:border-primary focus:ring-0 rounded-t-lg px-4 py-3 transition-all">
+<option>15 Min</option>
+<option>30 Min</option>
+<option selected="">45 Min</option>
+<option>60 Min</option>
+</select>
+</div>
+</div>
+<!-- Toggle & Fee -->
+<div class="space-y-4 pt-2">
+<div class="flex items-center justify-between">
+<span class="text-sm font-bold text-on-surface">Online Session</span>
+<button class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none bg-primary-container" type="button">
+<span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200"></span>
+</button>
+</div>
+<div class="space-y-1">
+<label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Fee Range ($)</label>
+<div class="flex items-center gap-4">
+<input class="w-full bg-surface-container-highest/50 border-0 border-b-2 border-outline-variant/30 focus:border-primary focus:ring-0 rounded-t-lg px-3 py-2 text-sm" placeholder="Min" type="number"/>
+<input class="w-full bg-surface-container-highest/50 border-0 border-b-2 border-outline-variant/30 focus:border-primary focus:ring-0 rounded-t-lg px-3 py-2 text-sm" placeholder="Max" type="number"/>
+</div>
+</div>
+</div>
+<!-- Specialities Multiselect (Simulation) -->
+<div class="space-y-1">
+<label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Specialties</label>
+<div class="flex flex-wrap gap-2 mt-2">
+<span class="bg-primary-fixed/50 text-on-primary-fixed px-2 py-1 rounded text-[10px] font-bold flex items-center gap-1 uppercase">Cardiology <span class="material-symbols-outlined text-[12px] cursor-pointer" data-icon="close">close</span></span>
+<span class="bg-primary-fixed/50 text-on-primary-fixed px-2 py-1 rounded text-[10px] font-bold flex items-center gap-1 uppercase">Pediatrics <span class="material-symbols-outlined text-[12px] cursor-pointer" data-icon="close">close</span></span>
+<button class="bg-surface-container-high text-slate-600 px-2 py-1 rounded text-[10px] font-bold flex items-center gap-1 uppercase hover:bg-slate-300 transition-colors">Add +</button>
+</div>
+</div>
+<!-- Notes -->
+<div class="space-y-1">
+<label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Internal Notes</label>
+<textarea class="w-full bg-surface-container-highest/50 border-0 border-b-2 border-outline-variant/30 focus:border-primary focus:ring-0 rounded-t-lg px-4 py-3 transition-all placeholder:text-slate-400 text-sm" placeholder="Mention protocol variations..." rows="2"></textarea>
+</div>
+<div class="pt-4 flex gap-4">
+<button class="flex-1 px-6 py-4 rounded-xl font-headline font-bold text-white primary-gradient shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity">Save Routine</button>
+<button class="px-6 py-4 rounded-xl font-headline font-bold text-slate-500 bg-surface-container hover:bg-surface-container-high transition-colors">Discard</button>
+</div>
+</form>
+</div>
+</aside>
+</main>
+<!-- Bottom Navigation Shell (Mobile only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-[#f2f4f8]/50 dark:border-slate-800/50 shadow-[0px_-8px_24px_rgba(24,28,31,0.06)]">
+<a class="flex flex-col items-center justify-center text-slate-400 px-4 py-1.5 hover:text-[#2457D6] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-['Inter'] font-medium text-[10px] uppercase tracking-wider mt-1">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 px-4 py-1.5 hover:text-[#2457D6] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-['Inter'] font-medium text-[10px] uppercase tracking-wider mt-1">Apps</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-[#2457D6]/10 text-[#2457D6] rounded-2xl px-4 py-1.5 active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="event_repeat" style="font-variation-settings: 'FILL' 1;">event_repeat</span>
+<span class="font-['Inter'] font-medium text-[10px] uppercase tracking-wider mt-1">Routines</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 px-4 py-1.5 hover:text-[#2457D6] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-['Inter'] font-medium text-[10px] uppercase tracking-wider mt-1">Settings</span>
+</a>
+</nav>
+</body></html>

@@ -127,7 +127,7 @@ namespace PsikologProje_Void.Services
                         AuthorDoctorName = n.AuthorDoctor.FirstName + " " + n.AuthorDoctor.LastName,
                         SourceLabel = n.AuthorDoctorId == doctorId
                             ? "Sizin notunuz"
-                            : (n.Visibility == ClinicalNoteVisibility.Public ? "Public not" : "Paylasilan not"),
+                            : (n.Visibility == ClinicalNoteVisibility.Public ? "Açık not" : "Paylasilan not"),
                         SharedByPatientName = activeShare != null
                             ? activeShare.SharedByPatient.FirstName + " " + activeShare.SharedByPatient.LastName
                             : null,
@@ -342,9 +342,17 @@ namespace PsikologProje_Void.Services
                 .Where(n => n.PatientId == patientId)
                 .AsQueryable();
 
-            if (selectedVisibilities.Count > 0 && selectedVisibilities.Count < Enum.GetValues<ClinicalNoteVisibility>().Length)
+            // Varsayılan: hastalar gizli notları görmesin
+            if (selectedVisibilities.Count > 0)
             {
-                noteQuery = noteQuery.Where(n => selectedVisibilities.Contains(n.Visibility));
+                if (selectedVisibilities.Count < Enum.GetValues<ClinicalNoteVisibility>().Length)
+                {
+                    noteQuery = noteQuery.Where(n => selectedVisibilities.Contains(n.Visibility));
+                }
+            }
+            else
+            {
+                noteQuery = noteQuery.Where(n => n.Visibility != ClinicalNoteVisibility.Private);
             }
 
             if (selectedDoctorIds.Count > 0)

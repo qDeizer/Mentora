@@ -171,7 +171,7 @@
                            role="button"
                            data-bs-toggle="dropdown"
                            aria-expanded="false">
-                            <i class="fas fa-palette me-1"></i>Tema
+                            <i class="fas fa-palette"></i>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end p-3 appearance-dropdown" aria-labelledby="appearanceDropdown">
                             <label class="form-label small mb-1" for="themePreferenceSelect">Tema</label>
@@ -257,7 +257,7 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdownUser" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <img src="@(string.IsNullOrEmpty(currentUser.ProfilePhotoPath) ? "/images/default-avatar.png" : currentUser.ProfilePhotoPath)" class="navbar-profile-img" alt="Profil">
-                                <span class="navbar-user-name">@currentUser.FirstName @currentUser.LastName</span>
+                                
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end custom-dropdown" aria-labelledby="navbarDropdownUser">
                                 <li><h6 class="dropdown-header">@currentUser.Email</h6></li>

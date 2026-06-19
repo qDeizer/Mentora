@@ -58,6 +58,10 @@ try
     builder.Services.Configure<DetailedLoggingOptions>(builder.Configuration.GetSection(DetailedLoggingOptions.SectionName));
     builder.Services.AddScoped<MvcAuditActionFilter>();
 
+    // Varsayılan kültür Türkçe
+    System.Globalization.CultureInfo.DefaultThreadCurrentCulture = new System.Globalization.CultureInfo("tr-TR");
+    System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = new System.Globalization.CultureInfo("tr-TR");
+
     builder.Services.AddControllersWithViews(options =>
     {
         options.Filters.AddService<MvcAuditActionFilter>();
